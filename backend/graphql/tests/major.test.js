@@ -39,6 +39,17 @@ afterAll(async () => {
   await db.sequelize.close();
 });
 
+it('returns majorIds', async () => {
+  const res = await query({
+    query: gql`
+      query major {
+        majorIds
+      }
+    `,
+  });
+  expect(res).toMatchSnapshot();
+});
+
 it('gets major from majorId', async () => {
   const res = await query({
     query: gql`

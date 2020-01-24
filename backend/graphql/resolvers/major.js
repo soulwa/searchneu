@@ -1,5 +1,4 @@
 import { MajorData } from '../../database/models/index';
-import macros from '../../macros';
 
 const { UserInputError } = require('apollo-server');
 
@@ -17,15 +16,11 @@ const getLatestMajorOccurrence = async (majorId, recordType) => {
   return (response || noResultsError(recordType));
 };
 
-const getMajorIds = async () => {
-  const response = (await MajorData.findAll({ attributes: ['majorId'], raw: true })).map(major => major.majorId);
-  macros.log(response);
-  return response;
-};
-
 const resolvers = {
   Query: {
-    majorIds: (parent) => { return getMajorIds() },
+    majorIds: () => { 
+      return MajorData.findAll({ attributes: ['majorId'], raw: true }).then((majors) => majors.map(major => major.majorId));
+    },
     major: (parent, args) => { return getLatestMajorOccurrence(args.majorId, 'major'); },
   },
   Major: {

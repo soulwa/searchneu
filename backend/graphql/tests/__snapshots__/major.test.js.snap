@@ -109,3 +109,22 @@ Object {
   },
 }
 `;
+
+exports[`returns majorIds 1`] = `
+Object {
+  "data": Object {
+    "majorIds": Array [
+      "computer-information-science/computer-science/bscs",
+      "computer-information-science/computer-science/bscs",
+      "science/biochemistry/biochemistry-bs",
+    ],
+  },
+  "errors": undefined,
+  "extensions": undefined,
+  "http": Object {
+    "headers": Headers {
+      Symbol(map): Object {},
+    },
+  },
+}
+`;
