@@ -3,6 +3,7 @@ import { gql } from 'apollo-server';
 const typeDef = gql`
   extend type Query {
     major(majorId: String!): Major
+    majorIds: [String!]
   }
 
   type Major {

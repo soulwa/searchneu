@@ -9,7 +9,7 @@ const logSuccess = (result) => {
   console.log(`Congratulations! You have created the ${result.name} major!`);
 }
 
-const biochemPlansOfStudy = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'plans-2018-biochem.json')));
+const biochemPlansOfStudy = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'plans-2018-biochem.txt')));
 const biochemRequirements = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'BIOCHEMISTRY,\ BS.txt')));
 
 MajorData.create({ 
@@ -20,7 +20,7 @@ MajorData.create({
   majorId: 'science/biochemistry/biochemistry-bs' 
 }).then((result) => { logSuccess(result) });
 
-const mathPlansOfStudy = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'plans-2018-math.json')));
+const mathPlansOfStudy = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'plans-2018-math.txt')));
 const mathRequirements = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'MATHEMATICS,\ BS.txt')));
 
 MajorData.create({ 
@@ -31,7 +31,7 @@ MajorData.create({
   majorId: 'science/mathematics/mathematics-bs' 
 }).then((result) => { logSuccess(result) });
 
-const csPlansOfStudy = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'plans-2018-purecs.json')));
+const csPlansOfStudy = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'plans-2018-purecs.txt')));
 const csRequirements = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'COMPUTER\ SCIENCE,\ BSCS.txt')));
 
 MajorData.create({ 
