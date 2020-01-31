@@ -18,8 +18,8 @@ const getLatestMajorOccurrence = async (majorId, recordType) => {
 
 const resolvers = {
   Query: {
-    majorIds: () => { 
-      return MajorData.findAll({ attributes: ['majorId'], raw: true }).then((majors) => majors.map(major => major.majorId));
+    majors: () => {
+      return MajorData.findAll({ raw: true });
     },
     major: (parent, args) => { return getLatestMajorOccurrence(args.majorId, 'major'); },
   },

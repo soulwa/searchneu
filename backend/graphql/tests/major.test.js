@@ -39,11 +39,13 @@ afterAll(async () => {
   await db.sequelize.close();
 });
 
-it('returns majorIds', async () => {
+it('gives all majorIds when requested', async () => {
   const res = await query({
     query: gql`
-      query major {
-        majorIds
+      query majors {
+        majors {
+          majorId
+        }
       }
     `,
   });
