@@ -58,63 +58,10 @@ class Updater {
 
     users = Object.values(users);
 
-    let classHashes = [];
-    let sectionHashes = [];
 
-    const sectionHashToUsers = {};
-    const classHashToUsers = {};
-
-    for (const user of users) {
-      if (!user.facebookMessengerId) {
-        macros.warn('User has no FB id?', JSON.stringify(user));
-        continue;
-      }
-
-      // Firebase, for some reason, strips leading 0s from the Facebook messenger id.
-      // Add them back here.
-      while (user.facebookMessengerId.length < 16) {
-        user.facebookMessengerId = `0${user.facebookMessengerId}`;
-      }
-
-
-      if (!user.watchingClasses) {
-        user.watchingClasses = [];
-      }
-
-      if (!user.watchingSections) {
-        user.watchingSections = [];
-      }
-
-      // When an item is deleted from an array in firebase, firebase dosen't shift the rest of the items down one index.
-      // Instead, it adds an undefined item to the array.
-      // This removes any possible undefined items from the array.
-      // The warnings can be added back when unsubscribing is done with code.
-      _.pull(user.watchingClasses, null);
-      _.pull(user.watchingSections, null);
-
-      classHashes = classHashes.concat(user.watchingClasses);
-      sectionHashes = sectionHashes.concat(user.watchingSections);
-
-      for (const classHash of user.watchingClasses) {
-        if (!classHashToUsers[classHash]) {
-          classHashToUsers[classHash] = [];
-        }
-
-        classHashToUsers[classHash].push(user.facebookMessengerId);
-      }
-
-      for (const sectionHash of user.watchingSections) {
-        if (!sectionHashToUsers[sectionHash]) {
-          sectionHashToUsers[sectionHash] = [];
-        }
-
-        sectionHashToUsers[sectionHash].push(user.facebookMessengerId);
-      }
-    }
-
-    // Remove duplicates. This will occur if multiple people are watching the same class.
-    classHashes = _(classHashes).uniq().compact();
-    sectionHashes = _(sectionHashes).uniq().compact();
+    const {
+      classHashes, sectionHashes, sectionHashToUsers, classHashToUsers,
+    } = this.getWatchedItemsFromUsers(users);
 
     macros.log('watching classes ', classHashes.size());
 
@@ -122,39 +69,11 @@ class Updater {
     const esOldDocs = await elastic.getMapFromIDs(elastic.CLASS_INDEX, classHashes);
 
     const oldWatchedClasses = _.mapValues(esOldDocs, (doc) => { return doc.class; });
-    const oldWatchedSections = {};
-    for (const aClass of Object.values(esOldDocs)) {
-      for (const section of aClass.sections) {
-        oldWatchedSections[Keys.getSectionHash(section)] = section;
-      }
-    }
 
-    // Track all section hashes of classes that are being watched. Used for sanity check
-    const sectionHashesOfWatchedClasses = Object.keys(oldWatchedSections);
+    const oldWatchedSections = this.extractOldWatchedSections(esOldDocs);
+    this.checkSectionsWithoutClasses(oldWatchedSections, sectionHashes);
 
-    // Sanity check: Find the sections that are being watched, but are not part of a watched class
-    for (const sectionHash of _.difference(sectionHashes, sectionHashesOfWatchedClasses)) {
-      macros.warn('Section', sectionHash, "is being watched but it's class is not being watched?");
-    }
-
-    // Scrape the latest data
-    const promises = Object.values(oldWatchedClasses).map((aClass) => {
-      return ellucianCatalogParser.main(aClass.prettyUrl).then((newClass) => {
-        if (!newClass) {
-          // TODO: This should be changed into a notification that the class probably no longer exists. Shoudn't unsubscribe people.
-          macros.warn('New class data is null?', aClass.prettyUrl, aClass);
-          return null;
-        }
-
-
-        // Copy over some fields that are not scraped from this scraper.
-        newClass.value.host = aClass.host;
-        newClass.value.termId = aClass.termId;
-        newClass.value.subject = aClass.subject;
-
-        return newClass;
-      });
-    });
+    const promises = this.scrapeLatestData(oldWatchedClasses);
 
     // Remove the instances where newClass was null
     _.pull(promises, null);
@@ -196,6 +115,115 @@ class Updater {
     // The key is the facebookMessengerId and the value is a list of messages.
     const userToMessageMap = {};
 
+    this.newSectionAddedToClassMessages(output, oldWatchedClasses, classHashToUsers, userToMessageMap);
+    this.seatsOpenedUpMessages(output, oldWatchedSections, sectionHashToUsers, classHashToUsers, userToMessageMap);
+
+    const classMap = {};
+    this.updateCRNsAndSections(output, classMap);
+    await elastic.bulkUpdateFromMap(elastic.CLASS_INDEX, classMap);
+
+
+    // Loop through the messages and send them.
+    // Do this as the very last stage on purpose.
+    // If something crashes/breaks above, the new data is saved to the database
+    // and does not cause a notification to be sent to users every five minutes
+    // (because the new data will be saved, the next time this runs it will compare against the new data)
+    // If this is ran before the data is saved, this could happen:
+    // Fetch new data -> send notification -> crash (repeat), and never save the updated data.
+    this.sendMessages(userToMessageMap);
+
+
+    const totalTime = Date.now() - startTime;
+
+    macros.log('Done running updater onInterval. It took', totalTime, 'ms.');
+
+    macros.logAmplitudeEvent('Updater', {
+      totalTime: totalTime,
+    });
+  }
+
+
+  sendMessages(userToMessageMap) {
+    for (const fbUserId of Object.keys(userToMessageMap)) {
+      for (const message of userToMessageMap[fbUserId]) {
+        notifyer.sendFBNotification(fbUserId, message);
+      }
+      setTimeout(((facebookUserId) => {
+        notifyer.sendFBNotification(facebookUserId, 'Reply with "stop" to unsubscribe from notifications.');
+      }).bind(this, fbUserId), 100);
+
+      macros.logAmplitudeEvent('Facebook message sent out', {
+        toUser: fbUserId,
+        messages: userToMessageMap[fbUserId],
+        messageCount: userToMessageMap[fbUserId].length,
+      });
+    }
+  }
+
+
+  updateCRNsAndSections(output, classMap) {
+    for (const aClass of output.classes) {
+      const associatedSections = output.sections.filter((s) => {
+        return aClass.crns.includes(s.crn);
+      });
+      // Sort each classes section by crn.
+      // This will keep the sections the same between different scrapings.
+      if (associatedSections.length > 1) {
+        associatedSections.sort((a, b) => {
+          return a.crn > b.crn;
+        });
+      }
+      classMap[Keys.getClassHash(aClass)] = {
+        class: {
+          crns: aClass.crns,
+        },
+        sections: associatedSections,
+      };
+    }
+  }
+
+  seatsOpenedUpMessages(output, oldWatchedSections, sectionHashToUsers, classHashToUsers, userToMessageMap) {
+    for (const newSection of output.sections) {
+      const hash = Keys.getSectionHash(newSection);
+      const oldSection = oldWatchedSections[hash];
+
+      // This may run in the odd chance that that the following 3 things happen:
+      // 1. a user signes up for a section.
+      // 2. the section dissapears (eg. it is removed from Banner).
+      // 3. the section re appears again.
+      // If this happens just ignore it for now, but the best would probably to be notifiy if there are seats open now
+      if (!oldSection) {
+        macros.warn('Section was added?', hash, newSection, sectionHashToUsers, classHashToUsers);
+        continue;
+      }
+
+      let message;
+
+      if (newSection.seatsRemaining > 0 && oldSection.seatsRemaining <= 0) {
+        // See above comment about space before the exclamation mark.
+        message = `A seat opened up in ${newSection.subject} ${newSection.classId} (CRN: ${newSection.crn}). Check it out at https://searchneu.com/${newSection.termId}/${newSection.subject}${newSection.classId} !`;
+      } else if (newSection.waitRemaining > 0 && oldSection.waitRemaining <= 0) {
+        message = `A waitlist seat opened up in ${newSection.subject} ${newSection.classId} (CRN: ${newSection.crn}). Check it out at https://searchneu.com/${newSection.termId}/${newSection.subject}${newSection.classId} !`;
+      }
+
+      if (message) {
+        const usersToMessage = sectionHashToUsers[hash];
+        if (!usersToMessage) {
+          continue;
+        }
+
+        for (const user of usersToMessage) {
+          if (!userToMessageMap[user]) {
+            userToMessageMap[user] = [];
+          }
+
+          userToMessageMap[user].push(message);
+        }
+      }
+    }
+  }
+
+  newSectionAddedToClassMessages(output, oldWatchedClasses, classHashToUsers, userToMessageMap) {
     for (const aNewClass of output.classes) {
       const hash = Keys.getClassHash(aNewClass);
 
@@ -242,96 +270,113 @@ class Updater {
         }
       }
     }
+  }
 
-    for (const newSection of output.sections) {
-      const hash = Keys.getSectionHash(newSection);
-      const oldSection = oldWatchedSections[hash];
+  scrapeLatestData(oldWatchedClasses) {
+    const promises = Object.values(oldWatchedClasses)
+      .map((aClass) => {
+        return ellucianCatalogParser.main(aClass.prettyUrl)
+          .then((newClass) => {
+            if (!newClass) {
+              // TODO: This should be changed into a notification that the class probably no longer exists. Shoudn't unsubscribe people.
+              macros.warn('New class data is null?', aClass.prettyUrl, aClass);
+              return null;
+            }
 
-      // This may run in the odd chance that that the following 3 things happen:
-      // 1. a user signes up for a section.
-      // 2. the section dissapears (eg. it is removed from Banner).
-      // 3. the section re appears again.
-      // If this happens just ignore it for now, but the best would probably to be notifiy if there are seats open now
-      if (!oldSection) {
-        macros.warn('Section was added?', hash, newSection, sectionHashToUsers, classHashToUsers);
+
+            // Copy over some fields that are not scraped from this scraper.
+            newClass.value.host = aClass.host;
+            newClass.value.termId = aClass.termId;
+            newClass.value.subject = aClass.subject;
+
+            return newClass;
+          });
+      });
+    return promises;
+  }
+
+  checkSectionsWithoutClasses(oldWatchedSections, sectionHashes) {
+    // Track all section hashes of classes that are being watched. Used for sanity check
+    const sectionHashesOfWatchedClasses = Object.keys(oldWatchedSections);
+
+    // Sanity check: Find the sections that are being watched, but are not part of a watched class
+    for (const sectionHash of _.difference(sectionHashes, sectionHashesOfWatchedClasses)) {
+      macros.warn('Section', sectionHash, 'is being watched but it\'s class is not being watched?');
+    }
+  }
+
+  extractOldWatchedSections(esOldDocs) {
+    const oldWatchedSections = {};
+    for (const aClass of Object.values(esOldDocs)) {
+      for (const section of aClass.sections) {
+        oldWatchedSections[Keys.getSectionHash(section)] = section;
+      }
+    }
+    return oldWatchedSections;
+  }
+
+
+  /**
+   *
+   * @param users
+   * @returns {{sectionHashes: [], classHashToUsers: {}, classHashes: [], sectionHashToUsers: {}}}
+   */
+  getWatchedItemsFromUsers(users) {
+    let classHashes = [];
+    let sectionHashes = [];
+
+    const sectionHashToUsers = {};
+    const classHashToUsers = {};
+
+    for (const user of users) {
+      if (!user.facebookMessengerId) {
+        macros.warn('User has no FB id?', JSON.stringify(user));
         continue;
       }
 
-      let message;
+      // Firebase, for some reason, strips leading 0s from the Facebook messenger id.
+      // Add them back here.
+      user.facebookMessengerId.padStart(16, '0');
 
-      if (newSection.seatsRemaining > 0 && oldSection.seatsRemaining <= 0) {
-        // See above comment about space before the exclamation mark.
-        message = `A seat opened up in ${newSection.subject} ${newSection.classId} (CRN: ${newSection.crn}). Check it out at https://searchneu.com/${newSection.termId}/${newSection.subject}${newSection.classId} !`;
-      } else if (newSection.waitRemaining > 0 && oldSection.waitRemaining <= 0) {
-        message = `A waitlist seat opened up in ${newSection.subject} ${newSection.classId} (CRN: ${newSection.crn}). Check it out at https://searchneu.com/${newSection.termId}/${newSection.subject}${newSection.classId} !`;
-      }
+      user.watchingClasses = user.watchingClasses || [];
+      user.watchingSections = user.watchingSections || [];
 
-      if (message) {
-        const usersToMessage = sectionHashToUsers[hash];
-        if (!usersToMessage) {
-          continue;
+      // When an item is deleted from an array in firebase, firebase dosen't shift the rest of the items down one index.
+      // Instead, it adds an undefined item to the array.
+      // This removes any possible undefined items from the array.
+      // The warnings can be added back when unsubscribing is done with code.
+      _.pull(user.watchingClasses, null);
+      _.pull(user.watchingSections, null);
+
+      classHashes = classHashes.concat(user.watchingClasses);
+      sectionHashes = sectionHashes.concat(user.watchingSections);
+
+      for (const classHash of user.watchingClasses) {
+        if (!classHashToUsers[classHash]) {
+          classHashToUsers[classHash] = [];
         }
 
-        for (const user of usersToMessage) {
-          if (!userToMessageMap[user]) {
-            userToMessageMap[user] = [];
-          }
+        classHashToUsers[classHash].push(user.facebookMessengerId);
+      }
 
-          userToMessageMap[user].push(message);
+      for (const sectionHash of user.watchingSections) {
+        if (!sectionHashToUsers[sectionHash]) {
+          sectionHashToUsers[sectionHash] = [];
         }
+
+        sectionHashToUsers[sectionHash].push(user.facebookMessengerId);
       }
     }
 
-    const classMap = {};
-    for (const aClass of output.classes) {
-      const associatedSections = output.sections.filter((s) => { return aClass.crns.includes(s.crn); });
-      // Sort each classes section by crn.
-      // This will keep the sections the same between different scrapings.
-      if (associatedSections.length > 1) {
-        associatedSections.sort((a, b) => {
-          return a.crn > b.crn;
-        });
-      }
-      classMap[Keys.getClassHash(aClass)] = {
-        class: {
-          crns: aClass.crns,
-        },
-        sections: associatedSections,
-      };
-    }
-    await elastic.bulkUpdateFromMap(elastic.CLASS_INDEX, classMap);
-
-
-    // Loop through the messages and send them.
-    // Do this as the very last stage on purpose.
-    // If something crashes/breaks above, the new data is saved to the database
-    // and does not cause a notification to be sent to users every five minutes
-    // (because the new data will be saved, the next time this runs it will compare against the new data)
-    // If this is ran before the data is saved, this could happen:
-    // Fetch new data -> send notification -> crash (repeat), and never save the updated data.
-    for (const fbUserId of Object.keys(userToMessageMap)) {
-      for (const message of userToMessageMap[fbUserId]) {
-        notifyer.sendFBNotification(fbUserId, message);
-      }
-      setTimeout(((facebookUserId) => {
-        notifyer.sendFBNotification(facebookUserId, 'Reply with "stop" to unsubscribe from notifications.');
-      }).bind(this, fbUserId), 100);
-
-      macros.logAmplitudeEvent('Facebook message sent out', {
-        toUser: fbUserId,
-        messages: userToMessageMap[fbUserId],
-        messageCount: userToMessageMap[fbUserId].length,
-      });
-    }
-
-
-    const totalTime = Date.now() - startTime;
-
-    macros.log('Done running updater onInterval. It took', totalTime, 'ms.');
-
-    macros.logAmplitudeEvent('Updater', {
-      totalTime: totalTime,
-    });
+    // Remove duplicates. This will occur if multiple people are watching the same class.
+    classHashes = _(classHashes).uniq().compact();
+    sectionHashes = _(sectionHashes).uniq().compact();
+    return {
+      classHashes: classHashes,
+      sectionHashes: sectionHashes,
+      sectionHashToUsers: sectionHashToUsers,
+      classHashToUsers: classHashToUsers,
+    };
   }
 }
 

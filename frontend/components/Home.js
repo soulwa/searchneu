@@ -470,7 +470,7 @@ class Home extends React.Component {
                     {this.state.searchQuery}
                   </p>
                 </div>
-                  &nbsp;on Google
+                &nbsp;on Google
               </a>
               ?
             </div>
@@ -578,7 +578,7 @@ class Home extends React.Component {
       attentionSection = (
         <div style={ actionCenterStyle } className='atentionContainer'>
           <p className='helpFistRow' />
-            Help improve Search NEU
+          Help improve Search NEU
           <p>
             <a href='https://forms.gle/HNJ1AWTCXnu3XovKA' target='_blank' rel='noopener noreferrer' className={ `getInvolvedText ${hiddenHelpButton}` }>
               Take our survey

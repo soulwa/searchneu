@@ -18,7 +18,8 @@ const request = new Request('bannerv9Parser');
  */
 class Bannerv9Parser {
   async main(termsUrl) {
-    const termIds = (await this.getTermList(termsUrl)).map((t) => { return t.termId; });
+    let termIds = (await this.getTermList(termsUrl)).map((t) => { return t.termId; });
+    termIds = [termIds[0]];
     const suffixes = ['10', '30', '40', '50', '60'];
     const undergradIds = termIds.filter((t) => { return suffixes.includes(t.slice(-2)); });
     return this.scrapeTerms(undergradIds.slice(0, 4));

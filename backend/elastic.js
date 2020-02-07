@@ -35,13 +35,20 @@ class Elastic {
    * @param  {Object} mapping   The new elasticsearch index mapping(schema)
    */
   async resetIndex(indexName, mapping) {
-    // Clear out the index.
-    await client.indices.delete({ index: indexName }).catch(() => {});
+
+    //Clear out the index.
+    await client.indices.delete({ index: indexName })
+      .catch(() => {
+        macros.error('There seems to be a problem deleting your indices. Check your ES version?');
+      });
+
+
     // Put in the new classes mapping (elasticsearch doesn't let you change mapping of existing index)
     await client.indices.create({
       index: indexName,
       body: mapping,
     });
+
   }
 
   /**
