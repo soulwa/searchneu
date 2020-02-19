@@ -2,14 +2,20 @@ import { ApolloServer, gql } from 'apollo-server-express';
 import GraphQLJSON, { GraphQLJSONObject } from 'graphql-type-json';
 import macros from '../macros';
 
+import connectionTypeDef from './typeDefs/connection';
+
 import classResolvers from './resolvers/class';
 import classTypeDef from './typeDefs/class';
 import classOccurrenceTypeDef from './typeDefs/classOccurrence';
+
+import employeeTypeDef from './typeDefs/employee';
 
 import majorResolvers from './resolvers/major';
 import majorTypeDef from './typeDefs/major';
 import majorOccurrenceTypeDef from './typeDefs/majorOccurrence';
 
+import searchResolvers from './resolvers/search';
+import searchTypeDef from './typeDefs/search';
 
 // Enable JSON custom type
 const JSONResolvers = {
@@ -28,8 +34,8 @@ const baseQuery = gql`
 `;
 
 const server = new ApolloServer({
-  typeDefs: [baseQuery, classTypeDef, classOccurrenceTypeDef, majorTypeDef, majorOccurrenceTypeDef],
-  resolvers: [JSONResolvers, classResolvers, majorResolvers],
+  typeDefs: [baseQuery, connectionTypeDef, classTypeDef, classOccurrenceTypeDef, employeeTypeDef, majorTypeDef, majorOccurrenceTypeDef, searchTypeDef],
+  resolvers: [JSONResolvers, classResolvers, majorResolvers, searchResolvers],
 });
 
 if (require.main === module) {
