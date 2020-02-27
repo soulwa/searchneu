@@ -6,9 +6,7 @@
 import _ from 'lodash';
 
 import elastic from './elastic';
-
 import classesScrapers from './scrapers/classes/main';
-
 import macros from './macros';
 import database from './database';
 import Keys from '../common/Keys';
@@ -29,12 +27,10 @@ class Updater {
       try {
         this.onInterval();
       } catch (e) {
-        // noinspection JSIgnoredPromiseFromCall
         macros.warn('Updater failed with :', e);
       }
     }, intervalTime);
   }
-
 
   static create() {
     return new this();
@@ -63,14 +59,12 @@ class Updater {
     const oldWatchedClasses = _.mapValues(esOldDocs, (doc) => { return doc.class; });
 
     const oldWatchedSections = this.extractOldWatchedSections(esOldDocs);
-    this.checkSectionsWithoutClasses(oldWatchedSections, sectionHashes);
+    this.ensureSectionsAndClassesExist(oldWatchedSections, sectionHashes);
 
     // Access the URLs from these objects and use them to scrape the latest data about these classes
-    const promises = this.scrapeLatestData(oldWatchedClasses);
-    _.pull(promises, null);
+    const promises = _.without(this.scrapeLatestData(oldWatchedClasses), null);
 
     let allParsersOutput;
-
     try {
       allParsersOutput = await Promise.all(promises);
       // Remove any instances where the output was null.
@@ -89,8 +83,7 @@ class Updater {
     };
 
     // Because ellucianCatalogParser returns a list of classes, instead of a singular class, we need to run it on all of them
-    const output = classesScrapers.restructureData(rootNode);
-    this.verifySectionsClassesDefined(output);
+    const output = this.verifySectionsClassesAreDefined(classesScrapers.restructureData(rootNode));
 
     // Compare with the existing data
     classesScrapers.runProcessors(output);
@@ -123,7 +116,10 @@ class Updater {
     await elastic.bulkUpdateFromMap(elastic.CLASS_INDEX, classMap);
   }
 
-  verifySectionsClassesDefined(output) {
+  /**
+   * If sections/classes are undefined in output, sets a default value of empty array
+   */
+  verifySectionsClassesAreDefined(output) {
     if (!output.sections) {
       output.sections = [];
     }
@@ -152,6 +148,7 @@ class Updater {
       for (const message of userToMessageMap[fbUserId]) {
         notifyer.sendFBNotification(fbUserId, message);
       }
+
       setTimeout(((facebookUserId) => {
         notifyer.sendFBNotification(facebookUserId, 'Reply with "stop" to unsubscribe from notifications.');
       }).bind(this, fbUserId), 100);
@@ -167,9 +164,10 @@ class Updater {
 
   updateCRNsAndSections(output, classMap) {
     for (const aClass of output.classes) {
-      const associatedSections = output.sections.filter((s) => {
-        return aClass.crns.includes(s.crn);
+      const associatedSections = output.sections.filter((section) => {
+        return aClass.crns.includes(section.crn);
       });
+
       // Sort each classes section by crn.
       // This will keep the sections the same between different scrapings.
       if (associatedSections.length > 1) {
@@ -177,6 +175,7 @@ class Updater {
           return a.crn > b.crn;
         });
       }
+
       classMap[Keys.getClassHash(aClass)] = {
         class: {
           crns: aClass.crns,
@@ -297,7 +296,7 @@ class Updater {
       });
   }
 
-  checkSectionsWithoutClasses(oldWatchedSections, sectionHashes) {
+  ensureSectionsAndClassesExist(oldWatchedSections, sectionHashes) {
     // Track all section hashes of classes that are being watched. Used for sanity check
     const sectionHashesOfWatchedClasses = Object.keys(oldWatchedSections);
 
