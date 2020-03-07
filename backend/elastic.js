@@ -219,13 +219,115 @@ class Elastic {
   }
 
   /**
-   * Search for classes and employees
-   * @param  {string}  query  The search to query for
-   * @param  {string}  termId The termId to look within
-   * @param  {integer} min    The index of first document to retreive
-   * @param  {integer} max    The index of last document to retreive
+   * Remove any invalid filter with the following criteria:
+   * 1. Correct key string and value type;
+   * 2. Check that { online: false } should never be in filters
+   *
+   * A sample filters JSON object has the following format:
+   * { 'NUpath': string[],
+   *   'college': string[],
+   *   'subject': string[],
+   *   'online': boolean,
+   *   'classType': string }
+   *
+   * @param {object} filters The json object represting all filters on classes
    */
-  async search(query, termId, min, max) {
+  validateFilters(filters) {
+    const isString = (givenVar) => {
+      return typeof givenVar === 'string';
+    };
+
+    const isStringArray = (givenVar) => {
+      return Array.isArray(givenVar) && givenVar.every((eachVar) => isString(eachVar));
+    };
+
+    const isTrue = (givenVar) => {
+      return typeof givenVar === 'boolean' && givenVar;
+    };
+
+    const validFiltersFormat = {
+      NUpath: isStringArray,
+      college: isStringArray,
+      subject: isStringArray,
+      online: isTrue,
+      classType: isString,
+    };
+
+    const validFilters = {};
+    for (const [filterKey, filterValues] of Object.entries(filters)) {
+      if (!(filterKey in validFiltersFormat)) {
+        macros.log('Invalid filter key.', filterKey);
+      } else if (!(validFiltersFormat[filterKey](filterValues))) {
+        macros.log('Invalid filter value type.', filterKey);
+      } else {
+        validFilters[filterKey] = filterValues;
+      }
+    }
+    return validFilters;
+  }
+
+  /**
+   * Get elasticsearch query from json filters and termId
+   * @param  {string}  termId  The termId to look within
+   * @param  {object}  filters The json object representing all filters on classes
+   */
+  getClassFilterQuery(termId, filters) {
+    const hasSectionsFilter = { exists: { field: 'sections' } };
+
+    const termFilter = { term: { 'class.termId': termId } };
+
+    const getNUpathFilter = (selectedNUpaths) => {
+      const NUpathFilters = selectedNUpaths.map((eachNUpath) => ({ match_phrase: { 'class.classAttributes': eachNUpath } }));
+      return { bool: { should: NUpathFilters } };
+    };
+
+    const getCollegeFilter = (selectedColleges) => {
+      const collegeFilters = selectedColleges.map((eachCollege) => ({ match_phrase: { 'class.classAttributes': eachCollege } }));
+      return { bool: { should: collegeFilters } };
+    };
+
+    const getSubjectFilter = (selectedSubjects) => {
+      const subjectFilters = selectedSubjects.map((eachSubject) => ({ match: { 'class.subject': eachSubject } }));
+      return { bool: { should: subjectFilters } };
+    };
+
+    // note that { online: false } is never in filters
+    const getOnlineFilter = (selectedOnlineOption) => {
+      return { term: { 'sections.online': selectedOnlineOption } };
+    };
+
+    const getClassTypeFilter = (selectedClassType) => {
+      return { match: { 'class.scheduleType': selectedClassType } };
+    };
+
+    // construct compound class filters (fliters joined by AND (must), options for a filter joined by OR (should))
+    const filterToEsQuery = {
+      NUpath: getNUpathFilter,
+      college: getCollegeFilter,
+      subject: getSubjectFilter,
+      online: getOnlineFilter,
+      classType: getClassTypeFilter,
+    };
+
+    const classFilters = [hasSectionsFilter, termFilter];
+    for (const [filterKey, filterValues] of Object.entries(filters)) {
+      if (filterKey in filterToEsQuery) {
+        classFilters.push(filterToEsQuery[filterKey](filterValues));
+      }
+    }
+
+    return { bool:{ must: classFilters } };
+  }
+
+  /**
+   * Search for classes and employees
+   * @param  {string}  query   The search to query for
+   * @param  {string}  termId  The termId to look within
+   * @param  {integer} min     The index of first document to retreive
+   * @param  {integer} max     The index of last document to retreive
+   * @param  {object}  filters The json object representing all filters on classes
+   */
+  async search(query, termId, min, max, filters = {}) {
     if (!this.subjects) {
       this.subjects = new Set(await this.getSubjectsFromClasses());
     }
@@ -250,44 +352,50 @@ class Elastic {
       fields = ['class.subject^10', 'class.classId'];
     }
 
-    const searchOutput = await client.search({
+    // get compound class filters
+    const validFilters = this.validateFilters(filters);
+    const classFilters = this.getClassFilterQuery(termId, validFilters);
+
+    // text query from the main search box
+    const matchTextQuery = {
+      multi_match: {
+        query: query,
+        type: 'most_fields', // More fields match => higher score
+        fuzziness: 'AUTO',
+        fields: fields,
+      },
+    };
+
+    // use lower classId has tiebreaker after relevance
+    const sortByClassId = { 'class.classId.keyword': { order: 'asc', unmapped_type: 'keyword' } };
+
+    // filter by type employee
+    const isEmployee = { term: { type: 'employee' } };
+
+    // compound query for text query and filters
+    const mainQuery = {
       index: `${this.EMPLOYEE_INDEX},${this.CLASS_INDEX}`,
       from: min,
       size: max - min,
       body: {
-        sort: [
-          '_score',
-          { 'class.classId.keyword': { order: 'asc', unmapped_type: 'keyword' } }, // Use lower classId has tiebreaker after relevance
-        ],
+        sort: ['_score', sortByClassId],
         query: {
           bool: {
-            must: {
-              multi_match: {
-                query: query,
-                type: 'most_fields', // More fields match => higher score
-                fuzziness: 'AUTO',
-                fields: fields,
-              },
-            },
+            must: matchTextQuery,
             filter: {
               bool: {
                 should: [
-                  {
-                    bool:{
-                      must: [
-                        { exists: { field: 'sections' } },
-                        { term: { 'class.termId': termId } },
-                      ],
-                    },
-                  },
-                  { term: { type: 'employee' } },
+                  classFilters,
+                  isEmployee,
                 ],
               },
             },
           },
         },
       },
-    });
+    };
+
+    const searchOutput = await client.search(mainQuery);
 
     return {
       searchContent: searchOutput.body.hits.hits.map((hit) => { return { ...hit._source, score: hit._score }; }),

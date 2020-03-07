@@ -237,7 +237,27 @@ app.get('/search', wrap(async (req, res) => {
     return;
   }
 
-  const { searchContent, took, resultCount } = await elastic.search(req.query.query, req.query.termId, req.query.minIndex, req.query.maxIndex);
+  let filters = {};
+  if (req.query.filters) {
+    // Ensure filters is a string
+    if (typeof req.query.filters !== 'string') {
+      macros.log('Invalid filters.', req.filters);
+      res.send(JSON.stringify({
+        error: 'Invalid filters.',
+      }));
+    } else {
+      try {
+        filters = JSON.parse(req.query.filters);
+      } catch (e) {
+        macros.log('Invalid filters JSON.', req.filters);
+        res.send(JSON.stringify({
+          error: 'Invalid filters.',
+        }));
+      }
+    }
+  }
+
+  const { searchContent, took, resultCount } = await elastic.search(req.query.query, req.query.termId, req.query.minIndex, req.query.maxIndex, filters);
   const midTime = Date.now();
 
   let string;
