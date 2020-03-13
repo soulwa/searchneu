@@ -8,6 +8,7 @@ import Home from './pages/Home';
 import Results from './pages/Results';
 import 'semantic-ui-css/semantic.min.css';
 import '../css/base.scss';
+import ToggleSwitch from './ToggleSwitch';
 
 
 export default function App() {
@@ -18,7 +19,7 @@ export default function App() {
           <Results />
         </Route>
         <Route path='/:termId?'>
-          <Home />
+          <ToggleSwitch />
         </Route>
       </Switch>
       <Route
