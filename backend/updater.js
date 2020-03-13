@@ -4,14 +4,16 @@
  */
 
 import _ from 'lodash';
+import { Op } from 'sequelize';
 
 import elastic from './elastic';
 
 import Bannerv9Parser from './scrapers/classes/parsersxe/bannerv9Parser';
 import macros from './macros';
-import database from './database';
 import Keys from '../common/Keys';
 import notifyer from './notifyer';
+import dumpProcessor from './dumpProcessor';
+import { Course, sequelize } from './database/models/index';
 
 
 class Updater {
@@ -50,79 +52,34 @@ class Updater {
     macros.log('updating');
     const startTime = Date.now();
 
-    let users = await database.get('users');
-    if (!users) {
+    const classHashToUsers = {};
+    const sectionHashToUsers = {};
+
+    (await sequelize.query('SELECT "courseId", ARRAY_AGG("userId") FROM "FollowedCourses" GROUP BY "courseId"', { type: sequelize.QueryTypes.SELECT }))
+      .forEach((classHash) => {
+        classHashToUsers[classHash.courseId] = classHash.array_agg;
+      });
+
+    (await sequelize.query('SELECT "sectionId", ARRAY_AGG("userId") FROM "FollowedSections" GROUP BY "sectionId"', { type: sequelize.QueryTypes.SELECT }))
+      .forEach((sectionHash) => {
+        sectionHashToUsers[sectionHash.sectionId] = sectionHash.array_agg;
+      });
+
+    const classHashes = Object.keys(classHashToUsers);
+    const sectionHashes = Object.keys(sectionHashToUsers);
+
+    if (classHashes.length === 0 && sectionHashes.length === 0) {
       return;
     }
 
-    users = Object.values(users);
-
-    let classHashes = [];
-    let sectionHashes = [];
-
-    const sectionHashToUsers = {};
-    const classHashToUsers = {};
-
-    for (const user of users) {
-      if (!user.facebookMessengerId) {
-        macros.warn('User has no FB id?', JSON.stringify(user));
-        continue;
-      }
-
-      // Firebase, for some reason, strips leading 0s from the Facebook messenger id.
-      // Add them back here.
-      while (user.facebookMessengerId.length < 16) {
-        user.facebookMessengerId = `0${user.facebookMessengerId}`;
-      }
-
-
-      if (!user.watchingClasses) {
-        user.watchingClasses = [];
-      }
-
-      if (!user.watchingSections) {
-        user.watchingSections = [];
-      }
-
-      // When an item is deleted from an array in firebase, firebase dosen't shift the rest of the items down one index.
-      // Instead, it adds an undefined item to the array.
-      // This removes any possible undefined items from the array.
-      // The warnings can be added back when unsubscribing is done with code.
-      _.pull(user.watchingClasses, null);
-      _.pull(user.watchingSections, null);
-
-      classHashes = classHashes.concat(user.watchingClasses);
-      sectionHashes = sectionHashes.concat(user.watchingSections);
-
-      for (const classHash of user.watchingClasses) {
-        if (!classHashToUsers[classHash]) {
-          classHashToUsers[classHash] = [];
-        }
-
-        classHashToUsers[classHash].push(user.facebookMessengerId);
-      }
-
-      for (const sectionHash of user.watchingSections) {
-        if (!sectionHashToUsers[sectionHash]) {
-          sectionHashToUsers[sectionHash] = [];
-        }
-
-        sectionHashToUsers[sectionHash].push(user.facebookMessengerId);
-      }
-    }
-
-    // Remove duplicates. This will occur if multiple people are watching the same class.
-    classHashes = _(classHashes).uniq().compact();
-    sectionHashes = _(sectionHashes).uniq().compact();
-
-    macros.log('watching classes ', classHashes.size());
+    macros.log('watching classes ', classHashes.length);
 
     // Get the old data for watched classes
-    const esOldDocs = await elastic.getMapFromIDs(elastic.CLASS_INDEX, classHashes);
+    const oldDocs = await Course.bulkJSON(await Course.findAll({ where: { id: { [Op.in]: classHashes } } }));
 
-    const oldWatchedClasses = _.mapValues(esOldDocs, (doc) => { return { sections: doc.sections, ...doc.class }; });
+    const oldWatchedClasses = _.mapValues(oldDocs, (doc) => { return doc.class; });
     const oldWatchedSections = {};
-    for (const aClass of Object.values(esOldDocs)) {
+    for (const aClass of Object.values(oldDocs)) {
       for (const section of aClass.sections) {
         oldWatchedSections[Keys.getSectionHash(section)] = section;
       }
@@ -275,7 +232,7 @@ class Updater {
       };
     }
     await elastic.bulkUpdateFromMap(elastic.CLASS_INDEX, classMap);
-
+    await dumpProcessor.main({ termDump: output });
 
     // Loop through the messages and send them.
     // Do this as the very last stage on purpose.

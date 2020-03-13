@@ -16,6 +16,8 @@ module.exports = (sequelize, DataTypes) => {
     url: DataTypes.STRING,
     crn: DataTypes.STRING,
     meetings: DataTypes.JSON,
+    info: DataTypes.TEXT,
+    profs: DataTypes.ARRAY(DataTypes.STRING),
   });
 
   Section.associate = (models) => {

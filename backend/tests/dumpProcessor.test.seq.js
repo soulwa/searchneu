@@ -26,7 +26,7 @@ afterAll(async () => {
 
 it('does not create records if dump is empty', async () => {
   const prevCounts = Promise.all([Professor.count(), Course.count(), Section.count()]);
-  await dumpProcessor.main({ classes: [], sections: [] }, {});
+  await dumpProcessor.main({ termDump: { classes: [], sections: [] } });
   expect(Promise.all([Professor.count(), Course.count(), Section.count()])).toEqual(prevCounts);
 });
 
@@ -75,7 +75,7 @@ describe('with professors', () => {
       },
     };
 
-    await dumpProcessor.main({ classes: [], sections: [] }, profDump);
+    await dumpProcessor.main({ termDump: { classes: [], sections: [] }, profDump: profDump });
     expect(await Professor.count()).toEqual(3);
   });
 });
@@ -99,6 +99,7 @@ describe('with classes', () => {
           prereqsFor: { type: 'and', values: [] },
           optPrereqsFor: { type: 'and', values: [] },
           classAttributes: ['fun intro'],
+          lastUpdateTime: 123456789,
         },
         {
           id: 'neu.edu/202030/CS/2510',
@@ -113,6 +114,7 @@ describe('with classes', () => {
           coreqs: { type: 'and', values: [] },
           prereqsFor: { type: 'and', values: [] },
           optPrereqsFor: { type: 'and', values: [] },
+          lastUpdateTime: 123456789,
         },
         {
           id: 'neu.edu/202030/CS/3500',
@@ -123,11 +125,12 @@ describe('with classes', () => {
           name: 'Object-Oriented Design',
           termId: '202030',
           subject: 'CS',
+          lastUpdateTime: 123456789,
         },
       ],
     };
 
-    await dumpProcessor.main(termDump, {});
+    await dumpProcessor.main({ termDump: termDump });
     expect(await Course.count()).toEqual(3);
   });
 });
@@ -142,6 +145,7 @@ describe('with sections', () => {
       name: 'Object-Oriented Design',
       termId: '202030',
       subject: 'CS',
+      lastUpdateTime: 123456789,
     });
   });
 
@@ -190,7 +194,7 @@ describe('with sections', () => {
       ],
     };
 
-    await dumpProcessor.main(termDump, {});
+    await dumpProcessor.main({ termDump: termDump });
     expect(await Section.count()).toEqual(3);
   });
 });
@@ -205,6 +209,7 @@ describe('with updates', () => {
       name: 'Object-Oriented Design',
       termId: '202030',
       subject: 'CS',
+      lastUpdateTime: 123456789,
     });
 
     await Section.create({
@@ -231,11 +236,12 @@ describe('with updates', () => {
           name: 'Compilers',
           termId: '202030',
           subject: 'CS',
+          lastUpdateTime: 123456789,
         },
       ],
     };
 
-    await dumpProcessor.main(termDump, {});
+    await dumpProcessor.main({ termDump: termDump });
     expect(await Course.count()).toEqual(1);
     expect(await Section.count()).toEqual(1);
     expect((await Course.findByPk('neu.edu/202030/CS/3500')).name).toEqual('Compilers');
