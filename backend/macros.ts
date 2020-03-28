@@ -44,11 +44,23 @@ while (1) {
   break;
 }
 
+interface EnvVars {
+  elasticURL?: string,
+  rollbarPostServerItemToken?: string,
+  fbToken?: string,
+  fbVerifyToken?: string,
+  fbAppSecret?: string,
+  dbUsername?: string,
+  dbPassword?: string,
+  dbName?: string,
+  dbHost?: string,
+}
+
 // This is the JSON object saved in /etc/searchneu/config.json
 // null = hasen't been loaded yet.
 // {} = it has been loaded, but nothing was found or the file doesn't exist or the file was {}
 // {...} = the file
-let envVariables = null;
+let envVariables: EnvVars = null;
 
 class Macros extends commonMacros {
 // Version of the schema for the data. Any changes in this schema will effect the data saved in the dev_data folder
@@ -68,7 +80,7 @@ class Macros extends commonMacros {
   // For iterating over every letter in a couple different places in the code.
   static ALPHABET = 'maqwertyuiopsdfghjklzxcvbn';
 
-  static getAllEnvVariables() {
+  static getAllEnvVariables(): EnvVars {
     if (envVariables) {
       return envVariables;
     }
@@ -93,10 +105,12 @@ class Macros extends commonMacros {
       envVariables = JSON.parse(fs.readFileSync(configFileName));
     }
 
+    envVariables = Object.assign(envVariables, process.env);
+
     return envVariables;
   }
 
-  static getEnvVariable(name) {
+  static getEnvVariable(name: keyof EnvVars): string {
     return this.getAllEnvVariables()[name];
   }
 
