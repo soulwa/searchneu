@@ -57,7 +57,7 @@ const CLASSTYPE_SPEC: FilterSpec<'Checkboxes'> = {
   category: FilterCategories.Checkboxes, default: [], display: 'Class Type', order: 4,
 }
 const CLASSIDRANGE_SPEC: FilterSpec<'Range'> = {
-  category: FilterCategories.Range, default: { min: 0, max: 9999 }, display: 'Class Type', order: 4,
+  category: FilterCategories.Range, default: { min: 0, max: 9999 }, display: 'Course ID Range', order: 5,
 }
 export const FILTER_SPECS = {
   online: ONLINE_SPEC,
