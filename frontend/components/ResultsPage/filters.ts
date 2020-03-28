@@ -5,7 +5,9 @@
  * Types and constants for filters. One source of truth for frontend filters
  */
 
-import { QueryParamConfig, BooleanParam, ArrayParam } from 'use-query-params';
+import {
+  QueryParamConfig, BooleanParam, ArrayParam, NumericObjectParam,
+} from 'use-query-params';
 import _ from 'lodash';
 
 // Neat utility to get a union type of the keys of T that extend type U.
@@ -19,6 +21,7 @@ export const FilterCategories = {
   Toggle: 'Toggle' as 'Toggle',
   Dropdown: 'Dropdown' as 'Dropdown',
   Checkboxes: 'Checkboxes' as 'Checkboxes',
+  Range: 'Range' as 'Range',
 }
 export type FilterCategory = ValueOf<typeof FilterCategories>;
 
@@ -26,14 +29,17 @@ export type FilterCategory = ValueOf<typeof FilterCategories>;
 type TypeForCat = {
   Toggle: boolean,
   Dropdown: string[],
-  Checkboxes: string[]
+  Checkboxes: string[],
+  Range: ClassRange,
 }
+type ClassRange = {min:number, max:number};
 
 // Query param encoders for each category of filter
 const ENCODERS_FOR_CAT: Record<FilterCategory, QueryParamConfig<any, any>> = {
   Toggle: BooleanParam,
   Dropdown: ArrayParam,
   Checkboxes: ArrayParam,
+  Range: NumericObjectParam,
 }
 
 // ============== Filter specifications ================
@@ -50,11 +56,15 @@ const SUBJECT_SPEC: FilterSpec<'Dropdown'> = {
 const CLASSTYPE_SPEC: FilterSpec<'Checkboxes'> = {
   category: FilterCategories.Checkboxes, default: [], display: 'Class Type', order: 4,
 }
+const CLASSIDRANGE_SPEC: FilterSpec<'Range'> = {
+  category: FilterCategories.Range, default: { min: 0, max: 9999 }, display: 'Class Type', order: 4,
+}
 export const FILTER_SPECS = {
   online: ONLINE_SPEC,
   nupath: NUPATH_SPEC,
   subject: SUBJECT_SPEC,
   classType: CLASSTYPE_SPEC,
+  classIdRange: CLASSIDRANGE_SPEC,
 }
 
 // A specification for a filter of category C. Needed for conditional types
@@ -65,8 +75,6 @@ type FilterSpec<C extends FilterCategory> = {
   default: TypeForCat[C],
 }
 type FilterSpecs = typeof FILTER_SPECS;
-// Represents additional info for each filter
-type FilterInfo<T> = {[K in keyof FilterSpecs]: T}
 
 // ============== Types For Components To Use ================
 // Represents which filters were selected by a user.
@@ -82,7 +90,7 @@ export type Option = {
 }
 
 // ============== Constants For Components To Use ================
-export const QUERY_PARAM_ENCODERS: FilterInfo<QueryParamConfig<any, any>> = _.mapValues(FILTER_SPECS, (spec) => ENCODERS_FOR_CAT[spec.category]);
+export const QUERY_PARAM_ENCODERS: Record<keyof FilterSpecs, QueryParamConfig<any, any>> = _.mapValues(FILTER_SPECS, (spec) => ENCODERS_FOR_CAT[spec.category]);
 export const DEFAULT_FILTER_SELECTION: FilterSelection = _.mapValues<FilterSelection>(FILTER_SPECS, (spec) => spec.default);
 export const FILTERS_BY_CATEGORY: Record<FilterCategory, Partial<FilterSpecs>> = _.mapValues(FilterCategories, (cat: FilterCategory) => {
   return _.pickBy(FILTER_SPECS, (spec) => spec.category === cat);
