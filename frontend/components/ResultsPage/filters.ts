@@ -13,7 +13,6 @@ type FilteredKeys<T, U> = { [P in keyof T]: T[P] extends U ? P : never }[keyof T
 // Get union type of the values of type T
 type ValueOf<T> = T[keyof T];
 
-
 // ============== Filter categories ================
 // Filter categoriesrepresents the different categories of filters that are possible
 export const FilterCategories = {
@@ -23,6 +22,13 @@ export const FilterCategories = {
 }
 export type FilterCategory = ValueOf<typeof FilterCategories>;
 
+// What type should the value of each category of filter be?
+type TypeForCat = {
+  Toggle: boolean,
+  Dropdown: string[],
+  Checkboxes: string[]
+}
+
 // Query param encoders for each category of filter
 const ENCODERS_FOR_CAT: Record<FilterCategory, QueryParamConfig<any, any>> = {
   Toggle: BooleanParam,
@@ -30,45 +36,46 @@ const ENCODERS_FOR_CAT: Record<FilterCategory, QueryParamConfig<any, any>> = {
   Checkboxes: ArrayParam,
 }
 
-// Default values for each category of filter
-const DEFAULTS_FOR_CAT: Record<FilterCategory, any> = {
-  Toggle: false,
-  Dropdown: [],
-  Checkboxes: [],
-};
-
 // ============== Filter specifications ================
 // Specify which filters exist, and which category they are
-export const FILTER_SPECS = {
-  online: { category: FilterCategories.Toggle, display: 'Online Classes Only', order: 3 },
-  nupath: { category: FilterCategories.Dropdown, display: 'NU Path', order: 2 },
-  subject: { category: FilterCategories.Dropdown, display: 'Subject', order: 1 },
-  classType: { category: FilterCategories.Checkboxes, display: 'Class Type', order: 4 },
+const ONLINE_SPEC: FilterSpec<'Toggle'> = {
+  category: FilterCategories.Toggle, default: false, display: 'Online Classes Only', order: 3,
 }
+const NUPATH_SPEC: FilterSpec<'Dropdown'> = {
+  category: FilterCategories.Dropdown, default: [], display: 'NU Path', order: 2,
+}
+const SUBJECT_SPEC: FilterSpec<'Dropdown'> = {
+  category: FilterCategories.Dropdown, default: [], display: 'Subject', order: 1,
+}
+const CLASSTYPE_SPEC: FilterSpec<'Checkboxes'> = {
+  category: FilterCategories.Checkboxes, default: [], display: 'Class Type', order: 4,
+}
+export const FILTER_SPECS = {
+  online: ONLINE_SPEC,
+  nupath: NUPATH_SPEC,
+  subject: SUBJECT_SPEC,
+  classType: CLASSTYPE_SPEC,
+}
+
 // A specification for a filter of category C. Needed for conditional types
-type FilterSpec<C> = {
+type FilterSpec<C extends FilterCategory> = {
   category: C,
   display: string,
   order: number
+  default: TypeForCat[C],
 }
 type FilterSpecs = typeof FILTER_SPECS;
 // Represents additional info for each filter
 type FilterInfo<T> = {[K in keyof FilterSpecs]: T}
 
-// Represents which categories of filters have "options" (multiple choice)
-type FilterCategoriesWithOptions = FilterSpec<'Dropdown'> | FilterSpec<'Checkboxes'>;
-
-// Union type of filters that have options
-type FiltersWithOptions = FilteredKeys<FilterSpecs, FilterCategoriesWithOptions>;
-
-
 // ============== Types For Components To Use ================
 // Represents which filters were selected by a user.
-export type FilterSelection = {[K in keyof FilterSpecs]?: FilterSpecs[K] extends FilterCategoriesWithOptions ? string[] : boolean}
+export type FilterSelection = {[K in keyof FilterSpecs]?: FilterSpecs[K] extends FilterSpec<infer C> ? TypeForCat[C] : never};
 
 // Represents the options for all filters
-export type FilterOptions = {[K in FiltersWithOptions]: Option[]}
+export type FilterOptions = Record<FilteredKeys<FilterSpecs, FilterSpec<'Dropdown'>|FilterSpec<'Checkboxes'>>, Option[]>;
 
+// A single option in a multiple choice filter
 export type Option = {
   value: string,
   count: number
@@ -76,7 +83,7 @@ export type Option = {
 
 // ============== Constants For Components To Use ================
 export const QUERY_PARAM_ENCODERS: FilterInfo<QueryParamConfig<any, any>> = _.mapValues(FILTER_SPECS, (spec) => ENCODERS_FOR_CAT[spec.category]);
-export const DEFAULT_FILTER_SELECTION: FilterSelection = _.mapValues(FILTER_SPECS, (spec) => DEFAULTS_FOR_CAT[spec.category]);
+export const DEFAULT_FILTER_SELECTION: FilterSelection = _.mapValues<FilterSelection>(FILTER_SPECS, (spec) => spec.default);
 export const FILTERS_BY_CATEGORY: Record<FilterCategory, Partial<FilterSpecs>> = _.mapValues(FilterCategories, (cat: FilterCategory) => {
   return _.pickBy(FILTER_SPECS, (spec) => spec.category === cat);
 });
