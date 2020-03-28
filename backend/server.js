@@ -169,32 +169,6 @@ function getTime() {
   return moment().format('hh:mm:ss a');
 }
 
-
-// Http to https redirect.
-app.use((req, res, next) => {
-  const remoteIp = getIpPath(req);
-
-  // If this is https request, done.
-  if (req.protocol === 'https') {
-    next();
-
-    // If we are behind a cloudflare proxy and cloudflare served a https response, done.
-  } else if (req.headers['x-forwarded-proto'] && req.headers['x-forwarded-proto'] === 'https') {
-    next();
-
-    // This is development mode
-  } else if (macros.DEV) {
-    next();
-
-    // This is prod and still on http, redirect to https.
-  } else {
-    // Cache the http to https redirect for 2 months.
-    res.setHeader('Cache-Control', 'public, max-age=5256000');
-    macros.log(getTime(), remoteIp, 'redirecting to https');
-    res.redirect(`https://${req.get('host')}${req.originalUrl}`);
-  }
-});
-
 graphql.applyMiddleware({ app: app });
 
 app.get('/search', wrap(async (req, res) => {
