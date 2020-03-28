@@ -52,7 +52,9 @@ type EnvKeys = 'elasticURL'
 | 'dbUsername'
 | 'dbPassword'
 | 'dbName'
-| 'dbHost';
+| 'dbHost'
+// Only for dev:
+| 'fbMessengerId';
 
 type EnvVars = Partial<Record<EnvKeys, string>>;
 
