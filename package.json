@@ -11,7 +11,7 @@
     "index": "yarn babel-node-ts backend/scrapers/classes/searchIndex.js; yarn babel-node-ts backend/scrapers/employees/searchIndex.js",
     "store": "yarn babel-node-ts backend/dumpProcessor.js",
     "resetIndex": "yarn babel-node-ts backend/resetIndex.js",
-    "script": "cd $INIT_CWD; yarn babel-node-ts --root-mode upward --ignore \".this_does_not_exit\"",
+    "script": "cd $INIT_CWD; babel-node --extensions \".js,.jsx,.ts,.tsx\" --root-mode upward --ignore \".this_does_not_exit\"",
     "inspect": "cd $INIT_CWD;echo 'Open chrome://inspect in chrome and hit the node button';yarn -s script -- --inspect-brk",
     "profile": "yarn run build_backend && mkdir -p cache && time env NODE_ENV=prod node --heap-prof --heap-prof-dir=cache --max_old_space_size=12000 dist/backend/scrapers/classes/parsersxe/startup.js",
     "dev_migrate": "npx sequelize-cli --env dev db:migrate",
