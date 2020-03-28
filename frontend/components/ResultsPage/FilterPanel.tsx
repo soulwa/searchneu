@@ -5,9 +5,12 @@ import _ from 'lodash';
 import CheckboxFilter from './CheckboxFilter';
 import DropdownFilter from './DropdownFilter';
 import ToggleFilter from './ToggleFilter';
+import RangeFilter from './RangeFilter';
+
 import {
   FilterOptions, FilterSelection, FILTERS_IN_ORDER,
 } from './filters';
+
 
 export interface FilterPanelProps {
   options: FilterOptions,

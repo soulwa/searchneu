@@ -5,7 +5,7 @@ import _ from 'lodash';
 interface RangeFilterProps {
   title: string,
   active: string[],
-  setActive: (a:boolean)=>void
+  setActive: (a:string[])=>void
 }
 
 export default function RangeFilter({ title, active, setActive }: RangeFilterProps) {
