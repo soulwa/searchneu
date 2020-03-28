@@ -40,7 +40,7 @@ fi
 # Make sure files in folders can run also be ran with babel-node
 # https://github.com/babel/babel/issues/9750
 cd backend
-npm run script macros.js
+npm run script macros.ts
 cd ..
 
 
