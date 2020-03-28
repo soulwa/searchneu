@@ -164,9 +164,9 @@ const config: webpack.Configuration = {
       },
     ],
   },
-  // externals: {
-  //   '../backend/macros': 'empty',
-  // },
+  externals: {
+    '../backend/macros': 'empty',
+  },
   node: {
     fs: 'empty',
   },
