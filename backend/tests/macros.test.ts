@@ -17,7 +17,6 @@ it('logging things work', () => {
 
 it('can get env vars', () => {
   expect(!!macros.getAllEnvVariables()).toBe(true);
-  expect(!!macros.getEnvVariable('this key does not exist')).toBe(false);
 });
 
 it('some other stuff doesnt crash', () => {
