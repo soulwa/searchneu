@@ -1,21 +1,15 @@
 /*
  * This file is part of Search NEU and licensed under AGPL3.
- * See the license file in the root folder for details.
- */
+ * See the license file in the root folder for details.  */
 
 import fs from 'fs-extra';
 import _ from 'lodash';
 import path from 'path';
 import Keys from '../common/Keys';
 import macros from './macros';
-import db from './database/models/index';
-
-const Professor = db.Professor;
-const Course = db.Course;
-const Section = db.Section;
-const Op = db.Sequelize.Op;
-const sequelize = db.sequelize;
-
+import {
+  Professor, Course, Section, Op, sequelize,
+} from './database/models/index';
 
 const profAttributes = Object.keys(_.omit(Professor.rawAttributes, ['id', 'createdAt', 'updatedAt']));
 const courseAttributes = Object.keys(_.omit(Course.rawAttributes, ['id', 'createdAt', 'updatedAt']));
@@ -30,10 +24,9 @@ class DumpProcessor {
    * @param {Object} termDump object containing all class and section data, normally acquired from scrapers
    * @param {Object} profDump object containing all professor data, normally acquired from scrapers
    */
-  async main(termDump, profDump) {
+  async main({ termDump = {}, profDump = {}, destroy = false }) {
     // the logs on prod are literally running out of space, so stopping sequelize logs for now
     sequelize.options.logging = false;
-
     const coveredTerms = new Set();
 
     const profPromises = _.chunk(Object.values(profDump), this.CHUNK_SIZE).map(async (profChunk) => {
@@ -53,13 +46,16 @@ class DumpProcessor {
     });
     await Promise.all(secPromises);
 
-    await Course.destroy({
-      where: {
-        termId: { [Op.in]: Array.from(coveredTerms) },
-        updatedAt: { [Op.lt]: new Date(new Date() - 24 * 60 * 60 * 1000) },
-      },
-    });
-    sequelize.options.logging = false;
+    // destroy courses that haven't been updated in over 2 days
+    if (destroy) {
+      await Course.destroy({
+        where: {
+          termId: { [Op.in]: Array.from(coveredTerms) },
+          updatedAt: { [Op.lt]: new Date(new Date() - 48 * 60 * 60 * 1000) },
+        },
+      });
+    }
+    sequelize.options.logging = true;
   }
 
   processClass(classInfo, coveredTerms) {
@@ -71,12 +67,6 @@ class DumpProcessor {
   processSection(secInfo) {
     const additionalProps = { id: `${Keys.getSectionHash(secInfo)}`, classHash: Keys.getClassHash(secInfo) };
     return { ...secInfo, ...additionalProps };
-  }
-
-  async truncateTables() {
-    await Professor.destroy({ where: {} });
-    await Section.destroy({ where: {} });
-    await Course.destroy({ where: {} });
   }
 }
 
@@ -93,7 +83,7 @@ async function fromFile(termFilePath, empFilePath) {
 
   const termDump = await fs.readJson(termFilePath);
   const profDump = await fs.readJson(empFilePath);
-  await instance.main(termDump, profDump);
+  await instance.main({ termDump: termDump, profDump: profDump });
 }
 
 if (require.main === module) {

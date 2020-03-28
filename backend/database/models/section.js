@@ -11,11 +11,14 @@ module.exports = (sequelize, DataTypes) => {
     seatsRemaining: DataTypes.INTEGER,
     waitCapacity: DataTypes.INTEGER,
     waitRemaining: DataTypes.INTEGER,
+    classType: DataTypes.STRING,
     online: DataTypes.BOOLEAN,
     honors: DataTypes.BOOLEAN,
     url: DataTypes.STRING,
     crn: DataTypes.STRING,
     meetings: DataTypes.JSON,
+    info: DataTypes.TEXT,
+    profs: DataTypes.ARRAY(DataTypes.STRING),
   });
 
   Section.associate = (models) => {

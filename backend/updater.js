@@ -4,17 +4,17 @@
  */
 
 import _ from 'lodash';
+import { Op } from 'sequelize';
 
 import elastic from './elastic';
 
-import classesScrapers from './scrapers/classes/main';
-
+import Bannerv9Parser from './scrapers/classes/parsersxe/bannerv9Parser';
 import macros from './macros';
-import database from './database';
 import Keys from '../common/Keys';
-import ellucianCatalogParser from './scrapers/classes/parsers/ellucianCatalogParser';
 import notifyer from './notifyer';
-
+import dumpProcessor from './dumpProcessor';
+import { Course, Section, sequelize } from './database/models/index';
+import HydrateSerializer from './database/serializers/hydrateSerializer';
 
 class Updater {
   // Don't call this directly, call .create instead.
@@ -30,6 +30,7 @@ class Updater {
         macros.warn('Updater failed with :', e);
       }
     }, intervalTime);
+    this.onInterval();
   }
 
 
@@ -49,81 +50,41 @@ class Updater {
   // Update the local data about the changes
   async onInterval() {
     macros.log('updating');
-    const startTime = Date.now();
 
-    let users = await database.get('users');
-    if (!users) {
+    if (macros.DEV) {
       return;
     }
 
-    users = Object.values(users);
+    const startTime = Date.now();
 
-    let classHashes = [];
-    let sectionHashes = [];
-
-    const sectionHashToUsers = {};
     const classHashToUsers = {};
+    const sectionHashToUsers = {};
 
-    for (const user of users) {
-      if (!user.facebookMessengerId) {
-        macros.warn('User has no FB id?', JSON.stringify(user));
-        continue;
-      }
+    (await sequelize.query('SELECT "courseId", ARRAY_AGG("userId") FROM "FollowedCourses" GROUP BY "courseId"', { type: sequelize.QueryTypes.SELECT }))
+      .forEach((classHash) => {
+        classHashToUsers[classHash.courseId] = classHash.array_agg;
+      });
 
-      // Firebase, for some reason, strips leading 0s from the Facebook messenger id.
-      // Add them back here.
-      while (user.facebookMessengerId.length < 16) {
-        user.facebookMessengerId = `0${user.facebookMessengerId}`;
-      }
+    (await sequelize.query('SELECT "sectionId", ARRAY_AGG("userId") FROM "FollowedSections" GROUP BY "sectionId"', { type: sequelize.QueryTypes.SELECT }))
+      .forEach((sectionHash) => {
+        sectionHashToUsers[sectionHash.sectionId] = sectionHash.array_agg;
+      });
 
+    const classHashes = Object.keys(classHashToUsers);
+    const sectionHashes = Object.keys(sectionHashToUsers);
 
-      if (!user.watchingClasses) {
-        user.watchingClasses = [];
-      }
-
-      if (!user.watchingSections) {
-        user.watchingSections = [];
-      }
-
-      // When an item is deleted from an array in firebase, firebase dosen't shift the rest of the items down one index.
-      // Instead, it adds an undefined item to the array.
-      // This removes any possible undefined items from the array.
-      // The warnings can be added back when unsubscribing is done with code.
-      _.pull(user.watchingClasses, null);
-      _.pull(user.watchingSections, null);
-
-      classHashes = classHashes.concat(user.watchingClasses);
-      sectionHashes = sectionHashes.concat(user.watchingSections);
-
-      for (const classHash of user.watchingClasses) {
-        if (!classHashToUsers[classHash]) {
-          classHashToUsers[classHash] = [];
-        }
-
-        classHashToUsers[classHash].push(user.facebookMessengerId);
-      }
-
-      for (const sectionHash of user.watchingSections) {
-        if (!sectionHashToUsers[sectionHash]) {
-          sectionHashToUsers[sectionHash] = [];
-        }
-
-        sectionHashToUsers[sectionHash].push(user.facebookMessengerId);
-      }
+    if (classHashes.length === 0 && sectionHashes.length === 0) {
+      return;
     }
 
-    // Remove duplicates. This will occur if multiple people are watching the same class.
-    classHashes = _(classHashes).uniq().compact();
-    sectionHashes = _(sectionHashes).uniq().compact();
-
-    macros.log('watching classes ', classHashes.size());
+    macros.log('watching classes ', classHashes.length);
 
     // Get the old data for watched classes
-    const esOldDocs = await elastic.getMapFromIDs(elastic.CLASS_INDEX, classHashes);
+    const oldDocs = await (new HydrateSerializer(Section)).bulkSerialize(await Course.findAll({ where: { id: { [Op.in]: classHashes } } }));
 
-    const oldWatchedClasses = _.mapValues(esOldDocs, (doc) => { return doc.class; });
+    const oldWatchedClasses = _.mapValues(oldDocs, (doc) => { return doc.class; });
     const oldWatchedSections = {};
-    for (const aClass of Object.values(esOldDocs)) {
+    for (const aClass of Object.values(oldDocs)) {
       for (const section of aClass.sections) {
         oldWatchedSections[Keys.getSectionHash(section)] = section;
       }
@@ -138,59 +99,33 @@ class Updater {
     }
 
     // Scrape the latest data
-    const promises = Object.values(oldWatchedClasses).map((aClass) => {
-      return ellucianCatalogParser.main(aClass.prettyUrl).then((newClass) => {
-        if (!newClass) {
-          // TODO: This should be changed into a notification that the class probably no longer exists. Shoudn't unsubscribe people.
-          macros.warn('New class data is null?', aClass.prettyUrl, aClass);
-          return null;
-        }
-
-
-        // Copy over some fields that are not scraped from this scraper.
-        newClass.value.host = aClass.host;
-        newClass.value.termId = aClass.termId;
-        newClass.value.subject = aClass.subject;
-
-        return newClass;
-      });
+    const promises = Object.values(oldWatchedClasses).map(async (aClass) => {
+      const promise = await Bannerv9Parser.scrapeClass(aClass.termId, aClass.subject, aClass.classId);
+      const { classes, sections } = promise;
+      if (classes.length === 1) {
+        classes[0].sections = sections;
+        return { classes: classes, sections: sections };
+      }
+      return null;
     });
 
-    // Remove the instances where newClass was null
-    _.pull(promises, null);
 
-    let allParsersOutput;
+    let output;
 
     try {
-      allParsersOutput = await Promise.all(promises);
+      output = await Promise.all(promises);
     } catch (e) {
-      macros.warn('ellucianCatalogParser call failed in updater with error:', e);
+      macros.warn('bannerv9parser call failed in updater with error:', e);
       return;
     }
 
     // Remove any instances where the output was null.
     // This can happen if the class at one of the urls that someone was watching dissapeared or was taken down
     // In this case the output of the ellucianCatalogParser will be null.
-    _.pull(allParsersOutput, null);
+    _.pull(output, null);
 
-    const rootNode = {
-      type: 'ignore',
-      deps: allParsersOutput,
-      value: {},
-    };
-
-    // Because ellucianCatalogParser returns a list of classes, instead of a singular class, we need to run it on all of them
-    const output = classesScrapers.restructureData(rootNode);
-
-    if (!output.sections) {
-      output.sections = [];
-    }
-
-    if (!output.classes) {
-      output.classes = [];
-    }
-
-    classesScrapers.runProcessors(output);
+    // concat classes and section arrays
+    output = _.mergeWith(...output, (a, b) => { return a.concat(b); });
 
     // Keep track of which messages to send which users.
     // The key is the facebookMessengerId and the value is a list of messages.
@@ -203,9 +138,12 @@ class Updater {
 
       // Count how many sections are present in the new but not in the old.
       let count = 0;
-      if (aNewClass.crns) {
-        for (const crn of aNewClass.crns) {
-          if (!oldClass.crns.includes(crn)) {
+      if (aNewClass.sections) {
+        const newCrns = aNewClass.sections.map((section) => { return section.crn; });
+        const oldCrns = (oldClass.sections || []).map((section) => { return section.crn; });
+
+        for (const crn of newCrns) {
+          if (!oldCrns.includes(crn)) {
             count++;
           }
         }
@@ -284,29 +222,22 @@ class Updater {
 
     const classMap = {};
     for (const aClass of output.classes) {
-      const associatedSections = output.sections.filter((s) => {
-        if (!aClass.crns) {
-          macros.log(`The class ${aClass.subject} ${aClass.classId} in ${aClass.termId} does not have crns!`);
-          return false;
-        }
-        return aClass.crns.includes(s.crn);
-      });
       // Sort each classes section by crn.
       // This will keep the sections the same between different scrapings.
-      if (associatedSections.length > 1) {
-        associatedSections.sort((a, b) => {
+      if (aClass.sections.length > 1) {
+        aClass.sections.sort((a, b) => {
           return a.crn > b.crn;
         });
       }
       classMap[Keys.getClassHash(aClass)] = {
         class: {
-          crns: aClass.crns,
+          lastUpdateTime: aClass.lastUpdateTime,
         },
-        sections: associatedSections,
+        sections: aClass.sections,
       };
     }
     await elastic.bulkUpdateFromMap(elastic.CLASS_INDEX, classMap);
-
+    await dumpProcessor.main({ termDump: output });
 
     // Loop through the messages and send them.
     // Do this as the very last stage on purpose.
@@ -319,9 +250,9 @@ class Updater {
       for (const message of userToMessageMap[fbUserId]) {
         notifyer.sendFBNotification(fbUserId, message);
       }
-      setTimeout(((facebookUserId) => {
-        notifyer.sendFBNotification(facebookUserId, 'Reply with "stop" to unsubscribe from notifications.');
-      }).bind(this, fbUserId), 100);
+      setTimeout(() => {
+        notifyer.sendFBNotification(fbUserId, 'Reply with "stop" to unsubscribe from notifications.');
+      }, 100);
 
       macros.logAmplitudeEvent('Facebook message sent out', {
         toUser: fbUserId,

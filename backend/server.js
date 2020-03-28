@@ -16,16 +16,18 @@ import moment from 'moment';
 import xhub from 'express-x-hub';
 import atob from 'atob';
 import _ from 'lodash';
+import searcher from './searcher';
 import elastic from './elastic';
+import { Course, Section } from './database/models/index';
 
 import Request from './scrapers/request';
 import webpackConfig from './webpack.config.babel';
 import macros from './macros';
 import notifyer from './notifyer';
-import Updater from './updater';
+// import Updater from './updater';
 import database from './database';
 import graphql from './graphql';
-import requestMapping from './requestMapping.json';
+import HydrateCourseSerializer from './database/serializers/hydrateCourseSerializer';
 
 // This file manages every endpoint in the backend
 // and calls out to respective files depending on what was called
@@ -56,7 +58,7 @@ const MAX_HOLD_TIME_FOR_GET_USER_DATA_REQS = 3000;
 let getUserDataInterval = null;
 
 // Start updater interval
-Updater.create();
+// Updater.create();
 
 // Verify that the webhooks are coming from facebook
 // This needs to be above bodyParser for some reason
@@ -70,9 +72,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 // Process application/json
 app.use(bodyParser.json());
-
-// Set up the request index.
-elastic.ensureIndexExists(elastic.REQUEST_ANALYTICS, requestMapping);
 
 // Prevent being in an iFrame.
 app.use((req, res, next) => {
@@ -135,14 +134,14 @@ function getRemoteIp(req) {
   }
 
   if (macros.PROD) {
-    macros.error('No cf-connecting-ip?', req.headers, req.connection.remoteAddress);
+    return '';
   }
 
   const forwardedForHeader = req.headers['x-forwarded-for'];
 
   if (!forwardedForHeader) {
     if (macros.PROD) {
-      macros.error('No forwardedForHeader?', req.headers, req.connection.remoteAddress);
+      macros.warn('No forwardedForHeader?', req.headers, req.connection.remoteAddress);
     }
 
     return req.connection.remoteAddress;
@@ -153,7 +152,7 @@ function getRemoteIp(req) {
   // Cloudflare sometimes sends health check requests
   // which will only have 1 item in this header
   if (splitHeader.length === 1) {
-    macros.error('Only have one item in the header?', forwardedForHeader);
+    macros.warn('Only have one item in the header?', forwardedForHeader);
     return splitHeader[0].trim();
   }
 
@@ -169,57 +168,6 @@ function getRemoteIp(req) {
 function getTime() {
   return moment().format('hh:mm:ss a');
 }
-
-
-// Log request to elasticsearch for analysis.
-app.use((req, res, next) => {
-  next();
-
-  let objectToLog = { ...req.headers, ...req.query };
-
-  const removeHeaderList = [
-    'connection',
-    'accept',
-    'dnt',
-    'sec-fetch-site',
-    'sec-fetch-mode',
-    'sec-fetch-user',
-    'accept-encoding',
-    'accept-language',
-    'cf-visitor',
-    'cf-connecting-ip',
-    'x-forwarded-proto',
-    'cf-ray',
-
-    // This is the ip of CloudFlare's server, not the user.
-    'x-real-ip',
-
-    // There are some third party scripts on the page that add a few cookies.
-    // But we don't need to analyse those, we can just use the tokens we add in the frontend.
-    'cookie',
-    'x-forwarded-for',
-  ];
-
-  // Don't log these headers because they are not useful for analysis.
-  objectToLog = _.omit(objectToLog, removeHeaderList);
-
-  for (const field of Object.keys(objectToLog)) {
-    // Don't log fields that are unreasonably long.
-    if (field.length > 500 || objectToLog[field].length > 2000) {
-      macros.log('Not logging long field', field.slice(0, 500));
-      objectToLog[field] = undefined;
-      continue;
-    }
-  }
-
-  objectToLog.path = req.path;
-  objectToLog.carrierIp = req.headers['x-real-ip'];
-  objectToLog.serverNow = Date.now();
-  objectToLog.remoteIp = getRemoteIp(req);
-
-  // Disabled for now - no need to log any more data.
-  // elastic.insertDoc(elastic.REQUEST_ANALYTICS, objectToLog);
-});
 
 
 // Http to https redirect.
@@ -257,7 +205,7 @@ app.get('/search', wrap(async (req, res) => {
     return;
   }
 
-  if (!req.query.query || typeof req.query.query !== 'string' || req.query.query.length > 500) {
+  if (typeof req.query.query !== 'string' || req.query.query.length > 500) {
     macros.log(getTime(), 'Need query.', req.query);
     res.send(JSON.stringify({
       error: 'Need query param.',
@@ -291,12 +239,34 @@ app.get('/search', wrap(async (req, res) => {
     return;
   }
 
-  const { searchContent, took, resultCount } = await elastic.search(req.query.query, req.query.termId, req.query.minIndex, req.query.maxIndex);
+  let filters = {};
+  if (req.query.filters) {
+    // Ensure filters is a string
+    if (typeof req.query.filters !== 'string') {
+      macros.log('Invalid filters.', req.filters);
+      res.send(JSON.stringify({
+        error: 'Invalid filters.',
+      }));
+    } else {
+      try {
+        filters = JSON.parse(req.query.filters);
+      } catch (e) {
+        macros.log('Invalid filters JSON.', req.filters);
+        res.send(JSON.stringify({
+          error: 'Invalid filters.',
+        }));
+      }
+    }
+  }
+
+  const {
+    searchContent, took, resultCount, aggregations,
+  } = await searcher.search(req.query.query, req.query.termId, req.query.minIndex, req.query.maxIndex, filters);
   const midTime = Date.now();
 
   let string;
   if (req.query.apiVersion === '2') {
-    string = JSON.stringify({ results: searchContent });
+    string = JSON.stringify({ results: searchContent, filterOptions: aggregations });
   } else {
     string = JSON.stringify(searchContent);
   }
@@ -367,12 +337,10 @@ async function onSendToMessengerButtonClick(sender, userPageId, b64ref) {
   }
 
   macros.log('Got webhook - received ', userObject);
-  const firebaseRef = await database.getRef(`/users/${sender}`);
-
-  let existingData = await firebaseRef.once('value');
-  existingData = existingData.val();
-
-  const aClass = (await elastic.get(elastic.CLASS_INDEX, userObject.classHash)).class;
+  // TODO: check that sender is a string and not a number
+  const existingData = await database.get(sender);
+  const classModel = await Course.findByPk(userObject.classHash);
+  const aClass = Object.values(await (new HydrateCourseSerializer(Section).bulkSerialize([classModel])))[0].class;
 
   // User is signing in from a new device
   if (existingData) {
@@ -461,7 +429,7 @@ async function onSendToMessengerButtonClick(sender, userPageId, b64ref) {
       macros.log('in webhook, did not finding matching f request ');
     }
 
-    firebaseRef.set(existingData);
+    database.set(sender, existingData);
   } else {
     let names = await notifyer.getUserProfileInfo(sender);
     if (!names || !names.first_name) {
@@ -493,7 +461,7 @@ async function onSendToMessengerButtonClick(sender, userPageId, b64ref) {
       notifyer.sendFBNotification(sender, `Successfully signed up for notifications for ${userObject.sectionHashes.length} sections in ${classCode}. Toggle the sliders back on https://searchneu.com to adjust notifications!`);
     }
 
-    database.set(`/users/${sender}`, newUser);
+    database.set(sender, newUser);
     if (getUserDataReqs[userObject.loginKey]) {
       macros.log('In webhook, responding to matching f request');
       getUserDataReqs[userObject.loginKey].res.send((JSON.stringify({
@@ -508,17 +476,15 @@ async function onSendToMessengerButtonClick(sender, userPageId, b64ref) {
   }
 }
 
+// TODO: maybe there should be delete functionality?
 async function unsubscribeSender(sender) {
-  const firebaseRef = await database.getRef(`/users/${sender}`);
-
-  let existingData = await firebaseRef.once('value');
-  existingData = existingData.val();
+  const existingData = await database.get(sender);
 
   if (existingData) {
     existingData.watchingClasses = [];
     existingData.watchingSections = [];
     macros.log('Unsubscribed ', sender, ' from everything.');
-    firebaseRef.set(existingData);
+    database.set(sender, existingData);
   } else {
     macros.log("Didn't unsubscribe ", sender, ' from anything because they were not in the database');
   }
@@ -589,27 +555,8 @@ app.post('/webhook/', wrap(async (req, res) => {
 // finds the user with the login key that's been requested
 // if the user doesn't exist, return
 async function findMatchingUser(requestLoginKey) {
-  // Loop over the db
-  const users = await database.get('users');
-  if (!users) {
-    return null;
-  }
-
-  // Loop over all the users
-  for (const user of Object.values(users)) {
-    if (!user.loginKeys) {
-      continue;
-    }
-
-
-    if (user.loginKeys.includes(requestLoginKey)) {
-      return user;
-    }
-  }
-
-  return null;
+  return database.getByLoginKey(requestLoginKey);
 }
-
 
 // sends data to the database in the backend
 async function verifyRequestAndGetDbUser(req, res) {
@@ -638,7 +585,7 @@ async function verifyRequestAndGetDbUser(req, res) {
   }
 
   // Get the user from the db.
-  const user = await database.get(`/users/${senderId}`);
+  const user = await database.get(senderId);
   if (!user) {
     macros.log(`Didn't find valid user from client request: ${JSON.stringify(user)}`, req.body.loginKey);
     return null;
@@ -685,7 +632,7 @@ app.post('/addSection', wrap(async (req, res) => {
 
   userObject.watchingSections.push(sectionHash);
 
-  await database.set(`/users/${req.body.senderId}`, userObject);
+  await database.set(req.body.senderId, userObject);
   macros.log('sending done, section added. User:', userObject);
 
   // If the request also contains the notif data, we can send a notification to the user.
@@ -749,7 +696,7 @@ app.post('/removeSection', wrap(async (req, res) => {
 
   _.pull(userObject.watchingSections, sectionHash);
 
-  await database.set(`/users/${req.body.senderId}`, userObject);
+  await database.set(req.body.senderId, userObject);
   macros.log('sending done, section removed.');
 
 
@@ -816,7 +763,7 @@ app.post('/addClass', wrap(async (req, res) => {
 
   userObject.watchingClasses.push(classHash);
 
-  await database.set(`/users/${req.body.senderId}`, userObject);
+  await database.set(req.body.senderId, userObject);
   macros.log('sending done, class added. User is now:', userObject);
 
   const notifData = req.body.notifData;
@@ -931,7 +878,7 @@ app.post('/getUserData', wrap(async (req, res) => {
   // if not, we have to loop over all the users's to find a matching loginKey
 
   if (senderId) {
-    const user = await database.get(`/users/${senderId}`);
+    const user = await database.get(senderId);
 
     // Don't do long polling when the the sender id is given
     // and the user doesn't exist in the db because
@@ -1118,7 +1065,7 @@ app.get('*', (req, res) => {
 // your express error handler
 // Express handles functions with four arguments as error handlers and functions with 3 arguments as middleware
 // Add the eslint comment to keep all the args.
-app.use((err, req, res, next) => { //eslint-disable-line no-unused-vars
+app.use((err, req, res, next) => { // eslint-disable-line @typescript-eslint/no-unused-vars
   // in case of specific URIError
   if (err instanceof URIError) {
     macros.log('Warning, could not process malformed url: ', req.url);

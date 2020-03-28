@@ -1,21 +1,30 @@
-
 module.exports = {
-  "parser": "babel-eslint",
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": './tsconfig.json',
+  },
   "extends": [
-    "airbnb"
+    "airbnb-typescript",
   ],
   "plugins": [
-    "babel",
-    "react",
-    "promise"
+    // "@typescript-eslint",
+    "promise",
+    "react-hooks"
   ],
   "env": {
     "browser": true,
     "jest": true
   },
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "extensions": [".js", ".jsx", ".ts", ".tsx"]
+      }
+    }
+  },
   "rules": {
     "arrow-parens": [1, "always"],
-    "arrow-body-style": [1, "always"],
+    "arrow-body-style": 0,
     "key-spacing": 0,
     "no-mixed-operators": 0,
     "no-param-reassign": 0,
@@ -59,6 +68,9 @@ module.exports = {
       propTypes: "static public field",
     }],
 
+    // Typescript
+    "@typescript-eslint/semi": 0,
+
     // The default for airbnb-eslint is to require the state to be above the constructor.
     // This changes the rule to ensure the state is always initiated in the constructore
     "react/state-in-constructor": [2, "always"],
@@ -71,10 +83,9 @@ module.exports = {
     }],
 
     // Prevents using variables before they are defined. 
-    "no-use-before-define": 1,
     "jsx-quotes": [2, "prefer-single"],
     "max-len": [2, 5000, 2],
-    "object-shorthand": ["error", "never"],
+    "object-shorthand": "off",
     "object-curly-spacing": [2, "always"],
     "react/forbid-prop-types": 0,
     "react/no-danger": 1,
@@ -86,12 +97,16 @@ module.exports = {
     "spaced-comment": 0,
     "react/prefer-stateless-function": [1],
     "react/jsx-filename-extension": [1, {
-      "extensions": [".js", ".jsx"]
+      "extensions": [".js", ".jsx", ".ts", ".tsx"]
     }],
     "react/jsx-curly-spacing": [2, "always", {
       "spacing": {
         "objectLiterals": "never"
       }
-    }]
+    }],
+    "react/sort-comp": 0,
+
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn"
   }
 }

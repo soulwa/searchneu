@@ -62,10 +62,11 @@ class ClassParser {
       subject: subjectCode,
       classId: courseNumber,
       classAttributes: attributes,
-      desc: description,
+      nupath: this.nupath(attributes),
+      desc: he.decode(description),
       prettyUrl: 'https://wl11gp.neu.edu/udcprod8/bwckctlg.p_disp_course_detail?'
         + `cat_term_in=${termId}&subj_code_in=${subjectCode}&crse_numb_in=${courseNumber}`,
-      name: SR.courseTitle,
+      name: he.decode(SR.courseTitle),
       url: 'https://wl11gp.neu.edu/udcprod8/bwckctlg.p_disp_listcrse?'
         + `term_in=${termId}&subj_in=${subjectCode}&crse_in=${courseNumber}&schd_in=%`,
       lastUpdateTime: Date.now(),
@@ -104,6 +105,13 @@ class ClassParser {
 
   serializeAttributes(str) {
     return he.decode(str).split('<br/>').map((a) => { return a.trim(); });
+  }
+
+  nupath(attributes) {
+    const regex = new RegExp('NUpath (.*?) *NC.{2}');
+    return attributes
+      .filter((a) => regex.test(a))
+      .map((a) => regex.exec(a)[1]);
   }
 
   /**

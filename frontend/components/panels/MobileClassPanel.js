@@ -23,6 +23,7 @@ import chevronRight from './chevron-right.svg';
 class MobileClassPanel extends BaseClassPanel {
   static propTypes = {
     aClass: PropTypes.object.isRequired,
+    history: PropTypes.object.isRequired,
   };
 
   constructor(props) {
@@ -119,7 +120,7 @@ class MobileClassPanel extends BaseClassPanel {
             role='button'
             tabIndex={ 0 }
           >
-              Show More...
+            Show More...
           </a>
         </div>
       </span>
