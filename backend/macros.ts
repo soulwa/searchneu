@@ -44,17 +44,17 @@ while (1) {
   break;
 }
 
-interface EnvVars {
-  elasticURL?: string,
-  rollbarPostServerItemToken?: string,
-  fbToken?: string,
-  fbVerifyToken?: string,
-  fbAppSecret?: string,
-  dbUsername?: string,
-  dbPassword?: string,
-  dbName?: string,
-  dbHost?: string,
-}
+type EnvKeys = 'elasticURL'
+| 'rollbarPostServerItemToken'
+| 'fbToken'
+| 'fbVerifyToken'
+| 'fbAppSecret'
+| 'dbUsername'
+| 'dbPassword'
+| 'dbName'
+| 'dbHost';
+
+type EnvVars = Partial<Record<EnvKeys, string>>;
 
 // This is the JSON object saved in /etc/searchneu/config.json
 // null = hasen't been loaded yet.
@@ -110,7 +110,7 @@ class Macros extends commonMacros {
     return envVariables;
   }
 
-  static getEnvVariable(name: keyof EnvVars): string {
+  static getEnvVariable(name: EnvKeys): string {
     return this.getAllEnvVariables()[name];
   }
 
@@ -149,7 +149,7 @@ class Macros extends commonMacros {
       return;
     }
 
-    const rollbar = Rollbar.init(rollbarKey);
+    const rollbar = Rollbar.init({ accessToken: rollbarKey });
 
     const stack = (new Error()).stack;
 
@@ -251,9 +251,10 @@ async function handleUncaught(err: Error) {
   Macros.error(err.stack);
 }
 
+let addedRejectionHandler: boolean;
 // Sometimes it helps debugging to enable this test mode too.
-if (Macros.PROD && !global.addedRejectionHandler) {
-  global.addedRejectionHandler = true;
+if (Macros.PROD && !addedRejectionHandler) {
+  addedRejectionHandler = true;
   process.on('unhandledRejection', handleUncaught);
   process.on('uncaughtException', handleUncaught);
 }
