@@ -66,7 +66,7 @@ const config: webpack.Configuration = {
         'process.env': {
           PROD: 'false',
           DEV: 'true',
-          TESTS: 'false',
+          TEST: 'false',
           fbMessengerId: String(fbMessengerId),
         },
       }),
@@ -75,7 +75,7 @@ const config: webpack.Configuration = {
         'process.env': {
           PROD: 'true',
           DEV: 'false',
-          TESTS: 'false',
+          TEST: 'false',
 
           // This is needed so the production version of react is used.
           NODE_ENV: '"production"',

@@ -10,7 +10,7 @@
 // This class is never instantiated.
 // So there is no point in adding a constructor.
 class Macros {
-  static TESTS: boolean;
+  static TEST: boolean;
 
   static DEV: boolean;
 
@@ -54,7 +54,7 @@ class Macros {
   }
 
   static error(...args: any) {
-    if (Macros.TESTS) {
+    if (Macros.TEST) {
       return;
     }
 
@@ -70,7 +70,7 @@ class Macros {
   }
 }
 
-// Set up the Macros.TESTS, Macros.DEV, and Macros.PROD based on some env variables.
+// Set up the Macros.TEST, Macros.DEV, and Macros.PROD based on some env variables.
 if (process.env.PROD || process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'prod' || (process.env.CI && process.env.NODE_ENV !== 'test')) {
   Macros.PROD = true;
   console.log('Running in prod mode.'); // eslint-disable-line no-console
@@ -78,7 +78,7 @@ if (process.env.PROD || process.env.NODE_ENV === 'production' || process.env.NOD
   Macros.DEV = true;
   console.log('Running in dev mode.'); // eslint-disable-line no-console
 } else if (process.env.NODE_ENV === 'test') {
-  Macros.TESTS = true;
+  Macros.TEST = true;
 } else {
   console.log(`Unknown env! (${process.env.NODE_ENV}) Setting to dev.`); // eslint-disable-line no-console
   Macros.DEV = true;
@@ -92,8 +92,8 @@ if (!Macros.DEV) {
   Macros.DEV = false;
 }
 
-if (!Macros.TESTS) {
-  Macros.TESTS = false;
+if (!Macros.TEST) {
+  Macros.TEST = false;
 }
 
 
