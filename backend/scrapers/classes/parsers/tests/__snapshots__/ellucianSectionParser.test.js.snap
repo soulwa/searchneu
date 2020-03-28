@@ -5,7 +5,6 @@ Object {
   "honors": true,
   "maxCredits": 0,
   "minCredits": 0,
-  "online": false,
   "seatsCapacity": 32,
   "seatsRemaining": 31,
   "waitCapacity": 0,
@@ -20,7 +19,6 @@ Object {
   "honors": false,
   "maxCredits": 1,
   "minCredits": 1,
-  "online": false,
   "seatsCapacity": 99,
   "seatsRemaining": 67,
   "waitCapacity": 0,
@@ -42,7 +40,6 @@ Object {
   "honors": true,
   "maxCredits": 3,
   "minCredits": 3,
-  "online": false,
   "prereqs": Object {
     "type": "and",
     "values": Array [

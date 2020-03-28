@@ -11,6 +11,7 @@ import Request from '../../request';
 import macros from '../../../macros';
 import ellucianBaseParser from './ellucianBaseParser';
 import ellucianRequisitesParser from './ellucianRequisitesParser';
+import { getBaseHost } from '../../employees/util';
 
 
 const request = new Request('EllucianSectionParser');
@@ -202,7 +203,7 @@ class EllucianSectionParser extends ellucianBaseParser.EllucianBaseParser {
     // This is specific for NEU for now.
     // Other colleges probably do it a little differently.
     // Could probably figure out online vs not online easily.. but not sure.
-    if (macros.getBaseHost(url) === 'neu.edu') {
+    if (getBaseHost(url) === 'neu.edu') {
       // Possible values for campus
       // Different campuses are not done yet.
       // But this where the code would go

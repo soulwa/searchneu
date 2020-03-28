@@ -36,7 +36,7 @@ class Macros {
 
   // Use this for normal logging
   // Will log as normal, but stays silent during testing
-  static log(...args: any[]) {
+  static log(...args: any) {
     if (process.env.NODE_ENV === 'test') {
       return;
     }
@@ -44,7 +44,7 @@ class Macros {
     console.log(...args); // eslint-disable-line no-console
   }
 
-  static warn(...args: any[]) {
+  static warn(...args: any) {
     if (process.env.NODE_ENV === 'test') {
       return;
     }
@@ -53,7 +53,7 @@ class Macros {
     console.warn(...args); // eslint-disable-line no-console
   }
 
-  static error(...args: any[]) {
+  static error(...args: any) {
     if (Macros.TESTS) {
       return;
     }

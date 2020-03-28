@@ -9,6 +9,7 @@ import _ from 'lodash';
 import Request from '../request';
 import cache from '../cache';
 import macros from '../../macros';
+import { standardizeEmail, standardizePhone, parseNameWithSpaces } from './util';
 
 const request = new Request('COE');
 
@@ -30,7 +31,7 @@ class COE {
         obj.name = name;
       }
 
-      const splitName = macros.parseNameWithSpaces(obj.name);
+      const splitName = parseNameWithSpaces(obj.name);
       if (!splitName) {
         return null;
       }
@@ -57,14 +58,14 @@ class COE {
         obj.interests = interests.children[0].data;
       }
 
-      const email = macros.standardizeEmail($('ul.caption > li > a').get(0).children[0].data);
+      const email = standardizeEmail($('ul.caption > li > a').get(0).children[0].data);
       if (email) {
         obj.email = email;
       }
 
       const phone = $('ul.caption > li').get(1).children[0];
       if (phone) {
-        obj.phone = macros.standardizePhone(phone.data);
+        obj.phone = standardizePhone(phone.data);
       }
 
       const pic = $('img').get(0).attribs;

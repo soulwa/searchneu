@@ -9,6 +9,7 @@ import macros from '../../macros';
 import linkSpider from '../linkSpider';
 import cache from '../cache';
 import Request from '../request';
+import { standardizeEmail, parseNameWithSpaces } from './util';
 
 const request = new Request('CSSH');
 
@@ -43,7 +44,7 @@ class Cssh {
     }
 
     // Parse the first name and the last name from the given name
-    const namesParsed = macros.parseNameWithSpaces(obj.name);
+    const namesParsed = parseNameWithSpaces(obj.name);
     if (!namesParsed) {
       macros.error('Unable to parse names', obj.name);
       return {};
@@ -92,8 +93,8 @@ class Cssh {
     emailElement = $(emailElement);
 
     // Parse both the email it is linked to and the email that is displayed to ensure they are the same.
-    const mailto = macros.standardizeEmail(emailElement.attr('href'));
-    const email = macros.standardizeEmail(emailElement.text().trim());
+    const mailto = standardizeEmail(emailElement.attr('href'));
+    const email = standardizeEmail(emailElement.text().trim());
 
     // If they are different, log a warning and skip this email.
     if ((mailto || email) && mailto !== email) {
