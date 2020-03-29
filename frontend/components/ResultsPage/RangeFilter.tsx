@@ -16,10 +16,14 @@ export default function RangeFilter({ title, selected, setActive }: RangeFilterP
         </p>
       </div>
       <div className='range-input'>
-        <label className='label-min'>Minimum: </label>
-        <input type='string' className='input-box' value={ selected.min } onChange={ (event) => setActive({ min:Number(event.target.value), max:selected.max }) } />
-        <label className='label-max'>Maximum: </label>
-        <input type='string' className='input-box' value={ selected.max } onChange={ (event) => setActive({ min: selected.min, max:Number(event.target.value) }) } />
+        <div className='range-min'>
+          <label className='label-min'>From: </label>
+          <input type='string' className='input-box' value={ selected.min } onChange={ (event) => setActive({ min:Number(event.target.value), max:selected.max }) } />
+        </div>
+        <div>
+          <label className='label-max'>To: </label>
+          <input type='string' className='input-box' value={ selected.max } onChange={ (event) => setActive({ min: selected.min, max:Number(event.target.value) }) } />
+        </div>
       </div>
     </div>
   );

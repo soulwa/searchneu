@@ -53,5 +53,9 @@
 
 .range-input {
   display: flex;
-  justify-content: space-between;
+  justify-content: left;
+}
+
+.range-min {
+  margin-right: 10px;
 }
