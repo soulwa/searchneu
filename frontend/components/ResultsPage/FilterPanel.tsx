@@ -33,6 +33,8 @@ function FilterPanel({ options, selected, setActive }: FilterPanelProps) {
           && <DropdownFilter title={ display } options={ options[key] } selected={ aFilter } setActive={ setActiveFilter } />}
             {category === 'Checkboxes'
           && <CheckboxFilter title={ display } options={ options[key] } selected={ aFilter } setActive={ setActiveFilter } />}
+            {category === 'Range'
+          && <RangeFilter title={ display } selected={ aFilter } setActive={ setActiveFilter } />}
           </>
         )
       })}
