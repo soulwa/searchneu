@@ -59,6 +59,17 @@ export default function FilterPills({ filters, setFilters }: FilterPillsProps) {
     }
   }
 
+  for (const [key, spec] of Object.entries(FILTERS_BY_CATEGORY.Range)) {
+    if (filters[key]) {
+      crumbs.push({
+        verbose: spec.display,
+        compact: spec.display,
+        onClose: () => setFilters({ [key]: { min: 0, max: 9999 } }),
+      })
+    }
+  }
+
+
   return (
     <div className='selected-filters'>
       <span className='selected-filters__label'>
