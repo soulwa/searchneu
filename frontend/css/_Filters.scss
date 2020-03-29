@@ -47,15 +47,17 @@
   display: flex;
 }
 
-.input-box {
-  width: 45px;
-}
+.RangeFilter {
+  &__range-input {
+    display: flex;
+    justify-content: left;
+  }
 
-.range-input {
-  display: flex;
-  justify-content: left;
-}
+  &__input-box {
+    width: 45px;
+  }
 
-.range-min {
-  margin-right: 10px;
+  &__range-min {
+    margin-right: 10px;
+  }
 }
