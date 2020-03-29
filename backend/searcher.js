@@ -67,7 +67,7 @@ class Searcher {
     };
 
     const getRangeFilter = (selectedRange) => {
-      return { range: { [selectedRange]: { gte: selectedRange.min, lte: selectedRange.max } } };
+      return { range: { 'class.classId': { gte: selectedRange.min, lte: selectedRange.max } } };
     };
 
     return {
