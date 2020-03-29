@@ -48,9 +48,13 @@
 }
 
 .RangeFilter {
-  &__range-input {
+  &__input {
     display: flex;
     justify-content: left;
+  }
+
+  &__title {
+    font-weight: bold;
   }
 
   &__input-box {
