@@ -49,13 +49,7 @@
       [
         "@babel/preset-env",
         {
-          "useBuiltIns": "entry",
-          "corejs": "^3.0.1",
           "targets": {
-            "browsers": [
-              "> 0.25%",
-              "not dead"
-            ],
             "node": "current"
           }
         }

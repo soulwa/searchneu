@@ -98,10 +98,6 @@ export default {
   module: {
     rules: [
       {
-        test: /\.tsx?$/,
-        loader: 'babel-loader',
-      },
-      {
         test: /\.js$/,
         use: ['source-map-loader'],
         enforce: 'pre',
@@ -117,12 +113,13 @@ export default {
       //   ],
       // },
       {
-        test: /\.js$/,
+        test: /\.[jt]sx?$/,
         loader: 'babel-loader',
 
         include: [path.join(rootDir, 'frontend'), path.join(rootDir, 'common')],
         options: {
           cacheDirectory: true,
+          presets: ['@babel/preset-env'],
         },
       },
 
