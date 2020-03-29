@@ -31,6 +31,14 @@ class Searcher {
       return typeof arg === 'boolean' && arg;
     };
 
+    const isNum = (arg) => {
+      return typeof arg === 'number';
+    };
+
+    const isRange = (arg) => {
+      return _.difference(Object.keys(arg), ['min', 'max']).length === 0 && isNum(arg.min) && isNum(arg.max);
+    };
+
     // filter-generating functions
     const getSectionsAvailableFilter = () => {
       return { exists: { field: 'sections' } };
@@ -58,12 +66,17 @@ class Searcher {
       return { term: { 'class.termId': selectedTermId } };
     };
 
+    const getRangeFilter = (selectedRange) => {
+      return { range: { [selectedRange]: { gte: selectedRange.min, lte: selectedRange.max } } };
+    };
+
     return {
       nupath: { validate: isStringArray, create: getNUpathFilter, agg: 'class.nupath.keyword' },
       subject: { validate: isStringArray, create: getSubjectFilter, agg: 'class.subject.keyword' },
       online: { validate: isTrue, create: getOnlineFilter, agg: false },
       classType: { validate: isStringArray, create: getClassTypeFilter, agg: 'sections.classType.keyword' },
       sectionsAvailable: { validate: isTrue, create: getSectionsAvailableFilter, agg: false },
+      classIdRange: { validate: isRange, create: getRangeFilter, agg: false },
       termId: { validate: isString, create: getTermIdFilter, agg: false },
     };
   }
