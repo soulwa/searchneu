@@ -134,7 +134,7 @@ class Searcher {
     ];
 
     const patternResults = query.match(courseCodePattern);
-    if (patternResults && (this.getSubjects()).has(patternResults[1].toLowerCase())) {
+    if (patternResults && (this.getSubjects()).has(patternResults[1].toUpperCase())) {
       // after the first result, all of the following results should be of the same subject, e.g. it's weird to get ENGL2500 as the second or third result for CS2500
       fields = ['class.subject^10', 'class.classId'];
     }

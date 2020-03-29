@@ -1,16 +1,23 @@
 import _ from 'lodash';
-import searcher from '../searcher';
 import Keys from '../../common/Keys';
-import { sequelize } from '../database/models/index';
-
-afterAll(async () => {
-  await sequelize.close();
-});
+import request from 'request-promise-native';
 
 function getFirstClassResult(results) {
   return results.searchContent[0].class;
 }
 
+async function prodSearch(query, termId, min, max, filters = {}) {
+  return request(`searchneu.com/search?query=${query}&termId=${termId}&min=${min}&max=${max}`);
+}
+
+describe('search', () => {
+  it('returns specified class with class code query', async () => {
+    const firstResult = getFirstClassResult(await prodSearch('cs2500', '202010', 0, 1));
+      expect(Keys.getClassHash(firstResult)).toBe('neu.edu/202010/CS/2500');
+  });
+});
+
+/*
 describe('searcher', () => {
   describe('searches', () => {
     it('returns specified class with class code query', async () => {
@@ -326,3 +333,4 @@ describe('searcher', () => {
     });
   });
 });
+*/
