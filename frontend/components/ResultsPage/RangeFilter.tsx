@@ -1,23 +1,25 @@
-import React, { useState } from 'react';
+import React from 'react';
 import '../../css/_Filters.scss';
-import _ from 'lodash';
 
 interface RangeFilterProps {
   title: string,
-  active: string[],
-  setActive: (a:string[])=>void
+  selected: {min:number, max:number},
+  setActive: (a:{min:number, max:number})=>void
 }
 
-export default function RangeFilter({ title, active, setActive }: RangeFilterProps) {
-  const [id] = useState(_.uniqueId('react-range-'));
+export default function RangeFilter({ title, selected, setActive }: RangeFilterProps) {
   return (
-    <div className='rangeFilter'>
-      <div className='toggleName'>
+    <div className='RangeFilter'>
+      <div className='RangeFilter__title'>
         <p>
           {title}
         </p>
       </div>
-      <div className='rangeInput'>
+      <div className='range-input'>
+        <label className='label-min'>Minimum</label>
+        <input type='number' className='input-min' value={ selected.min } onChange={ (event) => setActive({ min:Number(event.target.value), max:selected.max }) } />
+        <label className='label-max'>Maximum</label>
+        <input type='number' className='input-max' value={ selected.max } onChange={ (event) => setActive({ min: selected.min, max:Number(event.target.value) }) } />
       </div>
     </div>
   );
