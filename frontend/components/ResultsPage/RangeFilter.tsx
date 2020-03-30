@@ -22,7 +22,7 @@ export default function RangeFilter({ title, selected, setActive }: RangeFilterP
             type='string'
             className='RangeFilter__input-box'
             placeholder='0'
-            value={ selected.min }
+            value={ selected.min ? selected.min : '' }
             onChange={ (event) => setActive({ min:Number(event.target.value), max: (selected.max ? selected.max : null) }) }
           />
         </div>
@@ -32,7 +32,7 @@ export default function RangeFilter({ title, selected, setActive }: RangeFilterP
             type='string'
             className='RangeFilter__input-box'
             placeholder='9999'
-            value={ selected.max }
+            value={ selected.max ? selected.max : '' }
             onChange={ (event) => setActive({ min: (selected.min ? selected.min : null), max:Number(event.target.value) }) }
           />
         </div>
