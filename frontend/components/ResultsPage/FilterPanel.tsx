@@ -11,7 +11,6 @@ import {
   FilterOptions, FilterSelection, FILTERS_IN_ORDER,
 } from './filters';
 
-
 export interface FilterPanelProps {
   options: FilterOptions,
   selected: FilterSelection,
