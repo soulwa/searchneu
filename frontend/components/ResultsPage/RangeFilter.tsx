@@ -42,7 +42,7 @@ export default function RangeFilter({ title, selected, setActive }: RangeFilterP
             onChange={ (event) => setControlledInput({ min: (controlledInput.min ? controlledInput.min : null), max:Number(event.target.value) }) }
           />
         </div>
-        <div className='RangeFilter__apply-input' onChange={ () => setActive(controlledInput) }>
+        <div className='RangeFilter__apply-input' onClick={ () => setActive(controlledInput) }>
           <p>Apply</p>
         </div>
       </div>
