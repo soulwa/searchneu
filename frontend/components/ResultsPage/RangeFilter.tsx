@@ -36,6 +36,7 @@ export default function RangeFilter({ title, selected, setActive }: RangeFilterP
             onChange={ (event) => setActive({ min: (selected.min ? selected.min : null), max:Number(event.target.value) }) }
           />
         </div>
+        <input className='RangeFilter__apply-input' type='submit' onChange={ () => setActive({ min: (selected.min ? selected.min : null), max: (selected.max ? selected.max : null) }) } value='Apply' />
       </div>
     </div>
   );
