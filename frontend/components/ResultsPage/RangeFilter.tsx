@@ -3,8 +3,8 @@ import '../../css/_Filters.scss';
 
 interface RangeFilterProps {
   title: string,
-  selected: {min:number, max:number},
-  setActive: (a:{min:number, max:number})=>void
+  selected: {min:string, max:string},
+  setActive: (a:{min:string, max:string})=>void
 }
 
 export default function RangeFilter({ title, selected, setActive }: RangeFilterProps) {
@@ -29,7 +29,7 @@ export default function RangeFilter({ title, selected, setActive }: RangeFilterP
             className='RangeFilter__input-box'
             placeholder='0'
             value={ controlledInput.min ? controlledInput.min : '' }
-            onChange={ (event) => setControlledInput({ min:Number(event.target.value), max: (controlledInput.max ? controlledInput.max : null) }) }
+            onChange={ (event) => setControlledInput({ min:event.target.value, max: (controlledInput.max ? controlledInput.max : null) }) }
           />
         </div>
         <div>
@@ -39,7 +39,7 @@ export default function RangeFilter({ title, selected, setActive }: RangeFilterP
             className='RangeFilter__input-box'
             placeholder='9999'
             value={ controlledInput.max ? controlledInput.max : '' }
-            onChange={ (event) => setControlledInput({ min: (controlledInput.min ? controlledInput.min : null), max:Number(event.target.value) }) }
+            onChange={ (event) => setControlledInput({ min: (controlledInput.min ? controlledInput.min : null), max:event.target.value }) }
           />
         </div>
         <div className='RangeFilter__apply-input' onClick={ () => setActive(controlledInput) }>
