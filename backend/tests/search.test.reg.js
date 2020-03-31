@@ -1,19 +1,23 @@
 import _ from 'lodash';
 import Keys from '../../common/Keys';
-import request from 'request-promise-native';
+import request from 'request';
 
 function getFirstClassResult(results) {
-  return results.searchContent[0].class;
+  console.log(results.results);
+  return results.results[0].class;
 }
 
 async function prodSearch(query, termId, min, max, filters = {}) {
-  return request(`searchneu.com/search?query=${query}&termId=${termId}&min=${min}&max=${max}`);
+  const queryUrl = `searchneu.com/search?query=${query}&termId=${termId}&minIndex=${min}&maxIndex=${max}`
+  console.log(queryUrl);
+  //return request.get(
+  return request.get(queryUrl);
 }
 
 describe('search', () => {
   it('returns specified class with class code query', async () => {
-    const firstResult = getFirstClassResult(await prodSearch('cs2500', '202010', 0, 1));
-      expect(Keys.getClassHash(firstResult)).toBe('neu.edu/202010/CS/2500');
+    const firstResult = getFirstClassResult(await prodSearch('cs2500', '202110', 0, 1));
+    expect(Keys.getClassHash(firstResult)).toBe('neu.edu/202110/CS/2500');
   });
 });
 
