@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import '../../css/_Filters.scss';
 
 interface RangeFilterProps {
@@ -8,6 +8,12 @@ interface RangeFilterProps {
 }
 
 export default function RangeFilter({ title, selected, setActive }: RangeFilterProps) {
+  const [controlledInput, setControlledInput] = useState(selected);
+
+  useEffect(() => {
+    setControlledInput(selected)
+  }, [selected]);
+
   return (
     <div className='RangeFilter'>
       <div className='RangeFilter__title'>
@@ -22,8 +28,8 @@ export default function RangeFilter({ title, selected, setActive }: RangeFilterP
             type='string'
             className='RangeFilter__input-box'
             placeholder='0'
-            value={ selected.min ? selected.min : '' }
-            onChange={ (event) => setActive({ min:Number(event.target.value), max: (selected.max ? selected.max : null) }) }
+            value={ controlledInput.min ? controlledInput.min : '' }
+            onChange={ (event) => setControlledInput({ min:Number(event.target.value), max: (controlledInput.max ? controlledInput.max : null) }) }
           />
         </div>
         <div>
@@ -32,11 +38,13 @@ export default function RangeFilter({ title, selected, setActive }: RangeFilterP
             type='string'
             className='RangeFilter__input-box'
             placeholder='9999'
-            value={ selected.max ? selected.max : '' }
-            onChange={ (event) => setActive({ min: (selected.min ? selected.min : null), max:Number(event.target.value) }) }
+            value={ controlledInput.max ? controlledInput.max : '' }
+            onChange={ (event) => setControlledInput({ min: (controlledInput.min ? controlledInput.min : null), max:Number(event.target.value) }) }
           />
         </div>
-        <input className='RangeFilter__apply-input' type='submit' onChange={ () => setActive({ min: (selected.min ? selected.min : null), max: (selected.max ? selected.max : null) }) } value='Apply' />
+        <div className='RangeFilter__apply-input' onChange={ () => setActive(controlledInput) }>
+          <p>Apply</p>
+        </div>
       </div>
     </div>
   );
