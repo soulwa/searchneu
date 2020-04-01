@@ -5,6 +5,10 @@ variable "aws_region" {
   default     = "us-east-1"
 }
 
+variable "aws_profile" {
+  description = "The profile to use for AWS specified in ~/.aws/credentials"
+}
+
 variable "ecs_task_execution_role_name" {
   description = "ECS task execution role name"
   default = "myEcsTaskExecutionRole"
@@ -15,14 +19,14 @@ variable "az_count" {
   default     = "2"
 }
 
-variable "app_image" {
-  description = "Docker image to run in the ECS cluster"
-  default     = "crccheck/hello-world:latest"
+variable "name" {
+  description = "Name of the application"
+  default     = "searchneu"
 }
 
 variable "app_port" {
   description = "Port exposed by the docker image to redirect traffic to"
-  default     = 8000
+  default     = 5000
 }
 
 variable "app_count" {
