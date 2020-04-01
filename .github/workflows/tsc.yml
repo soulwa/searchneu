@@ -1,7 +1,6 @@
 name: Check Typescript Types
 
 on:
-  push:
   pull_request:
 
 jobs:
@@ -14,7 +13,5 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: 12
-    - name: yarn install
-      run: yarn install
-    - name: yarn tsc
-      run: yarn tsc
+    - run: yarn install
+    - run: yarn tsc
