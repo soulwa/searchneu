@@ -1,13 +1,13 @@
 # alb.tf
 
 resource "aws_alb" "main" {
-  name            = "${var.name}-load-balancer"
+  name            = module.main_label.id
   subnets         = aws_subnet.public.*.id
   security_groups = [aws_security_group.lb.id]
 }
 
 resource "aws_alb_target_group" "app" {
-  name        = "${var.name}-target-group"
+  name        = module.main_label.id
   port        = 80
   protocol    = "HTTP"
   vpc_id      = aws_vpc.main.id

@@ -21,15 +21,15 @@ jobs:
       - name: Build, tag, and push image to Amazon ECR
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: searchneu
+          ECR_REPOSITORY: prod-searchneu
           IMAGE_TAG: ${{ github.sha }}
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
       - name: Deploy to Amazon ECS service
         env: 
-          ECS_CLUSTER: searchneu-cluster
-          ECS_SERVICE: searchneu-service
+          ECS_CLUSTER: prod-searchneu
+          ECS_SERVICE: prod-searchneu
         run: |
           aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --force-new-deployment
           aws ecs wait services-stable --cluster $ECS_CLUSTER --service $ECS_SERVICE
