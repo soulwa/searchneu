@@ -64,6 +64,15 @@ data "aws_iam_policy_document" "github_actions_user" {
     resources = [aws_ecr_repository.app.arn]
   }
   statement {
+    sid    = "DeployService"
+    effect = "Allow"
+    actions = [
+      "ecs:UpdateService",
+      "ecs:DescribeServices"
+    ]
+    resources = [aws_ecs_service.main.id]
+  }
+  statement {
     sid    = "GetAuthorizationToken"
     effect = "Allow"
     actions = [
