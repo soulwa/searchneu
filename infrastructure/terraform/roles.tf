@@ -32,18 +32,22 @@ resource "aws_iam_user" "github_actions_user" {
   name = "github-actions-user"
 }
 
-resource "aws_iam_user_policy_attachment" "gh-attach-policy" {
-  user       = aws_iam_user.github_actions_user.name
-  policy_arn = aws_iam_policy.gh_policy.arn
+resource "aws_iam_access_key" "github_actions_user" {
+  user    = aws_iam_user.github_actions_user.name
 }
 
-resource "aws_iam_policy" "gh_policy" {
+resource "aws_iam_user_policy_attachment" "github_actions_user" {
+  user       = aws_iam_user.github_actions_user.name
+  policy_arn = aws_iam_policy.github_actions_user.arn
+}
+
+resource "aws_iam_policy" "github_actions_user" {
   name        = "github-actions-user-policy"
   description = "Policy for Github Actions to push to ECR"
-  policy      = data.aws_iam_policy_document.gh_role.json
+  policy      = data.aws_iam_policy_document.github_actions_user.json
 }
 
-data "aws_iam_policy_document" "gh_role" {
+data "aws_iam_policy_document" "github_actions_user" {
   version = "2012-10-17"
   statement {
     sid    = "AllowPush"
