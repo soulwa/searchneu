@@ -28,7 +28,3 @@
         - name: Logout of Amazon ECR
           if: always()
           run: docker logout ${{ steps.login-ecr.outputs.registry }}
-
-
-- name: "Configure AWS Credentials" Action For GitHub Actions
-  uses: aws-actions/configure-aws-credentials@v1
