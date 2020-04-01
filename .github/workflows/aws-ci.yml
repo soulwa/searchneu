@@ -32,6 +32,7 @@ jobs:
           ECS_SERVICE: searchneu-service
         run: |
           aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --force-new-deployment
+          aws ecs wait services-stable --cluster $ECS_CLUSTER --service $ECS_SERVICE
       - name: Logout of Amazon ECR
         if: always()
         run: docker logout ${{ steps.login-ecr.outputs.registry }}
