@@ -1,10 +1,11 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
+import { ClassRange } from './filters';
 import '../../css/_Filters.scss';
 
 interface RangeFilterProps {
   title: string,
-  selected: {min:string, max:string},
-  setActive: (a:{min:string, max:string})=>void
+  selected: ClassRange,
+  setActive: (a:ClassRange)=>void
 }
 
 export default function RangeFilter({ title, selected, setActive }: RangeFilterProps) {
@@ -42,7 +43,7 @@ export default function RangeFilter({ title, selected, setActive }: RangeFilterP
             onChange={ (event) => setControlledInput({ min: (controlledInput.min ? controlledInput.min : null), max:event.target.value }) }
           />
         </div>
-        <div className='RangeFilter__apply-input' onClick={ () => setActive(controlledInput) }>
+        <div className='RangeFilter__apply-input' onClick={ () => setActive({ min: controlledInput.min ? controlledInput.min : '0', max: controlledInput.max ? controlledInput.max : '9999' }) }>
           <p>Apply</p>
         </div>
       </div>
