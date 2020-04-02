@@ -62,7 +62,7 @@ export default function FilterPills({ filters, setFilters }: FilterPillsProps) {
   for (const [key, spec] of Object.entries(FILTERS_BY_CATEGORY.Range)) {
     if (filters[key] && (filters[key].min || filters[key].max)) {
       crumbs.push({
-        verbose: spec.display,
+        verbose: `${spec.display}: ${filters[key].min} - ${filters[key].max}`,
         compact: spec.display,
         onClose: () => setFilters({ [key]: {} }),
       })

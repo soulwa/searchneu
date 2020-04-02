@@ -29,7 +29,7 @@ export default function RangeFilter({ title, selected, setActive }: RangeFilterP
             type='string'
             className='RangeFilter__input-box'
             placeholder='0'
-            value={ controlledInput.min || '' }
+            value={ (controlledInput).min || '' }
             onChange={ (event) => setControlledInput({ min:event.target.value, max: (controlledInput.max || null) }) }
           />
         </div>
@@ -43,7 +43,11 @@ export default function RangeFilter({ title, selected, setActive }: RangeFilterP
             onChange={ (event) => setControlledInput({ min: (controlledInput.min || null), max:event.target.value }) }
           />
         </div>
-        <div className='RangeFilter__apply-input' onClick={ () => setActive({ min: controlledInput.min || '0', max: controlledInput.max || '9999' }) }>
+        <div
+          role='button'
+          tabIndex={ 0 }
+          className='RangeFilter__apply-input'
+          onClick={ () => setActive({ min: controlledInput.min || '0', max: controlledInput.max || '9999' }) }>
           <p>Apply</p>
         </div>
       </div>
