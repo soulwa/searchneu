@@ -104,7 +104,7 @@ class Section {
 
   // Unique list of all professors in all meetings, sorted alphabetically
   getProfs() {
-    return Array.from(this.profs).sort();
+    return this.profs.length > 0 ? Array.from(this.profs).sort() : ['TBA'];
   }
 
   getLocations(ignoreExams = true) {
