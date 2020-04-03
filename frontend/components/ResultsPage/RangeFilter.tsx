@@ -15,6 +15,7 @@ export default function RangeFilter({ title, selected, setActive }: RangeFilterP
     setControlledInput(selected)
   }, [selected]);
 
+  // @ts-ignore
   return (
     <div className='RangeFilter'>
       <div className='RangeFilter__title'>
@@ -29,7 +30,7 @@ export default function RangeFilter({ title, selected, setActive }: RangeFilterP
             type='string'
             className='RangeFilter__input-box'
             placeholder='0'
-            value={ (controlledInput).min || '' }
+            value={ controlledInput.min || '' }
             onChange={ (event) => setControlledInput({ min:event.target.value, max: (controlledInput.max || null) }) }
           />
         </div>
