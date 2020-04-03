@@ -69,7 +69,6 @@ export default function FilterPills({ filters, setFilters }: FilterPillsProps) {
     }
   }
 
-
   return (
     <div className='selected-filters'>
       <span className='selected-filters__label'>
