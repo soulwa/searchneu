@@ -71,7 +71,12 @@ resource "aws_ecs_service" "main" {
 
 
 locals {
-  all_secrets = concat(var.secrets, [
+  all_secrets_unsorted = concat(var.secrets, [
+    {
+      name        = "elasticURL"
+      value       = "https://${module.elasticsearch.domain_endpoint}"
+      description = "Elasticsearch hostname"
+    },
     {
       name        = "dbUsername"
       value       = aws_db_instance.default.username
@@ -93,6 +98,17 @@ locals {
       description = "Postgres database host"
     }
   ])
+  # For some insane reason the secrets list is unstable. We have to sort it to prevent recreating the params every time.
+  all_secrets_keys = [for s in local.all_secrets_unsorted : lookup(s, "name")]
+  all_secrets_name_map = zipmap(local.all_secrets_keys, local.all_secrets_unsorted)
+  all_secrets = [
+    for key in sort(local.all_secrets_keys): 
+    {
+      name = key
+      value = lookup(lookup(local.all_secrets_name_map, key), "value")
+      description = lookup(lookup(local.all_secrets_name_map, key), "description")
+    }
+  ]
 }
 # Secrets to put in env
 # Maybe use a KMS for better security?
