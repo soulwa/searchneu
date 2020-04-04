@@ -137,3 +137,11 @@
     }
 
 }
+
+@media only screen and (max-width: 320px) {
+    .FeedbackHeader {
+        &__q1 {
+            width: 210px;
+        }
+    }
+}
