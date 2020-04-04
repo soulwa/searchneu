@@ -42,3 +42,26 @@ resource "aws_security_group" "ecs_tasks" {
   }
 }
 
+# Traffic to Postgres shoudl only allow from ECS
+resource "aws_security_group" "postgres" {
+  name = "${module.main_label.id}-postgres-security-group"
+
+  description = "RDS postgres servers (terraform-managed)"
+  vpc_id = aws_vpc.main.id
+
+  # Only postgres in
+  ingress {
+    protocol = "tcp"
+    from_port = 5432
+    to_port = 5432
+    security_groups = [aws_security_group.ecs_tasks.id]
+  }
+
+  # Allow all outbound traffic.
+  egress {
+    protocol = "-1"
+    from_port = 0
+    to_port = 0
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}

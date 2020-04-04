@@ -69,14 +69,39 @@ resource "aws_ecs_service" "main" {
   depends_on = [aws_alb_listener.front_end, aws_iam_role_policy_attachment.ecs_task_execution_role, null_resource.enable_long_ecs_resource_ids]
 }
 
+
+locals {
+  all_secrets = concat(var.secrets, [
+    {
+      name        = "dbUsername"
+      value       = aws_db_instance.default.username
+      description = "Postgres database username"
+    },
+    {
+      name        = "dbPassword"
+      value       = aws_db_instance.default.password
+      description = "Postgres database password"
+    },
+    {
+      name        = "dbName"
+      value       = aws_db_instance.default.name
+      description = "Postgres database name"
+    },
+    {
+      name        = "dbHost"
+      value       = aws_db_instance.default.address
+      description = "Postgres database host"
+    }
+  ])
+}
 # Secrets to put in env
 # Maybe use a KMS for better security?
 # Also this module https://github.com/cloudposse/terraform-aws-ssm-parameter-store is nice but not up to date with Terraform 0.12
 resource "aws_ssm_parameter" "default" {
-  count           = length(var.secrets)
-  name            = lookup(var.secrets[count.index], "name")
-  description     = lookup(var.secrets[count.index], "description", lookup(var.secrets[count.index], "name"))
+  count           = length(local.all_secrets)
+  name            = lookup(local.all_secrets[count.index], "name")
+  description     = lookup(local.all_secrets[count.index], "description", lookup(local.all_secrets[count.index], "name"))
   type            = "SecureString"
-  value           = lookup(var.secrets[count.index], "value")
-  overwrite       = lookup(var.secrets[count.index], "overwrite", "true")
+  value           = lookup(local.all_secrets[count.index], "value")
+  overwrite       = lookup(local.all_secrets[count.index], "overwrite", "true")
 }
