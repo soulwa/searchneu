@@ -25,21 +25,19 @@ export default function RangeFilter({ title, selected, setActive }: RangeFilterP
       </div>
       <div className='RangeFilter__input'>
         <div className='RangeFilter__range-min'>
-          <label className='RangeFilter__label-min'>From: </label>
           <input
             type='string'
             className='RangeFilter__input-box'
-            placeholder='0'
+            placeholder='Min'
             value={ controlledInput.min }
             onChange={ (event) => setControlledInput({ min:event.target.value, max: controlledInput.max }) }
           />
         </div>
-        <div>
-          <label className='RangeFilter__label-max'>To: </label>
+        <div className='RangeFilter__range-max'>
           <input
             type='string'
             className='RangeFilter__input-box'
-            placeholder='9999'
+            placeholder='Max'
             value={ controlledInput.max }
             onChange={ (event) => setControlledInput({ min: controlledInput.min, max:event.target.value }) }
           />

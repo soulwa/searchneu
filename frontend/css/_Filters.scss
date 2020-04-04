@@ -51,6 +51,7 @@
   &__input {
     display: flex;
     justify-content: left;
+    padding-top: 10px;
   }
 
   &__title {
@@ -58,17 +59,21 @@
   }
 
   &__input-box {
-    width: 45px;
+    width: 70px;
+    height: 28px;
+    border-style: hidden;
   }
 
-  &__range-min {
-    margin-right: 10px;
+  &__range-max {
+    margin-left: 10px;
+    margin-right: 20px;
   }
 
   &__apply-input {
-    margin-left: 10px;
     cursor: pointer;
     background: inherit;
+    margin: auto;
+    text-align: center;
     border: none;
     border-radius: 1px;
   }
