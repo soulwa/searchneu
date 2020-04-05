@@ -12,6 +12,7 @@ import he from 'he';
 import Request from '../request';
 import cache from '../cache';
 import macros from '../../macros';
+import { standardizeEmail, occurrences } from './util';
 
 const request = new Request('Employees');
 
@@ -199,7 +200,7 @@ class Employee {
 
     name = _.trim(name, ',');
 
-    if (macros.occurrences(name, ',') !== 1) {
+    if (occurrences(name, ',') !== 1) {
       macros.log('Name has != 1 commas', name);
       return null;
     }
@@ -320,7 +321,7 @@ class Employee {
               }
 
               // Scrape the email from the table
-              const email = macros.standardizeEmail(parsedTable.email[j]);
+              const email = standardizeEmail(parsedTable.email[j]);
               if (email) {
                 person.emails = [email];
               }

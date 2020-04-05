@@ -9,6 +9,7 @@ import macros from '../../macros';
 import linkSpider from '../linkSpider';
 import Request from '../request';
 import cache from '../cache';
+import { standardizeEmail, parseNameWithSpaces, standardizePhone } from './util';
 
 const request = new Request('Camd');
 
@@ -46,7 +47,7 @@ class Camd {
     obj.name = $('#main > div.pagecenter > div > div > div > div > div.col10.last.right > h1.entry-title').text().trim().split(',')[0];
 
     // Parse the first name and the last name from the given name
-    const { firstName, lastName } = macros.parseNameWithSpaces(obj.name);
+    const { firstName, lastName } = parseNameWithSpaces(obj.name);
 
     if (firstName && lastName) {
       obj.firstName = firstName;
@@ -72,7 +73,7 @@ class Camd {
     const descriptionElements = $('#main div.pagecenter div.gdcenter div.col16 > div.col5 > p.smallp')[0].children;
 
     let email = $('#main > div.pagecenter > div > div > div > div:nth-child(1) > div.col5 > p > a').text().trim();
-    email = macros.standardizeEmail(email);
+    email = standardizeEmail(email);
     if (email) {
       obj.emails = [email];
     }
@@ -81,7 +82,7 @@ class Camd {
 
     texts.forEach((text) => {
       text = text.trim();
-      const possiblePhone = macros.standardizePhone(text);
+      const possiblePhone = standardizePhone(text);
       if (possiblePhone) {
         if (obj.phone) {
           macros.log('Duplicate phone?', obj.phone, possiblePhone);

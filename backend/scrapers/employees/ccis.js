@@ -8,6 +8,9 @@ import cheerio from 'cheerio';
 import Request from '../request';
 import macros from '../../macros';
 import cache from '../cache';
+import {
+  standardizeEmail, standardizePhone, parseGoogleScolarLink, parseNameWithSpaces,
+} from './util';
 
 const request = new Request('CCIS');
 
@@ -59,7 +62,7 @@ class NeuCCISFaculty {
       obj.name = $('h3.person-name', $personElement).text().trim();
 
       // Parse the first name and the last name from the given name
-      const { firstName, lastName } = macros.parseNameWithSpaces(obj.name);
+      const { firstName, lastName } = parseNameWithSpaces(obj.name);
 
       if (firstName && lastName) {
         obj.firstName = firstName;
@@ -86,8 +89,8 @@ class NeuCCISFaculty {
 
       // also email
       if (emailElements.length > 0) {
-        const email = macros.standardizeEmail(emailElements.text().trim());
-        const mailto = macros.standardizeEmail(emailElements.attr('href').trim());
+        const email = standardizeEmail(emailElements.text().trim());
+        const mailto = standardizeEmail(emailElements.attr('href').trim());
 
 
         if (!mailto || !email || mailto !== email) {
@@ -105,8 +108,8 @@ class NeuCCISFaculty {
 
         let tel = phoneElements.attr('href').trim();
 
-        tel = macros.standardizePhone(tel);
-        phone = macros.standardizePhone(phone);
+        tel = standardizePhone(tel);
+        phone = standardizePhone(phone);
 
         if (tel || phone) {
           if (!tel || !phone || tel !== phone) {
@@ -159,7 +162,7 @@ class NeuCCISFaculty {
 
     const googleScholarUrl = $('div.contact-block > div.contact-links > p.google-scholar > a').attr('href');
 
-    const userId = macros.parseGoogleScolarLink(googleScholarUrl);
+    const userId = parseGoogleScolarLink(googleScholarUrl);
     if (userId) {
       obj.googleScholarId = userId;
     }

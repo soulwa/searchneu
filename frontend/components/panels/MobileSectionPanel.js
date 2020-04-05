@@ -9,7 +9,7 @@ import { Icon } from 'semantic-ui-react';
 
 import WeekdayBoxes from './WeekdayBoxes';
 import LocationLinks from './LocationLinks';
-import macros from '../macros';
+import stripMiddleName from './stripMiddleName';
 import NotifCheckBox from './NotifCheckBox';
 
 import globe from './globe.svg';
@@ -135,7 +135,7 @@ export default class MobileSectionPanel extends React.Component {
           </a>
         </div>
 
-        <div className='mobile-section-title'>{`${macros.stripMiddleName(this.props.section.getProfs()[0])} ${titleEnding}`}</div>
+        <div className='mobile-section-title'>{`${stripMiddleName(this.props.section.getProfs()[0])} ${titleEnding}`}</div>
         <table>
           <tbody>
             <tr className='firstRow'>
