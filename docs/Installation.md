@@ -17,6 +17,12 @@ First, you need to download and install Node.js by following the instructions [h
 
 We recommend that you use yarn to install and manage the npm packages. Yarn is an alternate to the npm client that was developed by Facebook. While not required, we stronlgy recommend everyone to use yarn. Follow the instructions [here](https://yarnpkg.com/lang/en/docs/install/) to install yarn. 
 
+### Databases
+
+It's possible to run just the frontend and let the backend proxy to the production server, but this is not recommended. Instead, you should get Postgres and Elasticsearch on your computer. Luckily, all this can be auto-configured with Docker. 
+
+Install Docker on your machine. [Mac](https://docs.docker.com/docker-for-mac/install) and [Windows](https://docs.docker.com/docker-for-windows/install/) should use Docker Desktop. Linux should get [Docker Engine](https://docs.docker.com/install/linux/docker-ce/ubuntu/) and [Docker Compose](https://docs.docker.com/compose/install/) (Compose comes with Docker Desktop for Mac and Windows).
+
 
 ## Clone the repository
 
@@ -60,6 +66,13 @@ npm install
 ```
 
 If you get installation errors, try deleting the `node_modules` folder and running the install command again. If the problem continues, feel free to message us.
+
+### Start Databases
+
+1. Run `yarn dev:docker` to start Elasticsearch and Postgres in docker. This is just short for going into `infrastructure/dev` and running `docker-compose up`. 
+2. Run `yarn dev:migrate` to put the right columns in Postgres.
+
+`yarn dev:docker:del` will delete the entire ES and PG databases! Useful if you need to just hard reset.
 
 ### Start the server
 

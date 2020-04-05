@@ -17,18 +17,18 @@ exports[`should render coreqs string 1`] = `
 Array [
   <a
     className="reqClassLink"
-    href="/201810/CHEM 3506"
     onClick={[Function]}
-    tabIndex={0}
+    role="link"
+    tabIndex="0"
   >
     CHEM 3506
   </a>,
   " and ",
   <a
     className="reqClassLink"
-    href="/201810/CHEM 3507"
     onClick={[Function]}
-    tabIndex={0}
+    role="link"
+    tabIndex="0"
   >
     CHEM 3507
   </a>,
@@ -42,18 +42,18 @@ Array [
     Array [
       <a
         className="reqClassLink"
-        href="/201810/CHEM 3401"
         onClick={[Function]}
-        tabIndex={0}
+        role="link"
+        tabIndex="0"
       >
         CHEM 3401
       </a>,
       " or ",
       <a
         className="reqClassLink"
-        href="/201810/CHEM 3431"
         onClick={[Function]}
-        tabIndex={0}
+        role="link"
+        tabIndex="0"
       >
         CHEM 3431
       </a>,
@@ -66,18 +66,18 @@ Array [
     Array [
       <a
         className="reqClassLink"
-        href="/201810/CHEM 2321"
         onClick={[Function]}
-        tabIndex={0}
+        role="link"
+        tabIndex="0"
       >
         CHEM 2321
       </a>,
       " or ",
       <a
         className="reqClassLink"
-        href="/201810/CHEM 2331"
         onClick={[Function]}
-        tabIndex={0}
+        role="link"
+        tabIndex="0"
       >
         CHEM 2331
       </a>,
@@ -90,18 +90,18 @@ Array [
     Array [
       <a
         className="reqClassLink"
-        href="/201810/CHEM 2313"
         onClick={[Function]}
-        tabIndex={0}
+        role="link"
+        tabIndex="0"
       >
         CHEM 2313
       </a>,
       " or ",
       <a
         className="reqClassLink"
-        href="/201810/CHEM 2317"
         onClick={[Function]}
-        tabIndex={0}
+        role="link"
+        tabIndex="0"
       >
         CHEM 2317
       </a>,
