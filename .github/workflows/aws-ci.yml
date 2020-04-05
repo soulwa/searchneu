@@ -27,12 +27,8 @@ jobs:
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
       - name: Deploy to Amazon ECS service
-        env: 
-          ECS_CLUSTER: prod-searchneu
-          ECS_SERVICE: prod-searchneu
         run: |
-          aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --force-new-deployment
-          aws ecs wait services-stable --cluster $ECS_CLUSTER --service $ECS_SERVICE
+          ./infrastructure/aws/redeploy prod-searchneu
       - name: Logout of Amazon ECR
         if: always()
         run: docker logout ${{ steps.login-ecr.outputs.registry }}

@@ -1,0 +1,22 @@
+#!/bin/bash
+
+if [[ ! " prod staging " =~ " $1 " ]]; then
+  echo "Please provide environment to use: prod or staging"
+  exit 1
+fi
+CLUSTER="$1-searchneu"
+SERVICE=$CLUSTER
+TASK=$CLUSTER
+
+# Disable aws from sending stdout to less
+export AWS_PAGER=""
+
+echo "Running one-off task on $CLUSTER cluster with command: $2"
+
+# Get the network config from the web app service
+NETCONFIG=$(aws ecs describe-services --cluster $CLUSTER --services $SERVICE --output json | jq  '.services[0].networkConfiguration' | jq '.awsvpcConfiguration.assignPublicIp = "DISABLED"')
+OVERRIDES=$(printf '{"containerOverrides":[{"name":"%s","command":[%s]}]}' "$TASK" "$2")
+
+echo $OVERRIDES
+
+aws ecs run-task --overrides "$OVERRIDES" --reference-id "one-off task" --launch-type "FARGATE" --network-configuration "$NETCONFIG" --task-definition $TASK --cluster $CLUSTER

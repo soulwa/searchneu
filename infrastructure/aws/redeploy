@@ -1,0 +1,16 @@
+#!/bin/bash
+
+if [[ ! " prod staging " =~ " $1 " ]]; then
+  echo "Please provide environment to use: prod or staging"
+  exit 1
+fi
+CLUSTER="$1-searchneu"
+SERVICE=$CLUSTER # Service and cluster have same name
+
+# Disable aws from sending stdout to less
+export AWS_PAGER=""
+
+echo "Redeploying cluster $CLUSTER"
+
+aws ecs update-service --cluster $CLUSTER --service $SERVICE --force-new-deployment
+aws ecs wait services-stable --cluster $CLUSTER --service $SERVICE
