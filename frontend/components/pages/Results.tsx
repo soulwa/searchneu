@@ -113,7 +113,7 @@ export default function Results() {
           onChange={ setTerm }
         />
       </div>
-      <FeedbackHeader/>
+      <FeedbackHeader searchQuery={ query } selectedFilters={ filters } searchResults={ results }/>
       <div className='Results_Container'>
         {!macros.isMobile && (
           <>

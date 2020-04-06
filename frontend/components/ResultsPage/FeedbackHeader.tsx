@@ -1,7 +1,16 @@
 import React, { useState, useEffect } from 'react';
+import { FilterSelection } from './filters';
+import { SearchItem } from '../types';
 import macros from '../macros';
 
-export default function FeedbackHeader() {
+
+interface FeedbackHeaderProps {
+  searchQuery: string;
+  selectedFilters: FilterSelection;
+  searchResults: SearchItem[];
+}
+
+export default function FeedbackHeader({ searchQuery, selectedFilters, searchResults }: FeedbackHeaderProps) {
   const [close, setClose] = useState(false);
   const [yes, setYes] = useState(false);
   const [no, setNo] = useState(false);
@@ -46,7 +55,9 @@ export default function FeedbackHeader() {
                   tabIndex={ 0 }
                   onClick={ () => {
                     setYes(true);
-                    macros.logAmplitudeEvent('Feedback header click yes', { message: 'user found what they were looking for' });
+                    macros.logAmplitudeEvent('Feedback header click', {
+                      isYes: true, searchQuery: searchQuery, selectedFilters: selectedFilters, searchResults: searchResults.slice(0, 3),
+                    });
                   } }
                 >
                   {macros.isMobile ? 'Y' : 'Yes'}
@@ -57,7 +68,9 @@ export default function FeedbackHeader() {
                   tabIndex={ 0 }
                   onClick={ () => {
                     setNo(true);
-                    macros.logAmplitudeEvent('Feedback header click no', { message: 'user did not find what they were looking for' });
+                    macros.logAmplitudeEvent('Feedback header click', {
+                      isYes: false, searchQuery: searchQuery, selectedFilters: selectedFilters, searchResults: searchResults.slice(0, 3),
+                    });
                   } }
                 >
                   {macros.isMobile ? 'N' : 'No'}
@@ -68,22 +81,26 @@ export default function FeedbackHeader() {
           {no && (
             <>
               <div className='FeedbackHeader__q2'>What were you looking for?</div>
-              <input
-                className='FeedbackHeader__input'
-                autoComplete='off'
+              <div className='FeedbackHeader__inputWrapper'>
+                <input
+                  className='FeedbackHeader__input'
+                  autoComplete='off'
                 // eslint-disable-next-line jsx-a11y/no-autofocus
-                autoFocus={ !macros.isMobile }
-                placeholder={ !macros.isMobile ? 'Enter your original query' : undefined }
-                value={ feedbackQuery }
-                onChange={ (event) => { setFeedbackQuery(event.target.value); } }
-                onKeyDown={ (event) => {
-                  if (event.key === 'Enter') {
-                    setYes(true);
-                    setNo(false);
-                    macros.logAmplitudeEvent('Feedback header user enter input', { message: feedbackQuery })
-                  }
-                } }
-              />
+                  autoFocus={ !macros.isMobile }
+                  placeholder={ !macros.isMobile ? 'Please enter feedback' : undefined }
+                  value={ feedbackQuery }
+                  onChange={ (event) => { setFeedbackQuery(event.target.value); } }
+                  onKeyDown={ (event) => {
+                    if (event.key === 'Enter') {
+                      setYes(true);
+                      setNo(false);
+                      macros.logAmplitudeEvent('Feedback header user enter input', {
+                        feedbackQuery: feedbackQuery, searchQuery: searchQuery, selectedFilters: selectedFilters, searchResults: searchResults.slice(0, 3),
+                      })
+                    }
+                  } }
+                />
+              </div>
             </>
           )}
           <div className='FeedbackHeader__close' onClick={ () => { setClose(true); localStorage.setItem('SEEN', 'true'); } } role='button' aria-label='close' tabIndex={ 0 } />

@@ -15,7 +15,7 @@
         width: 297px;
         color: #000000;
         position: relative;
-        left: 6%;
+        left: 8%;
 
     }
 
@@ -31,16 +31,25 @@
         left: 6%;
     }
 
-    &__input {
+    &__inputWrapper {
+        display: flex;
         position: relative;
         left: 7%;
+        align-items: stretch;
         border: 0.75px solid #BABABA;
+        border-radius: 9px;
+        &:focus-within {
+            box-shadow: 0 0 5px  #0366D6;
+          }
+    }
+
+    &__input {
+        border: none;
         color: rgba(0, 0, 0, 0.6);
         font-size: 13px;
-        height: 20px;
+        margin: 2px 8px 2px;
         &:focus {
             outline: none;
-            box-shadow: 0 0 5px  #0366D6;
         }
         &::placeholder {
             color: rgba(51, 51, 51, 0.2);
@@ -57,6 +66,10 @@
         text-align: center;
         position: relative;
         left: 6%;
+
+        &:focus {
+            outline: none;
+        }
 
         &:hover {
             color: #ffff;
@@ -127,6 +140,15 @@
             font-size: 12px;
             width: 225px;
         }
+        &__thanks {
+            font-size: 12px;
+        }
+        &__q2 {
+            font-size: 12px;
+        }
+        &__inputWrapper {
+            left: 8%;
+        }
 
         &__yes, &__no {
             width: 20px;
@@ -142,6 +164,12 @@
     .FeedbackHeader {
         &__q1 {
             width: 210px;
+        }
+        &__inputWrapper {
+            width: 120px;
+        }
+        &__input {
+            width: 100px;
         }
     }
 }
