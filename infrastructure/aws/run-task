@@ -1,5 +1,7 @@
 #!/bin/bash
 
+function join_by { local d=$1; shift; echo -n "$1"; shift; printf "%s" "${@/#/$d}"; }
+
 if [[ ! " prod staging " =~ " $1 " ]]; then
   echo "Please provide environment to use: prod or staging"
   exit 1
@@ -15,8 +17,8 @@ echo "Running one-off task on $CLUSTER cluster with command: $2"
 
 # Get the network config from the web app service
 NETCONFIG=$(aws ecs describe-services --cluster $CLUSTER --services $SERVICE --output json | jq  '.services[0].networkConfiguration' | jq '.awsvpcConfiguration.assignPublicIp = "DISABLED"')
-OVERRIDES=$(printf '{"containerOverrides":[{"name":"%s","command":[%s]}]}' "$TASK" "$2")
+OVERRIDES=$(printf '{"containerOverrides":[{"name":"%s","command":["%s"]}]}' "$TASK" $(join_by '","' $2))
 
 echo $OVERRIDES
 
-aws ecs run-task --overrides "$OVERRIDES" --reference-id "one-off task" --launch-type "FARGATE" --network-configuration "$NETCONFIG" --task-definition $TASK --cluster $CLUSTER
+aws ecs run-task --overrides "$OVERRIDES" --launch-type "FARGATE" --network-configuration "$NETCONFIG" --task-definition $TASK --cluster $CLUSTER

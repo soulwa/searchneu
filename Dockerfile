@@ -26,4 +26,4 @@ ENV NODE_ENV=prod
 RUN yarn install --production
 
 EXPOSE 5000
-CMD ["yarn", "start_prod"]
+CMD ["yarn", "start:prod"]
