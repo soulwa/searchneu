@@ -46,3 +46,39 @@
 .toggleSwitch {
   display: flex;
 }
+
+.RangeFilter {
+  &__input {
+    display: flex;
+    justify-content: left;
+    padding-top: 10px;
+  }
+
+  &__title {
+    font-weight: bold;
+  }
+
+  &__input-box {
+    width: 70px;
+    height: 28px;
+    border-style: hidden;
+  }
+
+  &__range-max {
+    margin-left: 10px;
+    margin-right: 20px;
+  }
+
+  &__apply-input {
+    cursor: pointer;
+    background: inherit;
+    margin: auto;
+    text-align: center;
+    border: none;
+    border-radius: 1px;
+  }
+
+  &__apply-input:hover {
+    text-decoration: underline;
+  }
+}
