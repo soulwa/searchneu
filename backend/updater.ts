@@ -53,6 +53,10 @@ class Updater {
   constructor() {
     this.COURSE_MODEL = 'course';
     this.SECTION_MODEL = 'section';
+  }
+
+  // TODO must call this in server
+  async start() {
     // 5 min if prod, 30 sec if dev.
     // In dev the cache will be used so we are not actually hitting NEU's servers anyway.
     const intervalTime = macros.PROD ? 300000 : 30000;
@@ -195,10 +199,10 @@ class Updater {
 
   generateCourseMsg(userIds: string[], courseNotif: CourseNotification, userToMsg: Record<string, string[]>): void {
     const classCode: string = `${courseNotif.course.subject}${courseNotif.course.classId}`;
-    let message: string;
+    let message: string = '';
     if (courseNotif.count === 1) message += `A section was added to ${classCode}!`;
     else message += `${courseNotif.count} sections were added to ${classCode}!`;
-    message +=  `Check it out at https://searchneu.com/${courseNotif.course.termId}/${courseNotif.course.subject}${courseNotif.course.classId}` !
+    message +=  ` Check it out at https://searchneu.com/${courseNotif.course.termId}/${courseNotif.course.subject}${courseNotif.course.classId} !`;
 
     userIds.forEach((userId: string) => {
       if (!userToMsg[userId]) userToMsg[userId] = [];
@@ -210,8 +214,8 @@ class Updater {
     const classCode: string = `${sectionNotif.section.subject}${sectionNotif.section.classId}`;
     let message: string;
 
-    if (sectionNotif.section.seatsRemaining > 0) message = `A seat opened up in ${classCode} (CRN: ${sectionNotif.section.crn}). Check it out at https://searchneu.com/${sectionNotif.section.termId}/${sectionNotif.section.subject}/${sectionNotif.section.classId} !`;
-    else message = `A waitlist seat has opened up in ${classCode} (CRN: ${sectionNotif.section.crn}). Check it out at https://searchneu.com/${sectionNotif.section.termId}/${sectionNotif.section.subject}/${sectionNotif.section.classId} !`;
+    if (sectionNotif.section.seatsRemaining > 0) message = `A seat opened up in ${classCode} (CRN: ${sectionNotif.section.crn}). Check it out at https://searchneu.com/${sectionNotif.section.termId}/${sectionNotif.section.subject}${sectionNotif.section.classId} !`;
+    else message = `A waitlist seat has opened up in ${classCode} (CRN: ${sectionNotif.section.crn}). Check it out at https://searchneu.com/${sectionNotif.section.termId}/${sectionNotif.section.subject}${sectionNotif.section.classId} !`;
 
     userIds.forEach((userId: string) => {
       if (!userToMsg[userId]) userToMsg[userId] = [];
