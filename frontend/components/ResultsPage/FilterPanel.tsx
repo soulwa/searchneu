@@ -5,6 +5,8 @@ import _ from 'lodash';
 import CheckboxFilter from './CheckboxFilter';
 import DropdownFilter from './DropdownFilter';
 import ToggleFilter from './ToggleFilter';
+import RangeFilter from './RangeFilter';
+
 import {
   FilterOptions, FilterSelection, FILTERS_IN_ORDER,
 } from './filters';
@@ -30,6 +32,8 @@ function FilterPanel({ options, selected, setActive }: FilterPanelProps) {
           && <DropdownFilter title={ display } options={ options[key] } selected={ aFilter } setActive={ setActiveFilter } />}
             {category === 'Checkboxes'
           && <CheckboxFilter title={ display } options={ options[key] } selected={ aFilter } setActive={ setActiveFilter } />}
+            {category === 'Range'
+          && <RangeFilter title={ display } selected={ aFilter } setActive={ setActiveFilter } />}
           </>
         )
       })}

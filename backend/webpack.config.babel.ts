@@ -4,8 +4,8 @@
  */
 
 import HtmlWebpackPlugin from 'html-webpack-plugin';
-import path from 'path';
-import webpack from 'webpack';
+import * as path from 'path';
+import * as webpack from 'webpack';
 import FriendlyErrorsWebpackPlugin from 'friendly-errors-webpack-plugin';
 import notifier from 'node-notifier';
 
@@ -15,7 +15,7 @@ const rootDir = path.join(__dirname, '..');
 
 const fbMessengerId = macros.getEnvVariable('fbMessengerId');
 
-export default {
+const config: webpack.Configuration = {
   // https://webpack.js.org/configuration/devtool/
   devtool: macros.PROD ? 'source-map' : 'cheap-module-eval-source-map',
   mode: macros.PROD ? 'production' : 'development',
@@ -66,7 +66,7 @@ export default {
         'process.env': {
           PROD: 'false',
           DEV: 'true',
-          TESTS: 'false',
+          TEST: 'false',
           fbMessengerId: String(fbMessengerId),
         },
       }),
@@ -75,7 +75,7 @@ export default {
         'process.env': {
           PROD: 'true',
           DEV: 'false',
-          TESTS: 'false',
+          TEST: 'false',
 
           // This is needed so the production version of react is used.
           NODE_ENV: '"production"',
@@ -171,3 +171,5 @@ export default {
     fs: 'empty',
   },
 };
+
+export default config;

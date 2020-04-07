@@ -40,7 +40,7 @@ fi
 # Make sure files in folders can run also be ran with babel-node
 # https://github.com/babel/babel/issues/9750
 cd backend
-npm run script macros.js
+npm run script macros.ts
 cd ..
 
 
@@ -108,11 +108,11 @@ if [ "$TRAVIS_BRANCH" == "prod" ]; then
   if [ "$TRAVIS_EVENT_TYPE" == "cron" ]; then
     # If this is a cron job, we need to take down the server while the re-index is running so users's don't get invalid or incomplete data.
     # Taking down the server isn't idea, but its better than caches (both on our side and the user's side) getting invalid or incomplete data.
-    ssh -o StrictHostKeyChecking=no ubuntu@3.226.156.218 'cd searchneu; npm run stop_prod; yarn; yarn prod_migrate; NODE_ENV=prod npm run store; npm run start_prod'
+    ssh -o StrictHostKeyChecking=no ubuntu@3.226.156.218 'cd searchneu; npm run prod:stop; yarn; yarn prod:migrate; NODE_ENV=prod npm run store; npm run prod:start'
   else
     # If this is not a cron job, we don't have to take down the server for a few seconds.
     # Install any new packages while it is running, and then reboot the server.
-    ssh -o StrictHostKeyChecking=no ubuntu@3.226.156.218 'cd searchneu; yarn; npm run start_prod'
+    ssh -o StrictHostKeyChecking=no ubuntu@3.226.156.218 'cd searchneu; yarn; npm run prod:start'
   fi
 
   # Tell Rollbar about the deploy

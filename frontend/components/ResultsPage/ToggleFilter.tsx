@@ -12,7 +12,7 @@ export default function ToggleFilter({ title, selected, setActive }: ToggleFilte
   const [id] = useState(_.uniqueId('react-switch-'));
   return (
     <div className='toggleFilter'>
-      <div className='toggleName'>
+      <div className='filter__title'>
         <p>
           {title}
         </p>

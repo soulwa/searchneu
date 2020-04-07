@@ -13,6 +13,7 @@ import Request from '../../request';
 
 import EllucianBaseParser from './ellucianBaseParser';
 import ellucianSubjectParser from './ellucianSubjectParser';
+import { getBaseHost } from '../../employees/util';
 
 
 const request = new Request('EllucianTermsParser');
@@ -104,7 +105,7 @@ class EllucianTermsParser extends EllucianBaseParser.EllucianBaseParser {
       macros.log('ERROR, found 0 terms??', url);
     }
 
-    const host = macros.getBaseHost(url);
+    const host = getBaseHost(url);
 
     for (const term of terms) {
       // If this is a term that matches a term in staticHosts
