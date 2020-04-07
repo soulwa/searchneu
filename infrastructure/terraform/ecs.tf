@@ -5,9 +5,9 @@ resource "aws_ecs_cluster" "main" {
 }
 
 # Do we need to specify cpu and memory in the container definition? The task definition already defines it.
-module "container" {
+module "webserver-container" {
   source          = "git::https://github.com/cloudposse/terraform-aws-ecs-container-definition.git?ref=0.23.0"
-  container_name  = module.main_label.id
+  container_name  = "${module.main_label.id}-webserver"
   container_image = "${aws_ecr_repository.app.repository_url}:latest"
 
   log_configuration = {
@@ -37,14 +37,52 @@ module "container" {
   ]
 }
 
+module "scrape-container" {
+  source          = "git::https://github.com/cloudposse/terraform-aws-ecs-container-definition.git?ref=0.23.0"
+  container_name  = "${module.main_label.id}-scrape"
+  container_image = "${aws_ecr_repository.app.repository_url}:latest"
+  container_cpu   = 1024
+  container_memory= 3072
+
+  command         = ["yarn", "prod:scrape"]
+
+  log_configuration = {
+    logDriver = "awslogs"
+    options = {
+      awslogs-group         = "/ecs/${module.main_label.id}"
+      awslogs-region        = var.aws_region
+      awslogs-stream-prefix = "ecs"
+    }
+    secretOptions = null
+  }
+  
+  secrets = [
+    for ssmParam in aws_ssm_parameter.default:
+    {
+      name = ssmParam.name
+      valueFrom = ssmParam.arn
+    }
+  ]
+}
+
 resource "aws_ecs_task_definition" "app" {
-  family                   = module.main_label.id
+  family                   = "${module.main_label.id}-webserver"
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
   cpu                      = var.fargate_cpu
   memory                   = var.fargate_memory
-  container_definitions    = module.container.json
+  container_definitions    = module.webserver-container.json
+}
+
+resource "aws_ecs_task_definition" "scrape" {
+  family                   = "${module.main_label.id}-scrape"
+  execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
+  network_mode             = "awsvpc"
+  requires_compatibilities = ["FARGATE"]
+  cpu                      = 1024
+  memory                   = 3072
+  container_definitions    = module.scrape-container.json
 }
 
 resource "aws_ecs_service" "main" {
@@ -62,7 +100,7 @@ resource "aws_ecs_service" "main" {
 
   load_balancer {
     target_group_arn = aws_alb_target_group.app.id
-    container_name   = module.main_label.id
+    container_name   = "${module.main_label.id}-webserver"
     container_port   = var.app_port
   }
 
