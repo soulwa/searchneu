@@ -31,7 +31,7 @@ async function getFrontendData(file) {
     return null;
   }
 
-  await mkdirp(path.dirname(localPath));
+  await fs.ensureDir(path.dirname(localPath));
 
   let data;
 

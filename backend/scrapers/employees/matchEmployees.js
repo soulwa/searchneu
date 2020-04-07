@@ -3,7 +3,6 @@
  * See the license file in the root folder for details.
  */
 
-import mkdirp from 'mkdirp-promise';
 import _ from 'lodash';
 import objectHash from 'object-hash';
 import fs from 'fs-extra';
@@ -368,7 +367,7 @@ class CombineCCISandEmployees {
     macros.log(`Changed/Removed ${beforeModifyCount - mergedEmployees.length} person(s) from the employee list.`);
 
     // Save the array to disk for the employees API.
-    await mkdirp(macros.PUBLIC_DIR);
+    await fs.ensureDir(macros.PUBLIC_DIR);
     await fs.writeFile(path.join(macros.PUBLIC_DIR, 'employees.json'), JSON.stringify(mergedEmployees, null, 4));
 
     // Turn it into a hashmap instead of a list for the dump
