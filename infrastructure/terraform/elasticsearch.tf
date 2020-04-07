@@ -2,7 +2,7 @@ module "elasticsearch" {
   source                  = "git::https://github.com/cloudposse/terraform-aws-elasticsearch.git?ref=0.8.0"
   stage                   = var.stage
   name                    = var.name
-  # security_groups         = [aws_security_group.es]
+  security_groups         = [aws_security_group.elasticsearch.id]
   vpc_id                  = aws_vpc.main.id
   subnet_ids              = aws_subnet.private.*.id
   zone_awareness_enabled  = "true"
