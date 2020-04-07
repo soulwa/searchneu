@@ -61,6 +61,7 @@ $SIDEBAR_WIDTH: 268px;
   bottom: 0;
   overflow-y: scroll;
   scrollbar-width: none;
+  z-index: 21;
 
   &::-webkit-scrollbar {
     display: none;
