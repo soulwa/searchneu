@@ -4,7 +4,7 @@
  */
 
 
-import Class from '../../classModels/Class';
+import Course from '../../classModels/Course';
 import Section from '../../classModels/Section';
 
 
@@ -12,7 +12,7 @@ import Section from '../../classModels/Section';
 // Used for testing files in the frontend
 // Feel free to add more or modify existing ones, as long as the existing tests don't break.
 
-const cs0210 = Class.create({
+const cs0210 = Course.create({
   lastUpdateTime: 1511131673768,
   name: 'Introduction to Search',
   url: 'https://wl11gp.neu.edu/udcprod8/bwckctlg.p_disp_listcrse?term_in=201810&subj_in=CS&crse_in=0210&schd_in=%',
@@ -195,7 +195,7 @@ const sectionsForcs0210 = [
 cs0210.loadSectionsFromServerList(sectionsForcs0210);
 
 
-const cs1210 = Class.create({
+const cs1210 = Course.create({
   lastUpdateTime: 1511131674191,
   name: 'Computer Science/Information Science Overview 2: Co-op Preparation',
   url: 'https://wl11gp.neu.edu/udcprod8/bwckctlg.p_disp_listcrse?term_in=201810&subj_in=CS&crse_in=1210&schd_in=%',
@@ -440,7 +440,7 @@ const razzaq = {
 };
 
 
-const cs9999 = Class.create({
+const cs9999 = Course.create({
   lastUpdateTime: 1511131674191,
   name: 'Some class that has error prereqs',
   url: 'https://wl11gp.neu.edu/udcprod8/bwckctlg.p_disp_listcrse?term_in=201810&subj_in=CS&crse_in=1210&schd_in=%',

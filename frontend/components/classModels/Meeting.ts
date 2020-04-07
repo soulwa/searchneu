@@ -4,12 +4,43 @@
  */
 
 import _ from 'lodash';
-import moment from 'moment';
-
+import moment, { Moment } from 'moment';
 import macros from '../macros';
+import { DayOfWeek } from '../types';
+
+type ServerData = {
+  startDate : number;
+  endDate : number;
+  where : string;
+  type : string;
+  times: TimeTuple[];
+}
+
+type TimeTuple = {
+  start : number;
+  end : number;
+}
+
+type MomentTuple = {
+  start : Moment,
+  end : Moment
+}
+
+interface TimeToMoment {
+  [key: number] : MomentTuple[];
+}
+
 
 class Meeting {
-  constructor(serverData) {
+  where: string;
+
+  startDate: Moment;
+
+  endDate: Moment;
+
+  times: MomentTuple[][];
+
+  constructor(serverData : ServerData) {
     if (!serverData) {
       return null;
     }
@@ -17,6 +48,7 @@ class Meeting {
     this.where = serverData.where;
 
     // if without spaces and case insensitive is tba, make it TBA
+    // TODO: I don't think this code actually triggers
     if (this.where.replace(/\s/gi, '').toUpperCase() === 'TBA') {
       this.where = 'TBA';
     }
@@ -59,21 +91,21 @@ class Meeting {
 
     // returns objects like this: {3540000041400000: Array[3]}
     // if has three meetings per week that meet at the same times
-    let groupedByTimeOfDay = _.groupBy(timeMoments, (event) => {
+    const groupedByTimeOfDay : TimeToMoment = _.groupBy(timeMoments, (event) => {
       const zero = moment(event.start).startOf('day');
       return `${event.start.diff(zero)}${event.end.diff(zero)}`;
     });
 
     // Get the values of the object returned above
-    groupedByTimeOfDay = _.values(groupedByTimeOfDay);
+    const valuesGroupedByTimeOfDay : MomentTuple[][] = _.values(groupedByTimeOfDay);
 
     // And sort by start time
-    groupedByTimeOfDay.sort((meetingsInAday) => {
+    valuesGroupedByTimeOfDay.sort((meetingsInAday) => {
       const zero = moment(meetingsInAday[0].start).startOf('day');
       return meetingsInAday[0].start.diff(zero);
     });
 
-    this.times = groupedByTimeOfDay;
+    this.times = valuesGroupedByTimeOfDay;
   }
 
   getBuilding() {
@@ -129,25 +161,15 @@ class Meeting {
     return this.startDate.unix() === this.endDate.unix();
   }
 
-  // 0=sunday, 6 = saterday
-  getMeetsOnDay(dayIndex) {
+  getMeetsOnDay(dayIndex : DayOfWeek) {
     const flatTimes = _.flatten(this.times);
     return flatTimes.some((time) => { return time.start.day() === dayIndex; });
   }
 
-
   getMeetsOnWeekends() {
-    if (this.getIsExam()) {
-      return false;
-    }
-
-    if (this.getMeetsOnDay(0) || this.getMeetsOnDay(6)) {
-      return true;
-    }
-
-    return false;
+    return !this.getIsExam()
+        && this.getMeetsOnDay(DayOfWeek.SUNDAY) || this.getMeetsOnDay(DayOfWeek.SATURDAY);
   }
-
 
   // no idea if this is right
   compareTo(other) {

@@ -6,7 +6,7 @@ import EmployeePanel from '../panels/EmployeePanel';
 import DesktopClassPanel from '../panels/DesktopClassPanel';
 import MobileClassPanel from '../panels/MobileClassPanel';
 
-import Class from '../classModels/Class';
+import Course from '../classModels/Course';
 import Keys from '../../../common/Keys';
 import { SearchItem } from '../types';
 
@@ -43,7 +43,7 @@ const ResultItemMemoized = React.memo(({ result }:{result:SearchItem}) => {
   const history = useHistory();
 
   if (result.type === 'class') {
-    const aClass = Class.create(result.class);
+    const aClass = Course.create(result.class);
     aClass.loadSectionsFromServerList(result.sections);
     if (macros.isMobile) {
       return <MobileClassPanel aClass={ aClass } history={ history } />;
