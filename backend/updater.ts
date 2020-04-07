@@ -27,7 +27,7 @@ interface SerializedResult {
   sections: SectionType[]
 }
 
-type Notification = CourseNotification | SectionNotification;
+export type Notification = CourseNotification | SectionNotification;
 
 interface CourseNotification {
   type: 'Course',

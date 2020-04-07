@@ -1,6 +1,12 @@
 import { Course, Section, User, FollowedCourse, FollowedSection, sequelize } from '../database/models/index';
 import { Course as CourseType, Section as SectionType, Requisite } from '../types';
+import { Notification } from '../updater';
 import Updater from '../updater';
+import notifyer from '../notifyer';
+
+beforeEach(() => {
+  jest.spyOn(notifyer, 'sendFBNotification').mockImplementation(() => {});
+});
 
 afterAll(async () => {
   await sequelize.close();
@@ -65,6 +71,45 @@ describe('Updater', () => {
     ...defaultSectionProps,
   };
 
+  const FUNDIES_TWO_S1: SectionType = {
+    crn: '0248',
+    classId: '2510',
+    termId: '202030',
+    subject: 'CS',
+    seatsCapacity: 200,
+    seatsRemaining: 0,
+    waitCapacity: 10,
+    waitRemaining: 3,
+    ...defaultClassProps,
+    ...defaultSectionProps,
+  };
+
+  const FUNDIES_TWO_S2: SectionType = {
+    crn: '1357',
+    classId: '2510',
+    termId: '202030',
+    subject: 'CS',
+    seatsCapacity: 150,
+    seatsRemaining: 1,
+    waitCapacity: 0,
+    waitRemaining: 0,
+    ...defaultClassProps,
+    ...defaultSectionProps,
+  };
+
+  const PL_S1: SectionType = {
+    crn: '0987',
+    classId: '4400',
+    termId: '202030',
+    subject: 'CS',
+    seatsCapacity: 80,
+    seatsRemaining: 25,
+    waitCapacity: 0,
+    waitRemaining: 0,
+    ...defaultClassProps,
+    ...defaultSectionProps,
+  };
+
   // TODO this is low priority
   describe('modelToUserHash', () => {
     beforeEach(async () => {
@@ -114,7 +159,46 @@ describe('Updater', () => {
         'user2': [`A seat opened up in CS2500 (CRN: 5678). Check it out at https://searchneu.com/202030/CS2500 !`],
       });
     });
+
+    it('generates a waitlist message', () => {
+      const userToMsg: Record<string, string[]> = {};
+      UPDATER.generateSectionMsg(['user1', 'user2'], { type: 'Section', section: FUNDIES_TWO_S1 }, userToMsg);
+      expect(userToMsg).toEqual({
+        'user1': [`A waitlist seat has opened up in CS2510 (CRN: 0248). Check it out at https://searchneu.com/202030/CS2510 !`],
+        'user2': [`A waitlist seat has opened up in CS2510 (CRN: 0248). Check it out at https://searchneu.com/202030/CS2510 !`],
+      });
+    });
   });
 
+  describe('sendMessages', () => {
+    it('sends correct messages', () => {
+      const classHash: Record<string, string[]> = { 'neu.edu/202030/CS/2500': ['user1', 'user2'], 'neu.edu/202030/CS/2510': ['user2'], 'neu.edu/202030/CS/4400': [] };
+      const sectionHash: Record<string, string[]> = { 'neu.edu/202030/CS/2500/5678': ['user1', 'user2'], 'neu.edu/202030/CS/2510/0248': ['user2'], 'neu.edu/202030/CS/2510/1357': ['user2'], 'neu.edu/202030/CS/4400/0987': [] };
+
+      const notifications: Notification[] = [
+        { type: 'Course', course: FUNDIES_ONE, count: 1 },
+        { type: 'Section', section: FUNDIES_ONE_S2 },
+        { type: 'Section', section: FUNDIES_TWO_S1 },
+        { type: 'Section', section: FUNDIES_TWO_S2 },
+      ];
+
+      UPDATER.sendMessages(notifications, classHash, sectionHash);
+
+      expect(notifyer.sendFBNotification.mock.calls).toEqual([
+        ['user1', 'A section was added to CS2500! Check it out at https://searchneu.com/202030/CS2500 !'],
+        ['user1', 'A seat opened up in CS2500 (CRN: 5678). Check it out at https://searchneu.com/202030/CS2500 !'],
+        ['user2', 'A section was added to CS2500! Check it out at https://searchneu.com/202030/CS2500 !'],
+        ['user2', 'A seat opened up in CS2500 (CRN: 5678). Check it out at https://searchneu.com/202030/CS2500 !'],
+        ['user2', 'A waitlist seat has opened up in CS2510 (CRN: 0248). Check it out at https://searchneu.com/202030/CS2510 !'],
+        ['user2', 'A seat opened up in CS2510 (CRN: 1357). Check it out at https://searchneu.com/202030/CS2510 !'],
+      ]);
+
+      // Notifications: 
+      // 1. new fundies 1 section! 
+      // 2. there's a fundies 1 section with available seats!
+      // 3. there's a fundies 2 section with available seats!
+      // 4. there's a fundies 2 section with waitlist seats!
+    });
+  });
 
 });
