@@ -40,8 +40,8 @@
     "build_backend": "mkdir -p dist; mkdir -p dist/backend; babel --extensions '.js,.ts' backend -d dist/backend --copy-files; babel --extensions '.js,.ts' common -d dist/common",
     "build": "yarn -s build_backend; yarn -s build_frontend",
     "-deployment-": "--------deployment--------",
-    "stop:prod": "./node_modules/forever/bin/forever stopall",
-    "prod:start": "yarn -s stop_prod; NODE_ENV=prod ./node_modules/forever/bin/forever -a -l forever.log -o log.log -e error.log start dist/backend/startup.js"
+    "prod:stop": "./node_modules/forever/bin/forever stopall",
+    "prod:start": "yarn -s prod:stop; NODE_ENV=prod ./node_modules/forever/bin/forever -a -l forever.log -o log.log -e error.log start dist/backend/startup.js"
   },
   "repository": {
     "type": "git",
