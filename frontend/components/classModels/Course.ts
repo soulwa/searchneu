@@ -10,12 +10,50 @@ import moment from 'moment';
 import Keys from '../../../common/Keys';
 import macros from '../macros';
 import Section from './Section';
-import RequisiteBranch from './RequisiteBranch';
+import RequisiteBranch, { ReqFor, ReqType } from './RequisiteBranch';
+
 
 // This file used to have an equals method as part of coursepro, but then it was removed.
 // It might still be in the git history, or you can just ask Ryan if you ever find that you need an equals method.
 
-class Class {
+class Course {
+  static requiredPath : string[] = ['host', 'termId', 'subject'];
+
+  static optionalPath : string[] = ['classId'];
+
+  static API_ENDPOINT : string = '/listClasses';
+
+  isString: boolean;
+
+  sections: Section[];
+
+  prereqs : ReqType;
+
+  coreqs : ReqType;
+
+  host: string;
+
+  termId: string;
+
+  desc : string;
+
+  name : string;
+
+  prettyUrl : string;
+
+  classId : string;
+
+  subject : string;
+
+  lastUpdateTime : any;
+
+  hasWaitList : boolean;
+
+  prereqsFor : ReqFor;
+
+  optPrereqsFor : ReqFor;
+
+
   constructor() {
     //true, if for instance "AP placement exam, etc"
     this.isString = false;
@@ -25,7 +63,6 @@ class Class {
     // that don't exist anywhere on the site. Could be changed in future, the fitlter is in this file.
     // this.missing = false;
 
-    //instances of Section()
     this.sections = [];
 
     this.prereqs = {
@@ -52,7 +89,7 @@ class Class {
       macros.error('Passed null config?', config);
       return null;
     }
-    const instance = new this(config);
+    const instance = new this();
     instance.updateWithData(config);
     return instance;
   }
@@ -66,11 +103,11 @@ class Class {
     this.updateWithData(classMap[this.getHash()]);
   }
 
-  convertServerRequisites(data) {
-    let retVal = {};
+  convertServerRequisites(data) : Course {
+    let retVal;
 
     //already processed node, just process the prereqs and coreqs
-    if (data instanceof Class) {
+    if (data instanceof Course) {
       retVal = data;
 
       const newCoreqs = [];
@@ -95,7 +132,6 @@ class Class {
         newValues.push(this.convertServerRequisites(subTree));
       });
 
-
       retVal = new RequisiteBranch({
         type: data.type,
         values: newValues,
@@ -113,7 +149,6 @@ class Class {
       }
       // else data is a normal class that has a .subject and a .classId
 
-
       //the leafs of the prereq trees returned from the server dosent have host or termId,
       //but it is the same as the class that returned it,
       //so copy over the values
@@ -124,8 +159,8 @@ class Class {
         data.termId = this.termId;
       }
 
-
-      retVal = this.constructor.create(data, {}, false);
+      // TODO: oh no
+      retVal = (this.constructor as typeof Course).create(data);
     }
 
     if (!retVal) {
@@ -181,7 +216,7 @@ class Class {
     const classes = [];
 
     while ((curr = stack.pop())) {
-      if (curr instanceof Class) {
+      if (curr instanceof Course) {
         classes.push(curr);
       } else {
         // If it is a requisite branch, the classes needed are under prereqs...
@@ -195,7 +230,7 @@ class Class {
 
   // called once
   updateWithData(config) {
-    if (config instanceof Class) {
+    if (config instanceof Course) {
       macros.error('wtf', config);
     }
 
@@ -460,9 +495,4 @@ class Class {
 }
 
 
-Class.requiredPath = ['host', 'termId', 'subject'];
-Class.optionalPath = ['classId'];
-Class.API_ENDPOINT = '/listClasses';
-
-
-export default Class;
+export default Course;

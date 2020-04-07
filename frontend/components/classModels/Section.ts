@@ -10,6 +10,34 @@ import macros from '../macros';
 import Meeting from './Meeting';
 
 class Section {
+  static requiredPath : string[] = ['host', 'termId', 'subject', 'classId'];
+
+  static optionalPath : string[]= ['crn'];
+
+  static API_ENDPOINT : string = '/listSections';
+
+  dataStatus : string;
+
+  lastUpdateTime : any; // TODO: can anyone figure this out? I can't find an instance -- probably related to notifs broken
+
+  meetings: Meeting[];
+
+  profs : string[];
+
+  waitCapacity : number;
+
+  waitRemaining : 0;
+
+  online : boolean;
+
+  seatsRemaining: number;
+
+  seatsCapacity : number;
+
+  hasWaitList : number;
+
+  honors : boolean;
+
   constructor(config) {
     //loading status is done if any sign that has data
     if (config.dataStatus !== undefined) {
@@ -219,11 +247,6 @@ class Section {
     return 0;
   }
 }
-
-
-Section.requiredPath = ['host', 'termId', 'subject', 'classId'];
-Section.optionalPath = ['crn'];
-Section.API_ENDPOINT = '/listSections';
 
 
 export default Section;

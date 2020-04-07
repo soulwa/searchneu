@@ -21,3 +21,14 @@ export type SearchItem = Course | Employee;
 export function BLANK_SEARCH_RESULT(): SearchResult {
   return { results: [], filterOptions: { nupath: [], subject: [], classType: [] } }
 }
+
+
+export enum DayOfWeek {
+  SUNDAY,
+  MONDAY,
+  TUESDAY,
+  WEDNESDAY,
+  THURSDAY,
+  FRIDAY,
+  SATURDAY
+}

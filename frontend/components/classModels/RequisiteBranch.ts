@@ -2,15 +2,28 @@
  * This file is part of Search NEU and licensed under AGPL3.
  * See the license file in the root folder for details.
  */
-
-
 import macros from '../macros';
+import { Course } from '../types';
+
+export interface ReqType {
+  type: string,
+  values: Course[]
+}
+
+export interface ReqFor {
+  values : any[]
+}
+
 
 // This class holds a branch in the prerequisite or corequisite graph. For instance, if
 // a clas's prereqs are ((a or b) and (c or d)), then
 
 class RequisiteBranch {
-  constructor(data) {
+  prereqs: ReqType;
+
+  coreqs: ReqType;
+
+  constructor(data : ReqType) {
     if (data.type !== 'and' && data.type !== 'or') {
       macros.error('invalid branch type');
     }
@@ -22,7 +35,6 @@ class RequisiteBranch {
     const values = data.values.slice(0).sort((a, b) => {
       return a.compareTo(b);
     });
-
 
     this.prereqs = {
       type: data.type,
