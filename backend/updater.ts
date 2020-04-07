@@ -6,9 +6,6 @@
 import _ from 'lodash';
 import { Op } from 'sequelize';
 
-import elastic from './elastic';
-
-import Bannerv9Parser from './scrapers/classes/parsersxe/bannerv9Parser';
 import macros from './macros';
 import Keys from '../common/Keys';
 import notifyer from './notifyer';
@@ -17,7 +14,6 @@ import { Course, Section, sequelize } from './database/models/index';
 import HydrateSerializer from './database/serializers/hydrateSerializer';
 import termParser from './scrapers/classes/parsersxe/termParser';
 import { Course as CourseType, Section as SectionType } from './types';
-
 
 // TYPES
 interface OldData {
@@ -44,7 +40,7 @@ interface SectionNotification {
   section: SectionType,
 }
 
-class Updater2 {
+class Updater {
   // produce a new Updater instance
   COURSE_MODEL: string;
   SECTION_MODEL: string;
@@ -59,25 +55,22 @@ class Updater2 {
     this.SECTION_MODEL = 'section';
     // 5 min if prod, 30 sec if dev.
     // In dev the cache will be used so we are not actually hitting NEU's servers anyway.
-    // TODO make sure it actually uses the dev cache . . .
     const intervalTime = macros.PROD ? 300000 : 30000;
 
     setInterval(() => {
       try { 
-        this.onInterval(); 
+        this.update(); 
       } catch (e) { 
         macros.warn('Updater failed with: ', e); 
       }
     }, intervalTime);
     // TODO this seems unnecessary?
-    this.onInterval();
+    this.update();
   }
 
 
-  // TODO more descriptive name
   // Update classes and sections users are watching and notify them if seats have opened up
-  // TODO need to figure out the dynamic extent of different variables to see how much we can simplify the data
-  async onInterval() {
+  async update() {
     if (macros.DEV) return;
 
     macros.log('updating');
@@ -106,10 +99,8 @@ class Updater2 {
     }
 
     // scrape everything
-    // TODO should I return if empty?
     // TODO rename
-    const sections: any[] = termParser.requestsSectionsForTerm('202110');
-
+    const sections: Section[] = termParser.requestsSectionsForTerm('202110');
     const newSectionsByClass: Record<string, string[]> = _.groupBy(sections, (sec) => sec.classHash);
 
     const notifications: Notification[] = [];
@@ -117,7 +108,7 @@ class Updater2 {
     Object.entries(newSectionsByClass).map(([classHash, sectionHashes]) => {
       const sectionDiffCount: number = sectionHashes.filter((hash: string) => !oldSectionsByClass[classHash].includes(hash)).length;
       if (sectionDiffCount > 0) {
-        notifications.push({ type: 'Course', course: classHash, count: sectionDiffCount });
+        notifications.push({ type: 'Course', course: oldWatchedClasses[classHash], count: sectionDiffCount });
       }
     });
 
@@ -128,8 +119,7 @@ class Updater2 {
       }
     });
 
-
-    await this.sendMessages(notifications, classHashToUsers, sectionHashToUsers, oldWatchedClasses, oldWatchedSections);
+    await this.sendMessages(notifications, classHashToUsers, sectionHashToUsers);
     await dumpProcessor.main({ termDump: { sections } });
 
     const totalTime = Date.now() - startTime;
@@ -153,6 +143,7 @@ class Updater2 {
   // TODO purpose 
   async getOldData(classHashes: string[]): Promise<OldData> {
     const oldDocs: SerializedResult[] = await (new HydrateSerializer(Section)).bulkSerialize(await Course.findAll({ where: { id: { [Op.in]: classHashes } } }));
+
     const oldWatchedClasses = oldDocs.reduce((courseObj: Record<string, CourseType>, doc: SerializedResult): Record<string, CourseType> => {
       courseObj[Keys.getClassHash(doc.class)] = doc.class;
       return courseObj;
@@ -172,7 +163,7 @@ class Updater2 {
   }
 
   // TODO would be nice to shorten these types and whatnot
-  async sendMessages(notifs: Notification[], classHashToUsers: Record<string, string[]>, sectionHashToUsers: Record<string, string[]>, oldWatchedClasses: Record<string, CourseType>, oldWatchedSections: Record<string, SectionType>): Promise<void> {
+  async sendMessages(notifs: Notification[], classHashToUsers: Record<string, string[]>, sectionHashToUsers: Record<string, string[]>): Promise<void> {
     // user to message map
     const userToMsg: Record<string, string[]> = {};
     notifs.forEach((notif: Notification) => {
@@ -184,7 +175,6 @@ class Updater2 {
         this.generateSectionMsg(userIds, notif, userToMsg);
       }
     });
-    // iterate through user to message map 
 
     Object.keys(userToMsg).forEach((userId: string) => {
       userToMsg[userId].map((msg: string) => {
@@ -230,3 +220,4 @@ class Updater2 {
   }
 }
 
+export default Updater;
