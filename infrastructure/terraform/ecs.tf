@@ -152,10 +152,11 @@ locals {
 # Maybe use a KMS for better security?
 # Also this module https://github.com/cloudposse/terraform-aws-ssm-parameter-store is nice but not up to date with Terraform 0.12
 resource "aws_ssm_parameter" "default" {
-  count           = length(local.all_secrets)
+  count           = length(var.secrets) + 5
   name            = lookup(local.all_secrets[count.index], "name")
   description     = lookup(local.all_secrets[count.index], "description", lookup(local.all_secrets[count.index], "name"))
   type            = "SecureString"
   value           = lookup(local.all_secrets[count.index], "value")
   overwrite       = lookup(local.all_secrets[count.index], "overwrite", "true")
+  depends_on      = [module.elasticsearch, aws_db_instance.default]
 }

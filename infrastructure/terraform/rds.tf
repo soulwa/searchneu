@@ -12,6 +12,7 @@ resource "aws_db_instance" "default" {
   port                   = 5432
   db_subnet_group_name   = aws_db_subnet_group.default.id
   vpc_security_group_ids = [aws_security_group.postgres.id]
+  skip_final_snapshot    = true
 }
 
 resource "random_password" "db_pass" {
