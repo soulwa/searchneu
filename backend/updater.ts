@@ -15,6 +15,116 @@ import notifyer from './notifyer';
 import dumpProcessor from './dumpProcessor';
 import { Course, Section, sequelize } from './database/models/index';
 import HydrateSerializer from './database/serializers/hydrateSerializer';
+import termParser from './scrapers/classes/parsersxe/termParser';
+
+class Updater2 {
+  // produce a new Updater instance
+  COURSE_MODEL: string;
+  SECTION_MODEL: string;
+
+  static create() {
+    return new this();
+  }
+
+  // DO NOT call the constructor, instead use .create
+  constructor() {
+    this.COURSE_MODEL = 'course';
+    this.SECTION_MODEL = 'section';
+    // 5 min if prod, 30 sec if dev.
+    // In dev the cache will be used so we are not actually hitting NEU's servers anyway.
+    // TODO make sure it actually uses the dev cache . . .
+    const intervalTime = macros.PROD ? 300000 : 30000;
+
+    setInterval(() => {
+      try { 
+        this.onInterval(); 
+      } catch (e) { 
+        macros.warn('Updater failed with: ', e); 
+      }
+    }, intervalTime);
+    // TODO this seems unnecessary?
+    this.onInterval();
+  }
+
+
+  // TODO more descriptive name
+  // Update classes and sections users are watching and notify them if seats have opened up
+  // TODO need to figure out the dynamic extent of different variables to see how much we can simplify the data
+  async onInterval() {
+    if (macros.DEV) return;
+
+    macros.log('updating');
+    const startTime = Date.now();
+
+    // data getting produced in this chunk
+    // 1. a userId, sectionHash, and classHash are a string
+    // 1. classHashToUsers: Record<classHash, userId[]>
+    // 2. sectionHashToUsers: Record<sectionHash, userId[]>
+    // 3. classHashes: classHash[]
+    // 4. sectionHashes: sectionHash[]
+    // 5. 
+
+    // 
+
+    const classHashToUsers: Record<string, string[]> = await this.modelToUserHash(this.COURSE_MODEL);
+    const sectionHashToUsers: Record<string, string[]> = await this.modelToUserHash(this.SECTION_MODEL);
+
+    const classHashes: string[] = Object.keys(classHashToUsers);
+    const sectionHashes: string[] = Object.keys(sectionHashToUsers);
+
+    if (classHashes.length === 0 && sectionHashes.length === 0) {
+      return;
+    }
+
+    macros.log('watching classes ', classHashes.length);
+
+    const { oldWatchedClasses, oldWatchedSections, oldSectionsByClass } = await this.getOldData(classHashes);
+
+    // Track all section hashes of classes that are being watched. Used for sanity check
+    const sectionHashesOfWatchedClasses: string[] = Object.keys(oldWatchedSections);
+
+    // Sanity check: Find the sections that are being watched, but are not part of a watched class
+    for (const sectionHash of _.difference(sectionHashes, sectionHashesOfWatchedClasses)) {
+      macros.warn('Section', sectionHash, "is being watched but it's class is not being watched?");
+    }
+
+    const sections: any[] = termParser.requestsSectionsForTerm('202110');
+
+    const newSectionsByClass: any = _.groupBy(sections, (sec) => sec.classHash);
+    const classHashesToAlert: string[] = [];
+
+    Object.entries(newSectionsByClass).map(([key, value]) => {
+    });
+
+  }
+
+  // TODO purpose
+  async modelToUserHash(modelName: string): Promise<Record<string, string[]>> {
+    const columnName = `${modelName}Id`;
+    const dbResults = await sequelize.query(`SELECT "${columnName}", ARRAY_AGG("userId") FROM "FollowedCourses" GROUP BY "${columnName}"`, 
+                                      { type: sequelize.QueryTypes.SELECT });
+    return Object.assign({}, ...dbResults.map((res) => ({ [res[columnName]]: res.array_agg })));
+  }
+
+  // TODO purpose 
+  // TODO fetch correct return type
+  async getOldData(classHashes: string[]): Promise<any> {
+    const oldDocs = await (new HydrateSerializer(Section)).bulkSerialize(await Course.findAll({ where: { id: { [Op.in]: classHashes } } }));
+    const oldWatchedClasses = _.mapValues(oldDocs, (doc) => { return doc.class; });
+    const oldSectionsByClass = Object.values(oldDocs).map((doc) => ({ [doc.class.id]: doc.sections }));
+
+    const oldWatchedSections = {};
+    for (const aClass of Object.values(oldDocs)) {
+      for (const section of aClass.sections) {
+        oldWatchedSections[Keys.getSectionHash(section)] = section;
+      }
+    }
+
+    return { oldWatchedClasses, oldWatchedSections, oldSectionsByClass };
+  }
+
+
+}
 
 class Updater {
   // Don't call this directly, call .create instead.
