@@ -65,27 +65,3 @@ resource "aws_security_group" "postgres" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
-
-# Traffic to Elasticsearch should only allow from ECS
-resource "aws_security_group" "elasticsearch" {
-  name = "${module.main_label.id}-elasticsearch-security-group"
-
-  description = "elasticsearch servers (terraform-managed)"
-  vpc_id = aws_vpc.main.id
-
-  # Only elasticsearch in from ECS
-  ingress {
-    protocol = "tcp"
-    from_port = 80
-    to_port = 80
-    security_groups = [aws_security_group.ecs_tasks.id]
-  }
-
-  # Allow all outbound traffic.
-  egress {
-    protocol = "-1"
-    from_port = 0
-    to_port = 0
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
