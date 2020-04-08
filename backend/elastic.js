@@ -85,7 +85,7 @@ class Elastic {
   async bulkIndexFromMap(indexName, map) {
     const chunks = _.chunk(Object.keys(map), BULKSIZE);
     return pMap(chunks, (chunk, chunkNum) => {
-      macros.log(`indexed ${chunkNum * BULKSIZE} docs into ${indexName}`);
+      macros.log(`indexing ${chunkNum * BULKSIZE + chunk.length} docs into ${indexName}`);
       const bulk = [];
       for (const id of chunk) {
         bulk.push({ index: { _id: id } });
