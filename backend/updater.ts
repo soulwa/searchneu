@@ -15,26 +15,31 @@ import HydrateCourseSerializer from './database/serializers/hydrateCourseSeriali
 import termParser from './scrapers/classes/parsersxe/termParser';
 import { Course as CourseType, Section as SectionType } from './types';
 
-// TYPES
+// ======= TYPES ======== //
+// A collection of structs for simpler querying of pre-scrape data
 interface OldData {
   oldWatchedClasses:  Record<string, CourseType>,
   oldWatchedSections: Record<string, SectionType>,
   oldSectionsByClass: Record<string, string[]>
 }
 
+// A serialized result, the result of scrapers and serializing search results
 interface SerializedResult {
   class: CourseType,
   sections: SectionType[]
 }
 
+// Stores the information regarding a change to a course or section
 export type Notification = CourseNotification | SectionNotification;
 
+// marks new sections being added to a Course
 interface CourseNotification {
   type: 'Course',
   course: CourseType,
   count: number,
 }
 
+// marks seats becoming available in a section
 interface SectionNotification {
   type: 'Section',
   section: SectionType,
@@ -68,16 +73,14 @@ class Updater {
         macros.warn('Updater failed with: ', e); 
       }
     }, intervalTime);
-    // TODO this seems unnecessary?
     this.update();
   }
 
-
   // Update classes and sections users are watching and notify them if seats have opened up
   async update() {
+    macros.log('updating');
     if (macros.DEV) return;
 
-    macros.log('updating');
     const startTime = Date.now();
 
     const classHashToUsers: Record<string, string[]> = await this.modelToUserHash(this.COURSE_MODEL);
@@ -124,17 +127,12 @@ class Updater {
 
     sections.forEach((sec: SectionType) => {
       if (!oldWatchedSections[Keys.getSectionHash(sec)]) return;
-      console.log('\nYEYEYEYEYEYEYEYEYE');
 
       const oldSection: SectionType = oldWatchedSections[Keys.getSectionHash(sec)];
-      console.log(sec);
-      console.log(oldSection);
       if ((sec.seatsRemaining > 0 && oldSection.seatsRemaining <= 0) || (sec.waitRemaining > 0 && oldSection.waitRemaining <= 0)) {
         notifications.push({ type: 'Section', section: sec });
       }
     });
-
-    console.log(notifications);
 
     await this.sendMessages(notifications, classHashToUsers, sectionHashToUsers);
     await dumpProcessor.main({ termDump: { sections } });
@@ -148,7 +146,7 @@ class Updater {
     });
   }
 
-  // TODO purpose
+  // Return an Object of the list of users associated with what class or section they are following
   async modelToUserHash(modelName: string): Promise<Record<string, string[]>> {
     const columnName = `${modelName}Id`;
     const capitalizedName = modelName.charAt(0).toUpperCase() + modelName.slice(1) + 's';
@@ -158,7 +156,7 @@ class Updater {
   }
 
 
-  // TODO purpose 
+  // return a collection of data structures used for simplified querying of data
   async getOldData(classHashes: string[]): Promise<OldData> {
     const oldDocs: Record<string, SerializedResult> = await (new HydrateCourseSerializer(Section)).bulkSerialize(await Course.findAll({ where: { id: { [Op.in]: classHashes } } }));
 
@@ -179,7 +177,7 @@ class Updater {
     return { oldWatchedClasses, oldWatchedSections, oldSectionsByClass };
   }
 
-  // TODO would be nice to shorten these types and whatnot
+  // Send messages to users that are following changes to classes and sections
   async sendMessages(notifs: Notification[], classHashToUsers: Record<string, string[]>, sectionHashToUsers: Record<string, string[]>): Promise<void> {
     // user to message map
     const userToMsg: Record<string, string[]> = {};
@@ -210,6 +208,7 @@ class Updater {
     });
   }
 
+  // Send a message to people following changes to a course
   generateCourseMsg(userIds: string[], courseNotif: CourseNotification, userToMsg: Record<string, string[]>): void {
     const classCode: string = `${courseNotif.course.subject}${courseNotif.course.classId}`;
     let message: string = '';
@@ -223,6 +222,7 @@ class Updater {
     });
   }
 
+  // Send a message to people following changes to a section
   generateSectionMsg(userIds: string[], sectionNotif: SectionNotification, userToMsg: Record<string, string[]>): void {
     const classCode: string = `${sectionNotif.section.subject}${sectionNotif.section.classId}`;
     let message: string;

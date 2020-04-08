@@ -15,6 +15,8 @@ const request = new Request('notifyer', {
   retryCount: macros.DEV ? 1 : 3,
 });
 
+const MESSAGE_TAG = 'CONFIRMED_EVENT_UPDATE';
+
 class Notifyer {
   // Webhook to respond to Facebook messages.
   async sendFBNotification(sender, text) {
@@ -58,6 +60,7 @@ class Notifyer {
         message: {
           text: text,
         },
+        tag: MESSAGE_TAG,
       },
     };
 
