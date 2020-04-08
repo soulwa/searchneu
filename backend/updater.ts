@@ -11,7 +11,7 @@ import Keys from '../common/Keys';
 import notifyer from './notifyer';
 import dumpProcessor from './dumpProcessor';
 import { Course, Section, sequelize } from './database/models/index';
-import HydrateSerializer from './database/serializers/hydrateSerializer';
+import HydrateCourseSerializer from './database/serializers/hydrateCourseSerializer';
 import termParser from './scrapers/classes/parsersxe/termParser';
 import { Course as CourseType, Section as SectionType } from './types';
 
@@ -105,23 +105,36 @@ class Updater {
     // scrape everything
     // TODO rename
     const sections: Section[] = termParser.requestsSectionsForTerm('202110');
-    const newSectionsByClass: Record<string, string[]> = _.groupBy(sections, (sec) => sec.classHash);
+    const newSectionsByClass: Record<string, string[]> = sections.reduce((acc: Record<string, string[]>, sec: SectionType) => {
+      const hash: string = Keys.getClassHash(sec);
+      if (!acc[hash]) acc[hash] = [];
+      acc[hash].push(Keys.getSectionHash(sec));
+      return acc;
+    }, {});
 
     const notifications: Notification[] = [];
 
-    Object.entries(newSectionsByClass).map(([classHash, sectionHashes]) => {
+    Object.entries(newSectionsByClass).forEach(([classHash, sectionHashes]) => {
+      if (!oldSectionsByClass[classHash]) return;
       const sectionDiffCount: number = sectionHashes.filter((hash: string) => !oldSectionsByClass[classHash].includes(hash)).length;
       if (sectionDiffCount > 0) {
         notifications.push({ type: 'Course', course: oldWatchedClasses[classHash], count: sectionDiffCount });
       }
     });
 
-    sections.map((sec: SectionType) => {
+    sections.forEach((sec: SectionType) => {
+      if (!oldWatchedSections[Keys.getSectionHash(sec)]) return;
+      console.log('\nYEYEYEYEYEYEYEYEYE');
+
       const oldSection: SectionType = oldWatchedSections[Keys.getSectionHash(sec)];
+      console.log(sec);
+      console.log(oldSection);
       if ((sec.seatsRemaining > 0 && oldSection.seatsRemaining <= 0) || (sec.waitRemaining > 0 && oldSection.waitRemaining <= 0)) {
         notifications.push({ type: 'Section', section: sec });
       }
     });
+
+    console.log(notifications);
 
     await this.sendMessages(notifications, classHashToUsers, sectionHashToUsers);
     await dumpProcessor.main({ termDump: { sections } });
@@ -138,7 +151,8 @@ class Updater {
   // TODO purpose
   async modelToUserHash(modelName: string): Promise<Record<string, string[]>> {
     const columnName = `${modelName}Id`;
-    const dbResults = await sequelize.query(`SELECT "${columnName}", ARRAY_AGG("userId") FROM "FollowedCourses" GROUP BY "${columnName}"`, 
+    const capitalizedName = modelName.charAt(0).toUpperCase() + modelName.slice(1) + 's';
+    const dbResults = await sequelize.query(`SELECT "${columnName}", ARRAY_AGG("userId") FROM "Followed${capitalizedName}" GROUP BY "${columnName}"`, 
                                       { type: sequelize.QueryTypes.SELECT });
     return Object.assign({}, ...dbResults.map((res) => ({ [res[columnName]]: res.array_agg })));
   }
@@ -146,15 +160,14 @@ class Updater {
 
   // TODO purpose 
   async getOldData(classHashes: string[]): Promise<OldData> {
-    const oldDocs: SerializedResult[] = await (new HydrateSerializer(Section)).bulkSerialize(await Course.findAll({ where: { id: { [Op.in]: classHashes } } }));
+    const oldDocs: Record<string, SerializedResult> = await (new HydrateCourseSerializer(Section)).bulkSerialize(await Course.findAll({ where: { id: { [Op.in]: classHashes } } }));
 
-    const oldWatchedClasses = oldDocs.reduce((courseObj: Record<string, CourseType>, doc: SerializedResult): Record<string, CourseType> => {
-      courseObj[Keys.getClassHash(doc.class)] = doc.class;
+    const oldWatchedClasses = Object.entries(oldDocs).reduce((courseObj: Record<string, CourseType>, [classHash, doc]) => {
+      courseObj[classHash] = doc.class;
       return courseObj;
     }, {});
 
-    // TODO bad
-    const oldSectionsByClass = _.mapValues(oldDocs, (doc: SerializedResult) => Keys.getClassHash(doc.class));
+    const oldSectionsByClass = _.mapValues(oldDocs, (doc: SerializedResult) => doc.sections.map((sec: SectionType) => Keys.getSectionHash(sec)));
 
     const oldWatchedSections = {};
     for (const aClass of Object.values(oldDocs)) {
