@@ -3,9 +3,16 @@ import { Course as CourseType, Section as SectionType, Requisite } from '../type
 import { Notification } from '../updater';
 import Updater from '../updater';
 import notifyer from '../notifyer';
+import dumpProcessor from '../dumpProcessor';
+import termParser from '../scrapers/classes/parsersxe/termParser';
 
-beforeEach(() => {
+beforeEach(async () => {
   jest.spyOn(notifyer, 'sendFBNotification').mockImplementation(() => {});
+  await Course.truncate({ cascade: true, restartIdentity: true });
+  await Section.truncate({ cascade: true, restartIdentity: true });
+  await User.truncate({ cascade: true, restartIdentity: true });
+  await FollowedCourse.truncate({ cascade: true, restartIdentity: true });
+  await FollowedSection.truncate({ cascade: true, restartIdentity: true });
 });
 
 afterAll(async () => {
@@ -112,20 +119,6 @@ describe('Updater', () => {
 
   // TODO this is low priority
   describe('modelToUserHash', () => {
-    beforeEach(async () => {
-      await Course.truncate({ cascade: true, restartIdentity: true });
-      await Section.truncate({ cascade: true, restartIdentity: true });
-      await User.truncate({ cascade: true, restartIdentity: true });
-      await FollowedCourse.truncate({ cascade: true, restartIdentity: true });
-      await FollowedSection.truncate({ cascade: true, restartIdentity: true });
-
-
-      // create two classes, and two sections of one class, and four-ish users.
-      // some users being re-used (read: following multiple classes or sections).
-      // RULE: every user following a class is also following every section of that class
-
-    });
-
     it('works for followed courses', () => {
     });
     // to test this function:
@@ -192,12 +185,118 @@ describe('Updater', () => {
         ['user2', 'A waitlist seat has opened up in CS2510 (CRN: 0248). Check it out at https://searchneu.com/202030/CS2510 !'],
         ['user2', 'A seat opened up in CS2510 (CRN: 1357). Check it out at https://searchneu.com/202030/CS2510 !'],
       ]);
+    });
+  });
 
-      // Notifications: 
-      // 1. new fundies 1 section! 
-      // 2. there's a fundies 1 section with available seats!
-      // 3. there's a fundies 2 section with available seats!
-      // 4. there's a fundies 2 section with waitlist seats!
+  describe('update', () => {
+    it.only('WORKS', async () => {
+      jest.spyOn(dumpProcessor, 'main').mockImplementation(() => {});
+      jest.spyOn(termParser, 'requestsSectionsForTerm').mockImplementation(() => {
+        return [
+          FUNDIES_ONE_S1,
+          FUNDIES_ONE_S2,
+          FUNDIES_TWO_S1,
+          FUNDIES_TWO_S2,
+          PL_S1,
+        ];
+      });
+
+      await Course.create({ ...FUNDIES_ONE, id: 'neu.edu/202030/CS/2500' });
+      await Course.create({ ...FUNDIES_TWO, id: 'neu.edu/202030/CS/2510' });
+      await Course.create({ ...PL, id: 'neu.edu/202030/CS/4400' });
+
+      await Section.create({ 
+        ...FUNDIES_ONE_S2, 
+        id: 'neu.edu/202030/CS/2500/5678', 
+        classHash: 'neu.edu/202030/CS/2500',
+        seatsRemaining: 0,
+        waitRemaining: 0,
+      });
+      await Section.create({ 
+        ...FUNDIES_TWO_S1, 
+        id: 'neu.edu/202030/CS/2510/0248', 
+        classHash: 'neu.edu/202030/CS/2510',
+        seatsRemaining: 0,
+        waitRemaining: 0,
+      });
+
+      await Section.create({ 
+        ...FUNDIES_TWO_S2, 
+        id: 'neu.edu/202030/CS/2510/1357', 
+        classHash: 'neu.edu/202030/CS/2510',
+        seatsRemaining: 0,
+        waitRemaining: 0,
+      });
+
+      await Section.create({ 
+        ...PL_S1, 
+        id: 'neu.edu/202030/CS/4400/0987', 
+        classHash: 'neu.edu/202030/CS/4400',
+        seatsRemaining: 0,
+        waitRemaining: 0,
+      });
+
+      await User.create({
+        id: 'user1',
+        facebookPageId: 'user1',
+        firstName: 'user',
+        lastName: '1',
+        loginKeys: []
+      });
+
+      await User.create({
+        id: 'user2',
+        facebookPageId: 'user2',
+        firstName: 'user',
+        lastName: '2',
+        loginKeys: []
+      });
+
+      await FollowedCourse.create({
+        userId: 'user1',
+        courseId: 'neu.edu/202030/CS/2500',
+      });
+
+      await FollowedCourse.create({
+        userId: 'user2',
+        courseId: 'neu.edu/202030/CS/2500',
+      });
+
+      await FollowedCourse.create({
+        userId: 'user2',
+        courseId: 'neu.edu/202030/CS/2510',
+      });
+
+      await FollowedSection.create({
+        userId: 'user1',
+        sectionId: 'neu.edu/202030/CS/2500/5678',
+      });
+
+      await FollowedSection.create({
+        userId: 'user2',
+        sectionId: 'neu.edu/202030/CS/2500/5678',
+      });
+
+      await FollowedSection.create({
+        userId: 'user2',
+        sectionId: 'neu.edu/202030/CS/2510/0248',
+      });
+
+      await FollowedSection.create({
+        userId: 'user2',
+        sectionId: 'neu.edu/202030/CS/2510/1357',
+      });
+
+      await UPDATER.update();
+
+      expect(notifyer.sendFBNotification.mock.calls).toEqual([
+        ['user1', 'A section was added to CS2500! Check it out at https://searchneu.com/202030/CS2500 !'],
+        ['user1', 'A seat opened up in CS2500 (CRN: 5678). Check it out at https://searchneu.com/202030/CS2500 !'],
+        ['user2', 'A section was added to CS2500! Check it out at https://searchneu.com/202030/CS2500 !'],
+        ['user2', 'A seat opened up in CS2500 (CRN: 5678). Check it out at https://searchneu.com/202030/CS2500 !'],
+        ['user2', 'A waitlist seat has opened up in CS2510 (CRN: 0248). Check it out at https://searchneu.com/202030/CS2510 !'],
+        ['user2', 'A seat opened up in CS2510 (CRN: 1357). Check it out at https://searchneu.com/202030/CS2510 !'],
+      ]);
     });
   });
 
