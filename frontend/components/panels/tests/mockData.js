@@ -462,6 +462,69 @@ const cs9999 = Course.create({
   },
 });
 
+const probStatsSectionConfig = {
+  seatsCapacity: 70,
+  seatsRemaining: 10,
+  waitCapacity: 0,
+  waitRemaining: 0,
+  classType: 'Lecture',
+  online: false,
+  honors: false,
+  url: 'https://wl11gp.neu.edu/udcprod8/bwckschd.p_disp_detail_sched?term_in=202030&crn_in=30270',
+  crn: '30270',
+  meetings: [
+    {
+      startDate: 18267,
+      endDate: 18366,
+      where: 'West Village G 104',
+      type: 'Class',
+      times: {
+        1: [
+          {
+            start: 37800,
+            end: 41700,
+          },
+        ],
+        3: [
+          {
+            start: 37800,
+            end: 41700,
+          },
+        ],
+        4: [
+          {
+            start: 37800,
+            end: 41700,
+          },
+        ],
+      },
+    },
+    {
+      startDate: 18373,
+      endDate: 18373,
+      where: 'Ell Hall AUD',
+      type: 'Final Exam',
+      times: {
+        2: [
+          {
+            start: 37800,
+            end: 45000,
+          },
+        ],
+      },
+    },
+  ],
+  info: null,
+  profs: [
+    'Aaron Hoffman',
+  ],
+  lastUpdateTime: 1585334931550,
+  termId: '202030',
+  host: 'neu.edu',
+  subject: 'MATH',
+  classId: '3081',
+};
+
 
 export default {
   cs0210: cs0210,
@@ -469,4 +532,5 @@ export default {
   razzaq: razzaq,
   WMNS4520section: WMNS4520section,
   cs9999: cs9999,
+  probStatsSectionConfig: probStatsSectionConfig,
 };

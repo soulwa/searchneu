@@ -8,10 +8,6 @@ import moment, { Moment } from 'moment';
 import macros from '../macros';
 import { DayOfWeek } from '../types';
 
-type DayOfWeekToTime = {
-  [key in DayOfWeek]? : TimeTuple[];
-};
-
 export interface ServerData {
   startDate : number;
   endDate : number;
@@ -20,20 +16,23 @@ export interface ServerData {
   times: DayOfWeekToTime;
 }
 
+type DayOfWeekToTime = {
+  [key in DayOfWeek]? : TimeTuple[];
+};
+
 type TimeTuple = {
   start : number;
   end : number;
 }
 
-type MomentTuple = {
+export type MomentTuple = {
   start : Moment,
   end : Moment
 }
 
-interface TimeToMoment {
+type TimeToMoment = {
   [key: number] : MomentTuple[];
 }
-
 
 class Meeting {
   where: string;
@@ -45,7 +44,6 @@ class Meeting {
   times: MomentTuple[][];
 
   constructor(serverData : ServerData) {
-    macros.log(serverData);
     if (!serverData) {
       return null;
     }
@@ -150,21 +148,21 @@ class Meeting {
     return retVal;
   }
 
-  getIsHidden() {
+  getIsHidden() : boolean {
     return this.getHoursPerWeek() === 0;
   }
 
-  getIsExam() {
+  getIsExam() : boolean {
     // this could be improved by scraping more data...
     return this.startDate.unix() === this.endDate.unix();
   }
 
-  getMeetsOnDay(dayIndex : DayOfWeek) {
+  getMeetsOnDay(dayIndex : DayOfWeek) : boolean {
     const flatTimes = _.flatten(this.times);
     return flatTimes.some((time) => { return time.start.day() === dayIndex; });
   }
 
-  getMeetsOnWeekends() {
+  getMeetsOnWeekends() : boolean {
     return !this.getIsExam()
         && this.getMeetsOnDay(DayOfWeek.SUNDAY) || this.getMeetsOnDay(DayOfWeek.SATURDAY);
   }

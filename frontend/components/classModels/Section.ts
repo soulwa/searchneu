@@ -7,7 +7,7 @@ import _ from 'lodash';
 
 import Keys from '../../../common/Keys';
 import macros from '../macros';
-import Meeting from './Meeting';
+import Meeting, { MomentTuple } from './Meeting';
 
 class Section {
   static requiredPath : string[] = ['host', 'termId', 'subject', 'classId'];
@@ -52,21 +52,21 @@ class Section {
     this.meetings = [];
   }
 
-  static create(config) {
+  static create(config) : Section {
     const instance = new this(config);
     instance.updateWithData(config);
     return instance;
   }
 
-  getHash() {
+  getHash() : string {
     return Keys.getSectionHash(this);
   }
 
-  meetsOnWeekends() {
+  meetsOnWeekends() : boolean {
     return this.meetings.some((meeting) => { return meeting.getMeetsOnWeekends(); });
   }
 
-  getAllMeetingMoments(ignoreExams = true) {
+  getAllMeetingMoments(ignoreExams = true) : MomentTuple[] {
     let retVal = [];
     this.meetings.forEach((meeting) => {
       if (ignoreExams && meeting.getIsExam()) {
@@ -77,21 +77,15 @@ class Section {
     });
 
     retVal.sort((a, b) => {
-      if (a.start.unix() > b.start.unix()) {
-        return 1;
-      }
-      if (a.start.unix() < b.start.unix()) {
-        return -1;
-      }
-
-      return 0;
+      return a.start.unix() - b.start.unix();
     });
 
+    macros.log(retVal);
     return retVal;
   }
 
   //returns [false,true,false,true,false,true,false] if meeting mon, wed, fri
-  getWeekDaysAsBooleans() {
+  getWeekDaysAsBooleans() : boolean[] {
     const retVal = [false, false, false, false, false, false, false];
 
 
@@ -102,8 +96,8 @@ class Section {
     return retVal;
   }
 
-  getWeekDaysAsStringArray() {
-    const weekdaySet = new Set();
+  getWeekDaysAsStringArray() : string[] {
+    const weekdaySet = new Set<string>();
     this.getAllMeetingMoments().forEach((time) => {
       weekdaySet.add(time.start.format('dddd'));
     });
@@ -112,7 +106,7 @@ class Section {
   }
 
   //returns true if has exam, else false
-  getHasExam() {
+  getHasExam() : boolean {
     return this.meetings.some((meeting) => { return meeting.getIsExam(); });
   }
 
@@ -247,6 +241,5 @@ class Section {
     return 0;
   }
 }
-
 
 export default Section;

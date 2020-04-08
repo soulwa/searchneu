@@ -470,6 +470,4 @@ class Course {
     return false;
   }
 }
-
-
 export default Course;
