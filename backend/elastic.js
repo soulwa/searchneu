@@ -37,9 +37,14 @@ class Elastic {
    * @param  {Object} mapping   The new elasticsearch index mapping(schema)
    */
   async resetIndex(indexName, mapping) {
-    // Clear out the index.
-    await client.indices.delete({ index: indexName }).catch(() => {});
+    const exists = (await client.indices.exists({ index: indexName })).statusCode === 200;
+    if (exists) {
+      // Clear out the index.
+      macros.log('deleting index', indexName);
+      await client.indices.delete({ index: indexName });
+    }
     // Put in the new classes mapping (elasticsearch doesn't let you change mapping of existing index)
+    macros.log('inserting mapping for index', indexName);
     await client.indices.create({
       index: indexName,
       body: mapping,

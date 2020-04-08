@@ -8,5 +8,5 @@ if (require.main === module) {
   (async () => {
     await elastic.resetIndex('classes', classMap);
     await elastic.resetIndex('employees', employeeMap);
-  })();
+  })().catch((e) => macros.error(e));
 }
