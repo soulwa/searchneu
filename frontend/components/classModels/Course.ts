@@ -469,29 +469,6 @@ class Course {
     }
     return false;
   }
-
-  // Downloads the first layer of prereqs
-  async loadPrereqs(classMap) {
-    this.prereqs.values.forEach((childBranch) => {
-      if (childBranch instanceof RequisiteBranch) {
-        childBranch.loadPrereqs(classMap);
-      } else if (!childBranch.isString) {
-        childBranch.loadFromClassMap(classMap);
-      }
-    });
-  }
-
-
-  // Downloads the first layer of prereqs
-  async loadCoreqs(classMap) {
-    this.coreqs.values.forEach((childBranch) => {
-      if (childBranch instanceof RequisiteBranch) {
-        macros.error('meh');
-      } else if (!childBranch.isString) {
-        childBranch.loadFromClassMap(classMap);
-      }
-    });
-  }
 }
 
 

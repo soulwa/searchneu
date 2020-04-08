@@ -8,12 +8,16 @@ import moment, { Moment } from 'moment';
 import macros from '../macros';
 import { DayOfWeek } from '../types';
 
-type ServerData = {
+type DayOfWeekToTime = {
+  [key in DayOfWeek]? : TimeTuple[];
+};
+
+export interface ServerData {
   startDate : number;
   endDate : number;
   where : string;
   type : string;
-  times: TimeTuple[];
+  times: DayOfWeekToTime;
 }
 
 type TimeTuple = {
@@ -41,6 +45,7 @@ class Meeting {
   times: MomentTuple[][];
 
   constructor(serverData : ServerData) {
+    macros.log(serverData);
     if (!serverData) {
       return null;
     }
@@ -108,12 +113,12 @@ class Meeting {
     this.times = valuesGroupedByTimeOfDay;
   }
 
-  getBuilding() {
+  getBuilding() : string {
     // regex off the room number
     return this.where.replace(/\d+\s*$/i, '').trim();
   }
 
-  getHoursPerWeek() {
+  getHoursPerWeek() : number {
     let retVal = 0;
 
     _.flatten(this.times).forEach((time) => {
@@ -126,20 +131,13 @@ class Meeting {
 
   // returns sorted list of weekday strings, eg
   //["Monday","Friday"]
-  getWeekdayStrings() {
+  getWeekdayStrings() : string[] {
     const retVal = [];
 
     const flatTimes = _.flatten(this.times);
 
     flatTimes.sort((a, b) => {
-      if (a.start.unix() < b.start.unix()) {
-        return -1;
-      }
-      if (a.start.unix() > b.start.unix()) {
-        return 1;
-      }
-
-      return 0;
+      return a.start.unix() - b.start.unix()
     });
 
     flatTimes.forEach((time) => {
@@ -169,24 +167,6 @@ class Meeting {
   getMeetsOnWeekends() {
     return !this.getIsExam()
         && this.getMeetsOnDay(DayOfWeek.SUNDAY) || this.getMeetsOnDay(DayOfWeek.SATURDAY);
-  }
-
-  // no idea if this is right
-  compareTo(other) {
-    if (this.times.length === 0) {
-      return 1;
-    }
-    if (other.times.length === 0) {
-      return -1;
-    }
-    if (this.times[0][0].start.unix() > other.times[0][0].start.unix()) {
-      return 1;
-    }
-    if (this.times[0][0].start.unix() < other.times[0][0].start.unix()) {
-      return -1;
-    }
-
-    return 0;
   }
 }
 
