@@ -206,8 +206,6 @@ class Searcher {
   async getSearchResults(query, termId, min, max, filters) {
     const queries = this.generateMQuery(query, termId, min, max, filters);
     const results = await elastic.mquery(`${elastic.CLASS_INDEX},${elastic.EMPLOYEE_INDEX}`, queries);
-    macros.log('es results')
-    macros.log(JSON.stringify(results, null, 2));
     return this.parseResults(results.body.responses, Object.keys(this.aggFilters));
   }
 
