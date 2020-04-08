@@ -45,6 +45,10 @@ exports[`should render a section 1`] = `
         }
         selected={
           Object {
+            "classIdRange": Object {
+              "max": "",
+              "min": "",
+            },
             "classType": Array [],
             "nupath": Array [],
             "online": false,
