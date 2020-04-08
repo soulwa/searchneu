@@ -10,6 +10,6 @@ SERVICE=$CLUSTER # Service and cluster have same name
 # Disable aws from sending stdout to less
 export AWS_PAGER=""
 
-echo "Redeploying cluster $CLUSTER"
+echo "Redeploying cluster $CLUSTER with last pushed image"
 
 aws ecs update-service --cluster $CLUSTER --service $SERVICE --force-new-deployment
