@@ -96,7 +96,7 @@ class Elastic {
         bulk.push({ index: { _id: id } });
         bulk.push(map[id]);
       }
-      return client.bulk({ index: indexName, refresh: 'wait_for', body: bulk });
+      return client.bulk({ index: indexName, body: bulk });
     },
     { concurrency: 1 });
   }
