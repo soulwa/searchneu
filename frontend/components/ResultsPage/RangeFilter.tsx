@@ -46,7 +46,8 @@ export default function RangeFilter({ title, selected, setActive }: RangeFilterP
           role='button'
           tabIndex={ 0 }
           className='RangeFilter__apply-input'
-          onClick={ () => setActive({ min: controlledInput.min || '0', max: controlledInput.max || '9999' }) }>
+          onClick={ () => setActive({ min: controlledInput.min || '0', max: controlledInput.max || '9999' }) }
+        >
           <p>Apply</p>
         </div>
       </div>
