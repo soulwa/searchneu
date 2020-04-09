@@ -1,38 +1,63 @@
 # alb.tf
+module "alb" {
+  source  = "terraform-aws-modules/alb/aws"
+  version = "~> 5.0"
+  
+  name = module.main_label.id
 
-resource "aws_alb" "main" {
-  name            = module.main_label.id
-  subnets         = aws_subnet.public.*.id
-  security_groups = [aws_security_group.lb.id]
-}
+  load_balancer_type = "application"
 
-resource "aws_alb_target_group" "app" {
-  name        = module.main_label.id
-  port        = 80
-  protocol    = "HTTP"
-  vpc_id      = aws_vpc.main.id
-  target_type = "ip"
+  vpc_id             = aws_vpc.main.id
+  subnets            = aws_subnet.public.*.id
+  security_groups    = [aws_security_group.lb.id]
+  
+  target_groups = [
+    {
+      name_prefix      = "def"
+      backend_protocol = "HTTP"
+      backend_port     = 80
+      vpc_id           = aws_vpc.main.id
+      target_type      = "ip"
+    }
+  ]
 
-  health_check {
-    healthy_threshold   = "3"
-    interval            = "30"
-    protocol            = "HTTP"
-    matcher             = "200"
-    timeout             = "3"
-    path                = var.health_check_path
-    unhealthy_threshold = "2"
+  http_tcp_listeners = [
+    {
+      port        = 80
+      protocol    = "HTTP"
+      action_type = "redirect"
+      redirect = {
+        port        = "443"
+        protocol    = "HTTPS"
+        status_code = "HTTP_301"
+      }
+    }
+  ]
+
+  https_listeners = [
+    {
+      port               = 443
+      protocol           = "HTTPS"
+      certificate_arn    = aws_acm_certificate.cert.arn
+      target_group_index = 0
+    }
+  ]
+
+  tags = {
+    Environment = var.stage
   }
 }
 
-# Redirect all traffic from the ALB to the target group
-resource "aws_alb_listener" "front_end" {
-  load_balancer_arn = aws_alb.main.id
-  port              = 80
-  protocol          = "HTTP"
+# Get HTTPS cert
+resource "aws_acm_certificate" "cert" {
+  domain_name       = var.domain
+  validation_method = "DNS"
 
-  default_action {
-    target_group_arn = aws_alb_target_group.app.id
-    type             = "forward"
+  tags = {
+    Environment = var.stage
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
-

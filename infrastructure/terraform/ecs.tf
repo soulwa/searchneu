@@ -61,12 +61,12 @@ resource "aws_ecs_service" "main" {
   }
 
   load_balancer {
-    target_group_arn = aws_alb_target_group.app.id
+    target_group_arn = module.alb.target_group_arns[0]
     container_name   = "${module.main_label.id}-webserver"
     container_port   = var.app_port
   }
 
-  depends_on = [aws_alb_listener.front_end, aws_iam_role_policy_attachment.ecs_task_execution_role, null_resource.enable_long_ecs_resource_ids]
+  depends_on = [aws_iam_role_policy_attachment.ecs_task_execution_role, null_resource.enable_long_ecs_resource_ids]
 }
 
 # ======== Scraper ===========

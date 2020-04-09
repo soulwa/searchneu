@@ -20,6 +20,11 @@ variable "stage" {
   default     = "prod"
 }
 
+variable "domain" {
+  description = "Domain name to deploy to and get https cert for"
+  default     = "docker.searchneu.com"
+}
+
 variable "secrets" {
   description = "Secrets to put in SSM Parameter Store and add as environment variables"
 }
