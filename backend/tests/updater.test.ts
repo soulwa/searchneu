@@ -1,6 +1,7 @@
 import { Course, Section, User, FollowedCourse, FollowedSection, sequelize } from '../database/models/index';
 import { Course as CourseType, Section as SectionType, Requisite } from '../types';
 import { Notification } from '../updater';
+import Keys from '../../common/Keys';
 import Updater from '../updater';
 import notifyer from '../notifyer';
 import dumpProcessor from '../dumpProcessor';
@@ -10,6 +11,7 @@ beforeEach(async () => {
   jest.clearAllMocks();
   jest.spyOn(notifyer, 'sendFBNotification').mockImplementation(() => {});
   jest.useFakeTimers();
+
   await Course.truncate({ cascade: true, restartIdentity: true });
   await Section.truncate({ cascade: true, restartIdentity: true });
   await User.truncate({ cascade: true, restartIdentity: true });
@@ -25,9 +27,37 @@ afterAll(async () => {
   await sequelize.close();
 });
 
+function createEmptySection(sec: SectionType): Promise<void> {
+  return Section.create({
+    ...sec,
+    id: Keys.getSectionHash(sec),
+    classHash: Keys.getClassHash(sec),
+    crn: sec.crn,
+    seatsRemaining: 0,
+    waitRemaining: 0,
+  });
+}
+
+function createStubUser(name: string): Promise<void> {
+  return User.create({
+    id: name,
+    facebookPageId: name,
+    firstName: name,
+    lastName: name,
+    loginKeys: [],
+  });
+}
+
+function createFollowedCourse(userId: string, courseId: string): Promise<void> {
+  return FollowedCourse.create({ userId, courseId });
+}
+
+function createFollowedSection(userId: string, sectionId: string): Promise<void> {
+  return FollowedSection.create({ userId, sectionId });
+}
+
 describe('Updater', () => {
   const UPDATER: Updater = new Updater();
-
 
   const EMPTY_REQ: Requisite = { type: 'or', values: [] };
   const defaultClassProps = { host: 'neu.edu', classAttributes: [], prettyUrl: 'pretty', desc: 'a class', url: 'url', lastUpdateTime: 20, maxCredits: 4, minCredits: 0, coreqs: EMPTY_REQ, prereqs: EMPTY_REQ };
@@ -214,88 +244,22 @@ describe('Updater', () => {
       await Course.create({ ...FUNDIES_TWO, id: 'neu.edu/202030/CS/2510' });
       await Course.create({ ...PL, id: 'neu.edu/202030/CS/4400' });
 
-      await Section.create({ 
-        ...FUNDIES_ONE_S2, 
-        id: 'neu.edu/202030/CS/2500/5678', 
-        classHash: 'neu.edu/202030/CS/2500',
-        seatsRemaining: 0,
-        waitRemaining: 0,
-      });
+      await createEmptySection(FUNDIES_ONE_S2);
+      await createEmptySection(FUNDIES_TWO_S1);
+      await createEmptySection(FUNDIES_TWO_S2);
+      await createEmptySection(PL_S1);
 
-      await Section.create({ 
-        ...FUNDIES_TWO_S1, 
-        id: 'neu.edu/202030/CS/2510/0248', 
-        classHash: 'neu.edu/202030/CS/2510',
-        seatsRemaining: 0,
-        waitRemaining: 0,
-      });
+      await createStubUser('user1');
+      await createStubUser('user2');
 
-      await Section.create({ 
-        ...FUNDIES_TWO_S2, 
-        id: 'neu.edu/202030/CS/2510/1357', 
-        classHash: 'neu.edu/202030/CS/2510',
-        seatsRemaining: 0,
-        waitRemaining: 0,
-      });
+      await createFollowedCourse('user1', 'neu.edu/202030/CS/2500');
+      await createFollowedCourse('user2', 'neu.edu/202030/CS/2500');
+      await createFollowedCourse('user2', 'neu.edu/202030/CS/2510');
 
-      await Section.create({ 
-        ...PL_S1, 
-        id: 'neu.edu/202030/CS/4400/0987', 
-        classHash: 'neu.edu/202030/CS/4400',
-        seatsRemaining: 0,
-        waitRemaining: 0,
-      });
-
-      await User.create({
-        id: 'user1',
-        facebookPageId: 'user1',
-        firstName: 'user',
-        lastName: '1',
-        loginKeys: []
-      });
-
-      await User.create({
-        id: 'user2',
-        facebookPageId: 'user2',
-        firstName: 'user',
-        lastName: '2',
-        loginKeys: []
-      });
-
-      await FollowedCourse.create({
-        userId: 'user1',
-        courseId: 'neu.edu/202030/CS/2500',
-      });
-
-      await FollowedCourse.create({
-        userId: 'user2',
-        courseId: 'neu.edu/202030/CS/2500',
-      });
-
-      await FollowedCourse.create({
-        userId: 'user2',
-        courseId: 'neu.edu/202030/CS/2510',
-      });
-
-      await FollowedSection.create({
-        userId: 'user1',
-        sectionId: 'neu.edu/202030/CS/2500/5678',
-      });
-
-      await FollowedSection.create({
-        userId: 'user2',
-        sectionId: 'neu.edu/202030/CS/2500/5678',
-      });
-
-      await FollowedSection.create({
-        userId: 'user2',
-        sectionId: 'neu.edu/202030/CS/2510/0248',
-      });
-
-      await FollowedSection.create({
-        userId: 'user2',
-        sectionId: 'neu.edu/202030/CS/2510/1357',
-      });
+      await createFollowedSection('user1', 'neu.edu/202030/CS/2500/5678');
+      await createFollowedSection('user2', 'neu.edu/202030/CS/2500/5678');
+      await createFollowedSection('user2', 'neu.edu/202030/CS/2510/0248');
+      await createFollowedSection('user2', 'neu.edu/202030/CS/2510/1357');
     });
 
     it('WORKS', async () => {

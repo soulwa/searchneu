@@ -49,6 +49,7 @@ class Updater {
   // produce a new Updater instance
   COURSE_MODEL: string;
   SECTION_MODEL: string;
+  SEM_TO_UPDATE: string;
 
   static create() {
     return new this();
@@ -58,6 +59,7 @@ class Updater {
   constructor() {
     this.COURSE_MODEL = 'course';
     this.SECTION_MODEL = 'section';
+    this.SEM_TO_UPDATE = '202110';
   }
 
   // TODO must call this in server
@@ -106,14 +108,14 @@ class Updater {
     }
 
     // scrape everything
-    // TODO rename
-    const sections: Section[] = termParser.requestsSectionsForTerm('202110');
-    const newSectionsByClass: Record<string, string[]> = sections.reduce((acc: Record<string, string[]>, sec: SectionType) => {
+    const sections: Section[] = termParser.requestsSectionsForTerm(this.SEM_TO_UPDATE);
+    const newSectionsByClass: Record<string, string[]> = {};
+
+    for (const sec of sections) {
       const hash: string = Keys.getClassHash(sec);
-      if (!acc[hash]) acc[hash] = [];
-      acc[hash].push(Keys.getSectionHash(sec));
-      return acc;
-    }, {});
+      if (!newSectionsByClass[hash]) newSectionsByClass[hash] = [];
+      newSectionsByClass[hash].push(Keys.getSectionHash(sec));
+    }
 
     const notifications: Notification[] = [];
 
@@ -147,7 +149,7 @@ class Updater {
   }
 
   // Return an Object of the list of users associated with what class or section they are following
-  async modelToUserHash(modelName: string): Promise<Record<string, string[]>> {
+  async modelToUserHash(modelName: 'section' | 'course'): Promise<Record<string, string[]>> {
     const columnName = `${modelName}Id`;
     const capitalizedName = modelName.charAt(0).toUpperCase() + modelName.slice(1) + 's';
     const dbResults = await sequelize.query(`SELECT "${columnName}", ARRAY_AGG("userId") FROM "Followed${capitalizedName}" GROUP BY "${columnName}"`, 
@@ -160,10 +162,10 @@ class Updater {
   async getOldData(classHashes: string[]): Promise<OldData> {
     const oldDocs: Record<string, SerializedResult> = await (new HydrateCourseSerializer(Section)).bulkSerialize(await Course.findAll({ where: { id: { [Op.in]: classHashes } } }));
 
-    const oldWatchedClasses = Object.entries(oldDocs).reduce((courseObj: Record<string, CourseType>, [classHash, doc]) => {
-      courseObj[classHash] = doc.class;
-      return courseObj;
-    }, {});
+    const oldWatchedClasses: Record<string, CourseType> = {};
+    for (const [classHash, doc] of Object.entries(oldDocs)) {
+      oldWatchedClasses[classHash] = doc.class;
+    }
 
     const oldSectionsByClass = _.mapValues(oldDocs, (doc: SerializedResult) => doc.sections.map((sec: SectionType) => Keys.getSectionHash(sec)));
 
