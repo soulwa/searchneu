@@ -262,7 +262,7 @@ describe('Updater', () => {
 
     it('WORKS', async () => {
       jest.spyOn(dumpProcessor, 'main').mockImplementation(() => {});
-      jest.spyOn(termParser, 'requestsSectionsForTerm').mockImplementation(() => {
+      jest.spyOn(termParser, 'parseSections').mockImplementation(() => {
         return [
           FUNDIES_ONE_S1,
           FUNDIES_ONE_S2,
@@ -290,7 +290,7 @@ describe('Updater', () => {
 
     it('does not send unnecessary messages', async () => {
       jest.spyOn(dumpProcessor, 'main').mockImplementation(() => {});
-      jest.spyOn(termParser, 'requestsSectionsForTerm').mockImplementation(() => {
+      jest.spyOn(termParser, 'parseSections').mockImplementation(() => {
         return [
           PL_S1,
         ];
@@ -305,7 +305,7 @@ describe('Updater', () => {
 
     it('does not send messages if scraped classes do not match with followed terms', async () => {
       jest.spyOn(dumpProcessor, 'main').mockImplementation(() => {});
-      jest.spyOn(termParser, 'requestsSectionsForTerm').mockImplementation(() => {
+      jest.spyOn(termParser, 'parseSections').mockImplementation(() => {
         return [
           { ...FUNDIES_ONE_S2, termId: '202110' },
           { ...FUNDIES_TWO_S1, termId: '202110' },
