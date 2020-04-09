@@ -45,10 +45,13 @@ interface SectionNotification {
   section: SectionType,
 }
 
+// the types of models/records that a user can follow
+type ModelName = 'course' | 'section';
+
 class Updater {
   // produce a new Updater instance
-  COURSE_MODEL: string;
-  SECTION_MODEL: string;
+  COURSE_MODEL: ModelName;
+  SECTION_MODEL: ModelName;
   SEM_TO_UPDATE: string;
 
   static create() {
@@ -149,7 +152,7 @@ class Updater {
   }
 
   // Return an Object of the list of users associated with what class or section they are following
-  async modelToUserHash(modelName: 'section' | 'course'): Promise<Record<string, string[]>> {
+  async modelToUserHash(modelName: ModelName): Promise<Record<string, string[]>> {
     const columnName = `${modelName}Id`;
     const capitalizedName = modelName.charAt(0).toUpperCase() + modelName.slice(1) + 's';
     const dbResults = await sequelize.query(`SELECT "${columnName}", ARRAY_AGG("userId") FROM "Followed${capitalizedName}" GROUP BY "${columnName}"`, 
