@@ -53,6 +53,7 @@ class Section {
   }
 
   static create(config) : Section {
+    macros.log('config', config);
     const instance = new this(config);
     instance.updateWithData(config);
     return instance;
@@ -80,7 +81,6 @@ class Section {
       return a.start.unix() - b.start.unix();
     });
 
-    macros.log(retVal);
     return retVal;
   }
 
@@ -125,7 +125,7 @@ class Section {
   }
 
   // Unique list of all professors in all meetings, sorted alphabetically
-  getProfs() {
+  getProfs() : string[] {
     return Array.from(this.profs).sort();
   }
 
@@ -177,50 +177,25 @@ class Section {
   }
 
 
-  compareTo(other) {
-    if (this.online && !other.online) {
-      return 1;
-    }
-    if (other.online && !this.online) {
-      return -1;
-    }
-
-    if (this.meetings.length === 0 && other.meetings.length === 0) {
-      return 0;
-    }
-    if (this.meetings.length > 0 && other.meetings.length === 0) {
-      return -1;
-    }
-    if (this.meetings.length === 0 && other.meetings.length > 0) {
-      return 1;
-    }
-
-    // If both sections have meetings, then sort alphabetically by professor.
+  compareTo(other : Section) {
     const thisProfs = this.getProfs();
     const otherProfs = other.getProfs();
     const thisOnlyTBA = thisProfs.length === 1 && thisProfs[0] === 'TBA';
     const otherOnlyTBA = otherProfs.length === 1 && otherProfs[0] === 'TBA';
 
-    if (thisProfs.length > 0 || otherProfs.length > 0) {
-      if (thisProfs.length === 0) {
-        return -1;
-      }
-      if (otherProfs.length === 0) {
-        return 1;
-      }
+    const checks = [
+      [this.online, other.online],
+      [this.meetings.length > 0, other.meetings.length > 0],
+      // if both sections have meetings, sort alphabetically by professor
+      [otherProfs.length === 0, thisProfs.length === 0],
+      [thisOnlyTBA, otherOnlyTBA],
+      [thisProfs[0] > otherProfs[0], otherProfs[0] > thisProfs[0]],
+      // then sort by starting time of section
+    ];
 
-      if (thisOnlyTBA && !otherOnlyTBA) {
-        return 1;
-      }
-      if (!thisOnlyTBA && otherOnlyTBA) {
-        return -1;
-      }
-
-      if (thisProfs[0] > otherProfs[0]) {
-        return 1;
-      }
-      if (otherProfs[0] > thisProfs[0]) {
-        return -1;
+    for (let i = 0; i < checks.length; i++) {
+      if (this.compareTwoBools(checks[i][0], checks[i][1]) !== 0) {
+        return this.compareTwoBools(checks[i][0], checks[i][1]);
       }
     }
 
@@ -238,6 +213,16 @@ class Section {
       return 1;
     }
 
+    return 0;
+  }
+
+  compareTwoBools(bool1, bool2) {
+    if (bool1 && !bool2) {
+      return 1;
+    }
+    if (bool2 && !bool1) {
+      return -1;
+    }
     return 0;
   }
 }

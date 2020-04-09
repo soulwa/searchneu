@@ -525,6 +525,84 @@ const probStatsSectionConfig = {
   classId: '3081',
 };
 
+const probStatsExamConfig = {
+  startDate: 18373,
+  endDate: 18373,
+  where: 'Ell Hall AUD',
+  type: 'Final Exam',
+  times: {
+    2: [
+      {
+        start: 37800,
+        end: 45000,
+      },
+    ],
+  },
+};
+
+const probStatsConfig2 = {
+  seatsCapacity: 70,
+  seatsRemaining: 16,
+  waitCapacity: 0,
+  waitRemaining: 0,
+  classType: 'Lecture',
+  online: false,
+  honors: false,
+  url: 'https://wl11gp.neu.edu/udcprod8/bwckschd.p_disp_detail_sched?term_in=202030&crn_in=30240',
+  crn: '30240',
+  meetings: [
+    {
+      startDate: 18267,
+      endDate: 18366,
+      where: 'West Village G 104',
+      type: 'Class',
+      times: {
+        1: [
+          {
+            start: 28800,
+            end: 32700,
+          },
+        ],
+        3: [
+          {
+            start: 28800,
+            end: 32700,
+          },
+        ],
+        4: [
+          {
+            start: 28800,
+            end: 32700,
+          },
+        ],
+      },
+    },
+    {
+      startDate: 18373,
+      endDate: 18373,
+      where: 'Science Engineering Complex 102',
+      type: 'Final Exam',
+      times: {
+        2: [
+          {
+            start: 37800,
+            end: 45000,
+          },
+        ],
+      },
+    },
+  ],
+  info: null,
+  profs: [
+    'Hanai Sadaka',
+  ],
+  lastUpdateTime: 1585334931550,
+  termId: '202030',
+  host: 'neu.edu',
+  subject: 'MATH',
+  classId: '3081',
+}
+
 
 export default {
   cs0210: cs0210,
@@ -533,4 +611,6 @@ export default {
   WMNS4520section: WMNS4520section,
   cs9999: cs9999,
   probStatsSectionConfig: probStatsSectionConfig,
+  probStatsExamConfig: probStatsExamConfig,
+  probStatsConfig2: probStatsConfig2,
 };

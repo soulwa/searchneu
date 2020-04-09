@@ -436,7 +436,6 @@ class Course {
       this.hasWaitList = false;
     }
 
-
     //sort sections
     this.sections.sort((a, b) => {
       return a.compareTo(b);
@@ -452,7 +451,7 @@ class Course {
     return false;
   }
 
-  getHasOnlineSections() {
+  getHasOnlineSections() : boolean {
     for (let i = this.sections.length - 1; i >= 0; i--) {
       if (this.sections[i].online) {
         return true;
