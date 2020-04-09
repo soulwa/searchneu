@@ -108,7 +108,7 @@ class Updater {
     }
 
     // scrape everything
-    const sections: Section[] = termParser.requestsSectionsForTerm(this.SEM_TO_UPDATE);
+    const sections: Section[] = await termParser.requestsSectionsForTerm(this.SEM_TO_UPDATE);
     const newSectionsByClass: Record<string, string[]> = {};
 
     for (const sec of sections) {
