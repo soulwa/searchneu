@@ -48,12 +48,12 @@ function createStubUser(name: string): Promise<void> {
   });
 }
 
-function createFollowedCourse(userId: string, courseId: string): Promise<void> {
-  return FollowedCourse.create({ userId, courseId });
+function createFollowedCourses(courseId: string, users: string[]): Promise<void> {
+  return FollowedCourse.bulkCreate(users.map((userId: string) => ({ courseId, userId })));
 }
 
-function createFollowedSection(userId: string, sectionId: string): Promise<void> {
-  return FollowedSection.create({ userId, sectionId });
+function createFollowedSections(sectionId: string, users: string[]): Promise<void> {
+  return FollowedSection.bulkCreate(users.map((userId: string) => ({ sectionId, userId })));
 }
 
 describe('Updater', () => {
@@ -252,14 +252,12 @@ describe('Updater', () => {
       await createStubUser('user1');
       await createStubUser('user2');
 
-      await createFollowedCourse('user1', 'neu.edu/202030/CS/2500');
-      await createFollowedCourse('user2', 'neu.edu/202030/CS/2500');
-      await createFollowedCourse('user2', 'neu.edu/202030/CS/2510');
+      await createFollowedCourses('neu.edu/202030/CS/2500', ['user1', 'user2']);
+      await createFollowedCourses('neu.edu/202030/CS/2510', ['user2']);
 
-      await createFollowedSection('user1', 'neu.edu/202030/CS/2500/5678');
-      await createFollowedSection('user2', 'neu.edu/202030/CS/2500/5678');
-      await createFollowedSection('user2', 'neu.edu/202030/CS/2510/0248');
-      await createFollowedSection('user2', 'neu.edu/202030/CS/2510/1357');
+      await createFollowedSections('neu.edu/202030/CS/2500/5678', ['user1', 'user2']);
+      await createFollowedSections('neu.edu/202030/CS/2510/0248', ['user2']);
+      await createFollowedSections('neu.edu/202030/CS/2510/1357', ['user2']);
     });
 
     it('WORKS', async () => {
