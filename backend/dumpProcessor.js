@@ -55,6 +55,8 @@ class DumpProcessor {
         },
       });
     }
+    // Upsert ES
+    await Course.bulkUpsertES(await Course.findAll());
     sequelize.options.logging = true;
   }
 

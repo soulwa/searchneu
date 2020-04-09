@@ -47,7 +47,10 @@ module.exports = (sequelize, DataTypes) => {
     return elastic.bulkIndexFromMap(elastic.CLASS_INDEX, bulkCourses);
   };
 
-  Course.addHook('afterBulkCreate', async (instances) => { return Course.bulkUpsertES(instances); });
+  // Upserting to ES requires querying for sections. On create, we don't have sections in the db yet,
+  //    and the foreign key constraint means we cannot put sections in before courses
+  // Course.addHook('afterBulkCreate', async (instances) => { return Course.bulkUpsertES(instances); });
+
   Course.addHook('afterBulkUpdate', async ({ where }) => { return Course.bulkUpsertES(await Course.findAll({ where: where }), true); });
 
   return Course;
