@@ -6,10 +6,10 @@ Object {
     "class": Object {
       "allOccurrences": Array [
         Object {
-          "termId": 201830,
+          "termId": 201930,
         },
         Object {
-          "termId": 201930,
+          "termId": 201830,
         },
       ],
       "name": "Fundamentals of Computer Science 1",
