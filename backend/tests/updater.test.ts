@@ -140,6 +140,19 @@ describe('Updater', () => {
     ...defaultSectionProps,
   };
 
+  const FUNDIES_TWO_S3: SectionType = {
+    crn: '9753',
+    classId: '2510',
+    termId: '202030',
+    subject: 'CS',
+    seatsCapacity: 150,
+    seatsRemaining: 10,
+    waitCapacity: 0,
+    waitRemaining: 0,
+    ...defaultClassProps,
+    ...defaultSectionProps,
+  };
+
   const PL_S1: SectionType = {
     crn: '0987',
     classId: '4400',
@@ -318,6 +331,31 @@ describe('Updater', () => {
       jest.runOnlyPendingTimers();
 
       expect(notifyer.sendFBNotification.mock.calls).toEqual([]);
+    });
+
+    it('does not try to send messages to users associated with a class not being followed', async () => {
+      await createEmptySection(FUNDIES_TWO_S3);
+      jest.spyOn(dumpProcessor, 'main').mockImplementation(() => {});
+      jest.spyOn(termParser, 'parseSections').mockImplementation(() => {
+        return [
+          FUNDIES_ONE_S2,
+          FUNDIES_TWO_S1,
+          FUNDIES_TWO_S2,
+          FUNDIES_TWO_S3,
+        ];
+      });
+
+      await UPDATER.update();
+      jest.runOnlyPendingTimers();
+
+      expect(notifyer.sendFBNotification.mock.calls).toEqual([
+        ['user1', 'A seat opened up in CS2500 (CRN: 5678). Check it out at https://searchneu.com/202030/CS2500 !'],
+        ['user2', 'A seat opened up in CS2500 (CRN: 5678). Check it out at https://searchneu.com/202030/CS2500 !'],
+        ['user2', 'A waitlist seat has opened up in CS2510 (CRN: 0248). Check it out at https://searchneu.com/202030/CS2510 !'],
+        ['user2', 'A seat opened up in CS2510 (CRN: 1357). Check it out at https://searchneu.com/202030/CS2510 !'],
+        ['user1', 'Reply with "stop" to unsubscribe from notifications.'],
+        ['user2', 'Reply with "stop" to unsubscribe from notifications.'],
+      ]);
     });
   });
 });

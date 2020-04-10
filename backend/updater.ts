@@ -123,7 +123,7 @@ class Updater {
     const notifications: Notification[] = [];
 
     Object.entries(newSectionsByClass).forEach(([classHash, sectionHashes]) => {
-      if (!oldSectionsByClass[classHash]) return;
+      if (!oldSectionsByClass[classHash] || !classHashToUsers[classHash]) return;
       const sectionDiffCount: number = sectionHashes.filter((hash: string) => !oldSectionsByClass[classHash].includes(hash)).length;
       if (sectionDiffCount > 0) {
         notifications.push({ type: 'Course', course: oldWatchedClasses[classHash], count: sectionDiffCount });
@@ -131,7 +131,7 @@ class Updater {
     });
 
     sections.forEach((sec: SectionType) => {
-      if (!oldWatchedSections[Keys.getSectionHash(sec)]) return;
+      if (!oldWatchedSections[Keys.getSectionHash(sec)] || !sectionHashToUsers[Keys.getSectionHash(sec)]) return;
 
       const oldSection: SectionType = oldWatchedSections[Keys.getSectionHash(sec)];
       if ((sec.seatsRemaining > 0 && oldSection.seatsRemaining <= 0) || (sec.waitRemaining > 0 && oldSection.waitRemaining <= 0)) {
