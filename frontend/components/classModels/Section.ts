@@ -53,7 +53,6 @@ class Section {
   }
 
   static create(config) : Section {
-    macros.log('config', config);
     const instance = new this(config);
     instance.updateWithData(config);
     return instance;
@@ -125,7 +124,7 @@ class Section {
   }
 
   // Unique list of all professors in all meetings, sorted alphabetically
-  getProfs() : string[] {
+  getProfs() {
     return Array.from(this.profs).sort();
   }
 
@@ -177,43 +176,57 @@ class Section {
   }
 
 
-  compareTo(other : Section) {
+  compareTo(other) {
     const thisProfs = this.getProfs();
     const otherProfs = other.getProfs();
-    const thisOnlyTBA = thisProfs.length === 1 && thisProfs[0] === 'TBA';
-    const otherOnlyTBA = otherProfs.length === 1 && otherProfs[0] === 'TBA';
 
-    const checks = [
+    const meetingsExistChecks : boolean[][] = [
       [this.online, other.online],
-      [this.meetings.length > 0, other.meetings.length > 0],
-      // if both sections have meetings, sort alphabetically by professor
-      [otherProfs.length === 0, thisProfs.length === 0],
-      [thisOnlyTBA, otherOnlyTBA],
-      [thisProfs[0] > otherProfs[0], otherProfs[0] > thisProfs[0]],
-      // then sort by starting time of section
+      [this.meetings.length === 0, other.meetings.length === 0, true],
+      [this.meetings.length > other.meetings.length, other.meetings.length > this.meetings.length],
     ];
 
+    // If both sections have meetings, then sort alphabetically by professor.
+    const profChecks : boolean[][] = [
+      [otherProfs.length === 0 && thisProfs.length === 0],
+      [thisProfs.length === 1 && thisProfs[0] === 'TBA', otherProfs.length === 1 && otherProfs[0] === 'TBA'],
+      [thisProfs[0] > otherProfs[0], otherProfs[0] > thisProfs[0]],
+    ];
+
+    const meetingChecks : boolean[][] = [
+      [this.meetings[0].times.length === 0, !(other.meetings[0].times.length === 0), true],
+      [this.meetings[0].times[0][0].start.unix() > other.meetings[0].times[0][0].start.unix(),
+        !(this.meetings[0].times[0][0].start.unix() < other.meetings[0].times[0][0].start.unix())],
+    ];
+
+    const checks = [[true, meetingsExistChecks],
+      [this.profs.length > 0 || otherProfs.length > 0, profChecks],
+      [true, meetingChecks]];
+
     for (let i = 0; i < checks.length; i++) {
+      if (checks[i][0]) {
+        const compareCheck = this.compareList(checks[i][1]);
+        if (compareCheck !== null) {
+          return compareCheck
+        }
+      }
+    }
+
+    return 0;
+  }
+
+  compareList(checks) : number {
+    for (let i = 0; i < checks.length; i++) {
+      if (checks[i].length === 3) {
+        if (checks[i][0] && checks[i][1]) {
+          return 0;
+        }
+      }
       if (this.compareTwoBools(checks[i][0], checks[i][1]) !== 0) {
         return this.compareTwoBools(checks[i][0], checks[i][1]);
       }
     }
-
-    // Then, sort by the starting time of the section.
-    if (this.meetings[0].times.length === 0) {
-      return 1;
-    }
-    if (other.meetings[0].times.length === 0) {
-      return -1;
-    }
-    if (this.meetings[0].times[0][0].start.unix() < other.meetings[0].times[0][0].start.unix()) {
-      return -1;
-    }
-    if (this.meetings[0].times[0][0].start.unix() > other.meetings[0].times[0][0].start.unix()) {
-      return 1;
-    }
-
-    return 0;
+    return null;
   }
 
   compareTwoBools(bool1, bool2) {
