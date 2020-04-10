@@ -15,18 +15,26 @@ jobs:
     - run: yarn test
   seqtests:
     runs-on: ubuntu-latest
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgres
+        # Provide the password for postgres
+        env:
+          POSTGRES_PASSWORD: ''
     steps:
     - uses: actions/checkout@v1
     - name: install node v12
       uses: actions/setup-node@v1
       with:
         node-version: 12
-    - name: install postgres
-      uses: harmon758/postgresql-action@v1
-      with:
-        postgresql version: '11'
-        postgresql_db: searchneu_test
-        postgresql_user: postgres
+    # - name: install postgres
+    #   uses: harmon758/postgresql-action@v1
+    #   with:
+    #     postgresql version: '11'
+    #     postgresql_db: searchneu_test
+    #     postgresql_user: postgres
     - run: yarn install
     - run: yarn test:migrate
     - run: yarn seqtest
