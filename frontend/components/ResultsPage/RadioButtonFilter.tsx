@@ -10,24 +10,28 @@ interface RadioButtonFilterProps {
   setActive: (a:string) => void
 }
 
-export default function RadioButtonFilter({ title, selected, setActive }: RadioButtonFilterProps) {
+export default function RadioButtonFilter({
+  title, options, selected, setActive,
+}: RadioButtonFilterProps) {
   return (
+
     <div className='RadioButtonFilter'>
       <span className='RadioButtonFilter__title'>{title}</span>
       <RadioButtonGroup name='RadioButtonFilter' value={ selected } onChange={ setActive }>
         {(RadioButton) => (
           <>
-          {options.map((option) => (
-            <div key={ option.value } className='RadioButtonFilter__element'>
-              <label className='RadioButtonFilter__text'>
-                <RadioButton value={ option.value } />
-                <span className='CheckboxFilter__checkbox' />
-                {option.value}
-                <span className='CheckboxFilter__count'>
+            {options.map((option) => (
+              <div key={ option.value } className='RadioButtonFilter__element'>
+                <label className='RadioButtonFilter__text'>
+                  <RadioButton value={ option.value } />
+                  <span className='CheckboxFilter__checkbox' />
+                  {option.value}
+                  <span className='CheckboxFilter__count'>
                     {option.count}
                   </span>
-            </div>
-          ))}
+                </label>
+              </div>
+            ))}
           </>
         )}
       </RadioButtonGroup>
