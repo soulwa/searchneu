@@ -21,5 +21,10 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: 12
+    - name: install postgres
+      uses: harmon758/postgresql-action@v1
+      with:
+        postgresql version: '11'
+    - run: yarn db:migrate
     - run: yarn install
     - run: yarn seqtest
