@@ -9,7 +9,7 @@ import _ from 'lodash';
 import macros from './macros';
 import request from './request';
 import { SearchResult, BLANK_SEARCH_RESULT } from './types';
-import { FilterSelection } from './ResultsPage/filters';
+import { FilterSelection, DEFAULT_FILTER_SELECTION } from './ResultsPage/filters';
 
 // Every time there is a breaking change in the search api, increment the version
 // This way, the backend will send back the result that frontend is expecting
@@ -54,7 +54,7 @@ class Search {
       return BLANK_SEARCH_RESULT();
     }
 
-    const stringFilters = JSON.stringify(_.pickBy(filters, (v) => !Array.isArray(v) || v.length));
+    const stringFilters = JSON.stringify(_.pickBy(filters, (v, k: keyof FilterSelection) => !_.isEqual(v, DEFAULT_FILTER_SELECTION[k])));
 
     const searchHash = termId + query + stringFilters;
 
