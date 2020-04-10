@@ -20,22 +20,27 @@ jobs:
       # Label used to access the service container
       postgres:
         # Docker Hub image
-        image: postgres
+        image: postgres:11.5
         # Provide the password for postgres
         env:
+          POSTGRES_DB: searchneu_test
+          POSTGRES_USER: postgres
           POSTGRES_PASSWORD: ''
+        # needed because the postgres container does not provide a healthcheck
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
     - uses: actions/checkout@v1
-    - name: install node v12
-      uses: actions/setup-node@v1
-      with:
-        node-version: 12
+    # - name: install node v12
+    #   uses: actions/setup-node@v1
+    #   with:
+    #     node-version: 12
     # - name: install postgres
     #   uses: harmon758/postgresql-action@v1
     #   with:
     #     postgresql version: '11'
     #     postgresql_db: searchneu_test
     #     postgresql_user: postgres
+    - run: 
     - run: yarn install
     - run: yarn test:migrate
     - run: yarn seqtest
