@@ -7,7 +7,6 @@ import URI from 'urijs';
 
 import cache from '../cache';
 import macros from '../../macros';
-import termDump from './termDump';
 import differentCollegeUrls from './differentCollegeUrls';
 import bannerv9CollegeUrls from './bannerv9CollegeUrls';
 
