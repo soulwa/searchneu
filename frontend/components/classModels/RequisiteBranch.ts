@@ -48,34 +48,6 @@ class RequisiteBranch {
     };
   }
 
-
-  compareTo(other) {
-    if (!(other instanceof RequisiteBranch)) {
-      return -1;
-    }
-    if (other.prereqs.values.length < this.prereqs.values.length) {
-      return -1;
-    }
-    if (other.prereqs.values.length > this.prereqs.values.length) {
-      return 1;
-    }
-    if (other.prereqs.values.length === 0 && this.prereqs.values.length === 0) {
-      return 0;
-    }
-
-    for (let i = 0; i < this.prereqs.values.length; i++) {
-      const retVal = other.prereqs.values[i].compareTo(this.prereqs.values[i]);
-      if (retVal !== 0) {
-        return retVal;
-      }
-    }
-
-
-    macros.error('compareTo in RequisiteBranch needs more code', this, other);
-    return 0;
-  }
-
-
   // Downloads the first layer of prereqs
   async loadPrereqs(classMap) {
     this.prereqs.values.forEach((childBranch) => {
