@@ -13,4 +13,5 @@ jobs:
       with:
         node-version: 12
     - run: yarn install
-    - run: yarn lint
+    - run: yarn lintjs
+    - run: yarn lintstyle
