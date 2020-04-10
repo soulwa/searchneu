@@ -25,6 +25,6 @@ jobs:
       uses: harmon758/postgresql-action@v1
       with:
         postgresql version: '11'
-    - run: yarn db:migrate
+    - run: yarn dev:migrate
     - run: yarn install
     - run: yarn seqtest
