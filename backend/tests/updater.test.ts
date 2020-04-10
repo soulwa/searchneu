@@ -1,8 +1,9 @@
-import { Course, Section, User, FollowedCourse, FollowedSection, sequelize } from '../database/models/index';
+import {
+  Course, Section, User, FollowedCourse, FollowedSection, sequelize,
+} from '../database/models/index';
 import { Course as CourseType, Section as SectionType, Requisite } from '../types';
-import { Notification } from '../updater';
+import Updater, { Notification } from '../updater';
 import Keys from '../../common/Keys';
-import Updater from '../updater';
 import notifyer from '../notifyer';
 import dumpProcessor from '../dumpProcessor';
 import termParser from '../scrapers/classes/parsersxe/termParser';
@@ -59,17 +60,34 @@ function createFollowedSections(sectionId: string, users: string[]): Promise<voi
 describe('Updater', () => {
   const UPDATER: Updater = new Updater();
 
-  const EMPTY_REQ: Requisite = { type: 'or', values: [] };
-  const defaultClassProps = { host: 'neu.edu', classAttributes: [], prettyUrl: 'pretty', desc: 'a class', url: 'url', lastUpdateTime: 20, maxCredits: 4, minCredits: 0, coreqs: EMPTY_REQ, prereqs: EMPTY_REQ };
+  const EMPTY_REQ: Requisite = {
+    type: 'or',
+    values: [],
+  };
 
-  const defaultSectionProps = { online: false, honors: false, url: 'url', profs: [], meetings: [] };
+  const defaultClassProps = {
+    host: 'neu.edu',
+    classAttributes: [],
+    prettyUrl: 'pretty',
+    desc: 'a class',
+    url: 'url',
+    lastUpdateTime: 20,
+    maxCredits: 4,
+    minCredits: 0,
+    coreqs: EMPTY_REQ,
+    prereqs: EMPTY_REQ,
+  };
+
+  const defaultSectionProps = {
+    online: false, honors: false, url: 'url', profs: [], meetings: [],
+  };
 
   const FUNDIES_ONE: CourseType = {
     classId: '2500',
     name: 'Fundamentals of Computer Science 1',
     termId: '202030',
     subject: 'CS',
-    ...defaultClassProps
+    ...defaultClassProps,
   };
 
   const FUNDIES_TWO: CourseType = {
@@ -77,7 +95,7 @@ describe('Updater', () => {
     name: 'Fundamentals of Computer Science 2',
     termId: '202030',
     subject: 'CS',
-    ...defaultClassProps
+    ...defaultClassProps,
   };
 
   const PL: CourseType = {
@@ -85,7 +103,7 @@ describe('Updater', () => {
     name: 'Principles of Programming Languages',
     termId: '202030',
     subject: 'CS',
-    ...defaultClassProps
+    ...defaultClassProps,
   };
 
   const FUNDIES_ONE_S1: SectionType = {
@@ -178,16 +196,15 @@ describe('Updater', () => {
     //    c. Users
     //    d. FollowedCourses
     //    e. FollowedSections
-
   });
 
   describe('generateCourseMsg', () => {
     it('generates a message for multiple sections getting added', () => {
       const userToMsg: Record<string, string[]> = {};
-      UPDATER.generateCourseMsg(['user1', 'user2'], { type: 'Course', course: FUNDIES_ONE, count: 2 }, userToMsg);      
+      UPDATER.generateCourseMsg(['user1', 'user2'], { type: 'Course', course: FUNDIES_ONE, count: 2 }, userToMsg);
       expect(userToMsg).toEqual({
-        'user1': ['2 sections were added to CS2500! Check it out at https://searchneu.com/202030/CS2500 !'],
-        'user2': ['2 sections were added to CS2500! Check it out at https://searchneu.com/202030/CS2500 !'],
+        user1: ['2 sections were added to CS2500! Check it out at https://searchneu.com/202030/CS2500 !'],
+        user2: ['2 sections were added to CS2500! Check it out at https://searchneu.com/202030/CS2500 !'],
       });
     });
 
@@ -195,8 +212,8 @@ describe('Updater', () => {
       const userToMsg: Record<string, string[]> = {};
       UPDATER.generateCourseMsg(['user1', 'user2'], { type: 'Course', course: FUNDIES_ONE, count: 1 }, userToMsg);
       expect(userToMsg).toEqual({
-        'user1': ['A section was added to CS2500! Check it out at https://searchneu.com/202030/CS2500 !'],
-        'user2': ['A section was added to CS2500! Check it out at https://searchneu.com/202030/CS2500 !'],
+        user1: ['A section was added to CS2500! Check it out at https://searchneu.com/202030/CS2500 !'],
+        user2: ['A section was added to CS2500! Check it out at https://searchneu.com/202030/CS2500 !'],
       });
     });
   });
@@ -206,8 +223,8 @@ describe('Updater', () => {
       const userToMsg: Record<string, string[]> = {};
       UPDATER.generateSectionMsg(['user1', 'user2'], { type: 'Section', section: FUNDIES_ONE_S2 }, userToMsg);
       expect(userToMsg).toEqual({
-        'user1': [`A seat opened up in CS2500 (CRN: 5678). Check it out at https://searchneu.com/202030/CS2500 !`],
-        'user2': [`A seat opened up in CS2500 (CRN: 5678). Check it out at https://searchneu.com/202030/CS2500 !`],
+        user1: ['A seat opened up in CS2500 (CRN: 5678). Check it out at https://searchneu.com/202030/CS2500 !'],
+        user2: ['A seat opened up in CS2500 (CRN: 5678). Check it out at https://searchneu.com/202030/CS2500 !'],
       });
     });
 
@@ -215,15 +232,17 @@ describe('Updater', () => {
       const userToMsg: Record<string, string[]> = {};
       UPDATER.generateSectionMsg(['user1', 'user2'], { type: 'Section', section: FUNDIES_TWO_S1 }, userToMsg);
       expect(userToMsg).toEqual({
-        'user1': [`A waitlist seat has opened up in CS2510 (CRN: 0248). Check it out at https://searchneu.com/202030/CS2510 !`],
-        'user2': [`A waitlist seat has opened up in CS2510 (CRN: 0248). Check it out at https://searchneu.com/202030/CS2510 !`],
+        user1: ['A waitlist seat has opened up in CS2510 (CRN: 0248). Check it out at https://searchneu.com/202030/CS2510 !'],
+        user2: ['A waitlist seat has opened up in CS2510 (CRN: 0248). Check it out at https://searchneu.com/202030/CS2510 !'],
       });
     });
   });
 
   describe('sendMessages', () => {
     const classHash: Record<string, string[]> = { 'neu.edu/202030/CS/2500': ['user1', 'user2'], 'neu.edu/202030/CS/2510': ['user2'], 'neu.edu/202030/CS/4400': [] };
-    const sectionHash: Record<string, string[]> = { 'neu.edu/202030/CS/2500/5678': ['user1', 'user2'], 'neu.edu/202030/CS/2510/0248': ['user2'], 'neu.edu/202030/CS/2510/1357': ['user2'], 'neu.edu/202030/CS/4400/0987': [] };
+    const sectionHash: Record<string, string[]> = {
+      'neu.edu/202030/CS/2500/5678': ['user1', 'user2'], 'neu.edu/202030/CS/2510/0248': ['user2'], 'neu.edu/202030/CS/2510/1357': ['user2'], 'neu.edu/202030/CS/4400/0987': [],
+    };
 
     it('sends correct messages', () => {
       const notifications: Notification[] = [
