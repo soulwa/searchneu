@@ -16,7 +16,7 @@ type FilteredKeys<T, U> = { [P in keyof T]: T[P] extends U ? P : never }[keyof T
 type ValueOf<T> = T[keyof T];
 
 // ============== Filter categories ================
-// Filter categoriesrepresents the different categories of filters that are possible
+// Filter categories represents the different categories of filters that are possible
 export const FilterCategories = {
   Toggle: 'Toggle' as 'Toggle',
   Dropdown: 'Dropdown' as 'Dropdown',
