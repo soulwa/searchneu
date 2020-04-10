@@ -25,7 +25,7 @@ class TermParser {
       (a) => { return ClassParser.parseClassFromSearchResult(a, termId); },
       { concurrency: 500 });
 
-    const sections = parseSections(termId);
+    const sections = this.parseSections(termId);
     macros.log(`scraped ${classes.length} classes and ${sections.length} sections`);
     return { classes: classes, sections: sections };
   }
