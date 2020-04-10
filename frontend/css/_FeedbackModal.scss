@@ -1,11 +1,10 @@
 .FeedbackModal {
-  position: fixed;
-  bottom: 2%;
-  right: 2%;
-  z-index: 30;
   
-
-  &__pill{
+  &__pill {
+      position: fixed;
+      bottom: 2%;
+      right: 2%;
+      z-index: 30;
       display: flex;
       align-items: center;
       height: 32px;
@@ -15,7 +14,12 @@
       background: #FFFFFF;
 
       &:hover {
+        cursor: pointer;
         box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+      }
+      
+      &:focus {
+        outline: none;
       }
 
 
@@ -31,5 +35,56 @@
     white-space: nowrap;
     bottom: 22%;
     font-size: 12px;
+    user-select: none;
   }
+
+  &__popout {
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    z-index: 31;
+    bottom: 7%;
+    right: 1.5%;
+    width: 224px;
+    height: 284px;
+    background: #F6F6F6;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.25);
+    border-radius: 3px;
+  }
+
+  &__popoutHeader {
+    height: 38px;
+    background: #0A3767;
+    border-radius: 3px 3px 0px 0px;
+    display: flex;
+    align-items: center;
+  }
+
+  &__popoutHeader > p {
+    color: white;
+    margin-left: 10px;
+    font-size: 12px;
+    user-select: none;
+  }
+
+  &__popoutSubHeader {
+    display: flex;
+    align-items: center;
+    height: 60px;
+    border-bottom: 1px solid #DBD9D9
+  
+
+  }
+  &__popoutSubHeader > p {
+    color: black;
+    margin-left: 14px;
+    width: 180px;
+    font-size: 16px;
+    line-height: 23px;
+    user-select: none;
+
+  }
+
+
+
 }
