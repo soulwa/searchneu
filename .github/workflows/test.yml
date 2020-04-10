@@ -15,6 +15,7 @@ jobs:
     - run: yarn test
   seqtests:
     runs-on: ubuntu-latest
+    container: node:12.16-alpine
     services:
       # Label used to access the service container
       postgres:
