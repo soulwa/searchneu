@@ -18,7 +18,7 @@ import { Course as CourseType, Section as SectionType } from './types';
 // ======= TYPES ======== //
 // A collection of structs for simpler querying of pre-scrape data
 interface OldData {
-  oldWatchedClasses:  Record<string, CourseType>,
+  oldWatchedClasses: Record<string, CourseType>,
   oldWatchedSections: Record<string, SectionType>,
   oldSectionsByClass: Record<string, string[]>
 }
@@ -51,7 +51,9 @@ type ModelName = 'course' | 'section';
 class Updater {
   // produce a new Updater instance
   COURSE_MODEL: ModelName;
+
   SECTION_MODEL: ModelName;
+
   SEM_TO_UPDATE: string;
 
   static create() {
@@ -72,10 +74,10 @@ class Updater {
     const intervalTime = macros.PROD ? 300000 : 30000;
 
     setInterval(() => {
-      try { 
-        this.update(); 
-      } catch (e) { 
-        macros.warn('Updater failed with: ', e); 
+      try {
+        this.update();
+      } catch (e) {
+        macros.warn('Updater failed with: ', e);
       }
     }, intervalTime);
     this.update();
@@ -122,9 +124,9 @@ class Updater {
 
     const notifications: Notification[] = [];
 
-    Object.entries(newSectionsByClass).forEach(([classHash, sectionHashes]) => {
+    Object.entries(newSectionsByClass).forEach(([classHash, secHashes]) => {
       if (!oldSectionsByClass[classHash] || !classHashToUsers[classHash]) return;
-      const sectionDiffCount: number = sectionHashes.filter((hash: string) => !oldSectionsByClass[classHash].includes(hash)).length;
+      const sectionDiffCount: number = secHashes.filter((hash: string) => !oldSectionsByClass[classHash].includes(hash)).length;
       if (sectionDiffCount > 0) {
         notifications.push({ type: 'Course', course: oldWatchedClasses[classHash], count: sectionDiffCount });
       }
@@ -154,9 +156,9 @@ class Updater {
   // Return an Object of the list of users associated with what class or section they are following
   async modelToUserHash(modelName: ModelName): Promise<Record<string, string[]>> {
     const columnName = `${modelName}Id`;
-    const capitalizedName = modelName.charAt(0).toUpperCase() + modelName.slice(1) + 's';
-    const dbResults = await sequelize.query(`SELECT "${columnName}", ARRAY_AGG("userId") FROM "Followed${capitalizedName}" GROUP BY "${columnName}"`, 
-                                      { type: sequelize.QueryTypes.SELECT });
+    const capitalizedName = `${modelName.charAt(0).toUpperCase() + modelName.slice(1)}s`;
+    const dbResults = await sequelize.query(`SELECT "${columnName}", ARRAY_AGG("userId") FROM "Followed${capitalizedName}" GROUP BY "${columnName}"`,
+      { type: sequelize.QueryTypes.SELECT });
     return Object.assign({}, ...dbResults.map((res) => ({ [res[columnName]]: res.array_agg })));
   }
 
@@ -197,7 +199,7 @@ class Updater {
     });
 
     Object.keys(userToMsg).forEach((userId: string) => {
-      userToMsg[userId].map((msg: string) => {
+      userToMsg[userId].forEach((msg: string) => {
         notifyer.sendFBNotification(userId, msg);
       });
 
@@ -219,7 +221,7 @@ class Updater {
     let message: string = '';
     if (courseNotif.count === 1) message += `A section was added to ${classCode}!`;
     else message += `${courseNotif.count} sections were added to ${classCode}!`;
-    message +=  ` Check it out at https://searchneu.com/${courseNotif.course.termId}/${courseNotif.course.subject}${courseNotif.course.classId} !`;
+    message += ` Check it out at https://searchneu.com/${courseNotif.course.termId}/${courseNotif.course.subject}${courseNotif.course.classId} !`;
 
     userIds.forEach((userId: string) => {
       if (!userToMsg[userId]) userToMsg[userId] = [];
