@@ -116,7 +116,7 @@ class Request {
 
   async getFromInternetWithRetry(config) {
     let times = 3;
-    if (config.retryTimes) {
+    if (config.retryTimes !== undefined) {
       times = config.retryTimes;
     }
 
