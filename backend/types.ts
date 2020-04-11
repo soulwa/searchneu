@@ -46,6 +46,9 @@ export interface CourseReq {
   subject: string;
   missing?: true;
 }
+export function isCourseReq(req: Requisite): req is CourseReq {
+  return 'classId' in req;
+}
 
 // A section of a course
 export interface Section {
