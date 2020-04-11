@@ -85,6 +85,115 @@
 
   }
 
+  &__checkBoxes {
+    width: 180px;
+    margin-left: 12px;
+    margin-top: 16px;
+  }
+
+  &__checkboxElement {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-left: 2px;
+    margin-bottom: 5px;
+    
+
+  }
+
+  &__checkboxText {
+    padding-left: 28px;
+    flex-grow: 1;
+    cursor: pointer;
+    user-select: none;
+    font-size: 12px;
+
+    &:hover {
+      color: black;
+    }
+  }
+
+  &__checkboxBox {
+    display: block;
+    position: absolute;
+    top: 3px;
+    left: 0;
+    height: 16px;
+    width: 16px;
+    background-color: transparent;
+    border-radius: 5px;
+    border: 1px solid rgba(0, 0, 0, 0.42);
+
+    &:hover {
+      cursor: pointer;
+    }
+
+    &::after {
+      /* Styles for the check */
+      content: "";
+      position: absolute;
+      display: none;
+      left: 4px;
+      top: 1px;
+      width: 6px;
+      height: 9px;
+      border: solid #ffff;
+      border-radius: 1px;
+      border-width: 0 2px 2px 0;
+      -webkit-transform: rotate(40deg);
+      -ms-transform: rotate(40deg);
+      transform: rotate(40deg);
+    }
+  }
+
+  &__checkboxText > input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 16px;
+    width: 16px;
+  }
+
+  &__checkboxText > input:checked + .FeedbackModal__checkboxBox {
+    background: #338EF1;
+    border-color: #338EF1;
+  }
+  
+  &__checkboxText:hover > input:not(:checked) + .FeedbackModal__checkboxBox {
+    background-color: rgba(51, 142, 241, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.8);
+  }
+
+  &__checkboxText > input:checked + .FeedbackModal__checkboxBox::after {
+    display: block;
+  }
+
+  &__submit {
+    background: #338EF1;
+    width: 210px;
+    height: 24px;
+    border-radius: 4px;
+    margin-left: 7px;
+    margin-top: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+
+    &:focus {
+      outline: none;
+    }
+
+  }
+
+  &__submit > p {
+    color: white;
+    font-size: 11px;
+    text-align: center;
+    align-self: center;
+    user-select: none;
+  }
 
 
 }
