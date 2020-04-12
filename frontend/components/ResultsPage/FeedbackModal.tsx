@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import LogoInput from '../images/LogoInput';
 import CheckboxGroup from './CheckboxGroup';
 import macros from '../macros';
@@ -7,14 +7,31 @@ export default function FeedbackModal() {
   const [open, setOpen] = useState(false);
   const [selectedFeedback, setSelectedFeedback] = useState([]);
   const [submitted, setSubmitted] = useState(false);
+  const modalRef = useRef(null);
 
   const feedbackOptions = ['Class time', 'Professor', 'Prereqs', 'Something else'];
 
+  const handleClickOutside = (e) => {
+    if (modalRef.current.contains(e.target)) {
+      return;
+    }
+    setOpen(false);
+  }
+
+  useEffect(() => {
+    if (open) {
+      document.addEventListener('mousedown', handleClickOutside);
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [open]);
+
 
   return (
-    !submitted
-    && (
-    <div className='FeedbackModal'>
+    <div ref={ modalRef } className='FeedbackModal'>
       {open && (
       <div className='FeedbackModal__popout'>
         <div className='FeedbackModal__popoutHeader'>
@@ -40,8 +57,8 @@ export default function FeedbackModal() {
             )}
           </CheckboxGroup>
         </div>
-        <div className='FeedbackModal__submit' role='button' tabIndex={ 0 } onClick={ () => { setSubmitted(true); console.log(selectedFeedback); macros.logAmplitudeEvent('Feedback modal submit', { lookingFor: selectedFeedback }); } }>
-          <p>SEND FEEDBACK</p>
+        <div className={ !submitted ? 'FeedbackModal__submit' : 'FeedbackModal__submit--submitted' } role='button' tabIndex={ 0 } onClick={ () => { setSubmitted(true); console.log(selectedFeedback); macros.logAmplitudeEvent('Feedback modal submit', { lookingFor: selectedFeedback }); } }>
+          <p>{!submitted ? 'SEND FEEDBACK' : 'THANK YOU!' }</p>
         </div>
       </div>
       ) }
@@ -50,7 +67,6 @@ export default function FeedbackModal() {
         <p>SearchNEU Feedback</p>
       </div>
     </div>
-    )
 
 
   );

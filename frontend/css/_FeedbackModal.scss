@@ -185,6 +185,32 @@
       outline: none;
     }
 
+    &--submitted {
+      background:  #81C860;
+      width: 210px;
+      height: 24px;
+      border-radius: 4px;
+      margin-left: 7px;
+      margin-top: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      
+      &:focus {
+        outline: none;
+      }
+    }
+
+  }
+
+  &__submit--submitted > p {
+    color: white;
+    font-size: 11px;
+    text-align: center;
+    align-self: center;
+    user-select: none;
+
   }
 
   &__submit > p {
