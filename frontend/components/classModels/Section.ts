@@ -80,7 +80,6 @@ class Section {
       return a.start.unix() - b.start.unix();
     });
 
-    macros.log(retVal);
     return retVal;
   }
 

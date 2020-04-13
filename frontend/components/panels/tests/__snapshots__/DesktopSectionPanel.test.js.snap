@@ -18,6 +18,9 @@ exports[`should render a section 1`] = `
         Section {
           "classId": "1210",
           "crn": "13502",
+          "dataStatus": undefined,
+          "hasWaitList": undefined,
+          "honors": undefined,
           "host": "neu.edu",
           "lastUpdateTime": 1511131914029,
           "meetings": Array [
@@ -117,6 +120,9 @@ exports[`should render a section 1`] = `
           Section {
             "classId": "1210",
             "crn": "13502",
+            "dataStatus": undefined,
+            "hasWaitList": undefined,
+            "honors": undefined,
             "host": "neu.edu",
             "lastUpdateTime": 1511131914029,
             "meetings": Array [
@@ -185,6 +191,9 @@ exports[`should render a section w/ notif check boxes 1`] = `
         Section {
           "classId": "1210",
           "crn": "13502",
+          "dataStatus": undefined,
+          "hasWaitList": undefined,
+          "honors": undefined,
           "host": "neu.edu",
           "lastUpdateTime": 1511131914029,
           "meetings": Array [
@@ -284,6 +293,9 @@ exports[`should render a section w/ notif check boxes 1`] = `
           Section {
             "classId": "1210",
             "crn": "13502",
+            "dataStatus": undefined,
+            "hasWaitList": undefined,
+            "honors": undefined,
             "host": "neu.edu",
             "lastUpdateTime": 1511131914029,
             "meetings": Array [
@@ -352,6 +364,9 @@ exports[`should render another section 1`] = `
         Section {
           "classId": "1210",
           "crn": "14404",
+          "dataStatus": undefined,
+          "hasWaitList": undefined,
+          "honors": undefined,
           "host": "neu.edu",
           "lastUpdateTime": 1511131914065,
           "meetings": Array [
@@ -451,6 +466,9 @@ exports[`should render another section 1`] = `
           Section {
             "classId": "1210",
             "crn": "14404",
+            "dataStatus": undefined,
+            "hasWaitList": undefined,
+            "honors": undefined,
             "host": "neu.edu",
             "lastUpdateTime": 1511131914065,
             "meetings": Array [

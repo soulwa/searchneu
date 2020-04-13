@@ -62,6 +62,9 @@ exports[`should render some stuff 1`] = `
         Section {
           "classId": "1210",
           "crn": "13502",
+          "dataStatus": undefined,
+          "hasWaitList": undefined,
+          "honors": undefined,
           "host": "neu.edu",
           "lastUpdateTime": 1511131914029,
           "meetings": Array [

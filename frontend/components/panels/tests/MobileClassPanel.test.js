@@ -22,6 +22,6 @@ afterAll(() => {
 });
 
 it('should render some stuff', () => {
-  const wrapper = shallow(<MobileClassPanel aClass={ mockData.cs1210 } />);
+  const wrapper = shallow(<MobileClassPanel aClass={ mockData.cs1210 } history={ null } />);
   expect(wrapper).toMatchSnapshot();
 });

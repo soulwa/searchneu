@@ -10,7 +10,7 @@ import moment from 'moment';
 import Keys from '../../../common/Keys';
 import macros from '../macros';
 import Section from './Section';
-import RequisiteBranch, { ReqFor, ReqType } from './RequisiteBranch';
+import RequisiteBranch, { ReqFor, ReqType, ReqTypeType } from './RequisiteBranch';
 
 
 // This file used to have an equals method as part of coursepro, but then it was removed.
@@ -66,12 +66,12 @@ class Course {
     this.sections = [];
 
     this.prereqs = {
-      type: 'or',
+      type: ReqTypeType.OR,
       values: [],
     };
 
     this.coreqs = {
-      type: 'or',
+      type: ReqTypeType.OR,
       values: [],
     };
 
@@ -95,11 +95,12 @@ class Course {
   }
 
   // Returns a hash of this object used for referencing this instance - eg neu.edu/201910/CS/2500
-  getHash() {
+  getHash() : string {
     return Keys.getClassHash(this);
   }
 
   loadFromClassMap(classMap) {
+    macros.log('classMap', classMap);
     this.updateWithData(classMap[this.getHash()]);
   }
 
@@ -127,7 +128,7 @@ class Course {
 
     // Given a branch in the prereqs
     } else if (data.values && data.type) {
-      const newValues = [];
+      const newValues : Course[] = [];
       data.values.forEach((subTree) => {
         newValues.push(this.convertServerRequisites(subTree));
       });
@@ -360,7 +361,7 @@ class Course {
   }
 
 
-  getHeighestProfCount() {
+  getHeighestProfCount() : number {
     let count = 0;
 
     this.sections.forEach((section) => {
@@ -430,11 +431,7 @@ class Course {
       hasWaitList += section.hasWaitList;
     });
 
-    if (hasWaitList > this.sections.length / 2) {
-      this.hasWaitList = true;
-    } else {
-      this.hasWaitList = false;
-    }
+    this.hasWaitList = hasWaitList > this.sections.length / 2;
 
     //sort sections
     this.sections.sort((a, b) => {

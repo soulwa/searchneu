@@ -5,8 +5,13 @@
 import macros from '../macros';
 import { Course } from '../types';
 
+export enum ReqTypeType {
+  AND = 'and',
+  OR = 'or'
+}
+
 export interface ReqType {
-  type: string,
+  type: ReqTypeType,
   values: Course[]
 }
 
@@ -24,16 +29,12 @@ class RequisiteBranch {
   coreqs: ReqType;
 
   constructor(data : ReqType) {
-    if (data.type !== 'and' && data.type !== 'or') {
-      macros.error('invalid branch type');
-    }
-
-    if (!data.values || !Array.isArray(data.values)) {
-      macros.error('invalid values for req branch');
-    }
-
-    const values = data.values.slice(0).sort((a, b) => {
-      return a.compareTo(b);
+    const values = data.values.slice(0).sort((a : Course, b : Course) => {
+      try {
+        return a.compareTo(b);
+      } catch (e) {
+        return 0; // todo: temporary, anyone have ideas?
+      }
     });
 
     this.prereqs = {
@@ -43,13 +44,35 @@ class RequisiteBranch {
 
 
     this.coreqs = {
-      type: 'or',
+      type: ReqTypeType.OR,
       values: [],
     };
   }
 
+  compareTo(other : RequisiteBranch) {
+    if (!(other instanceof RequisiteBranch)) {
+      return -1;
+    }
+    if (this.prereqs.values.length === 0 && other.prereqs.values.length) {
+      return 0;
+    }
+    if (!(this.prereqs.values.length === other.prereqs.values.length)) {
+      return other.prereqs.values.length - this.prereqs.values.length;
+    }
+
+    for (let i = 0; i < this.prereqs.values.length; i++) {
+      const retVal = other.prereqs.values[i].compareTo(this.prereqs.values[i]);
+      if (retVal !== 0) {
+        return retVal;
+      }
+    }
+    return 0;
+  }
+
+
   // Downloads the first layer of prereqs
   async loadPrereqs(classMap) {
+    macros.log('classMap', classMap);
     this.prereqs.values.forEach((childBranch) => {
       if (childBranch instanceof RequisiteBranch) {
         childBranch.loadPrereqs(classMap);
