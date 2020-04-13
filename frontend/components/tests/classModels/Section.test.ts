@@ -3,7 +3,6 @@
  * See the license file in the root folder for details.
  */
 
-import moment from 'moment';
 import Section from '../../classModels/Section';
 import mockData from '../../panels/tests/mockData'
 import Meeting from '../../classModels/Meeting';
