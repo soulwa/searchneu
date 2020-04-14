@@ -1,15 +1,16 @@
+# ==================== Elasticsearch cluster ====================
 module "elasticsearch" {
   source                  = "git::https://github.com/cloudposse/terraform-aws-elasticsearch.git?ref=0.8.0"
-  stage                   = var.stage
-  name                    = var.name
+  name                    = module.label.name
+  stage                   = module.label.stage
   security_groups         = [aws_security_group.ecs_tasks.id] # sg that can connect, not sg of ES itself!
-  vpc_id                  = aws_vpc.main.id
-  subnet_ids              = aws_subnet.private.*.id
+  vpc_id                  = var.vpc_id
+  subnet_ids              = var.private_subnet_ids
   zone_awareness_enabled  = "true"
   elasticsearch_version   = "7.1"
   instance_type           = "t2.medium.elasticsearch"
-  instance_count          = var.az_count # one instance in each AZ
-  ebs_volume_size         = 10
+  instance_count          = 2
+  ebs_volume_size         = 20
   encrypt_at_rest_enabled = "false"
 
   create_iam_service_linked_role = "true"

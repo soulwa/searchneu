@@ -1,36 +1,3 @@
-# ECS task execution role data
-data "aws_iam_policy_document" "ecs_task_execution_role" {
-  version = "2012-10-17"
-  statement {
-    sid     = ""
-    effect  = "Allow"
-    actions = ["sts:AssumeRole"]
-
-    principals {
-      type        = "Service"
-      identifiers = ["ecs-tasks.amazonaws.com"]
-    }
-  }
-}
-
-# ECS task execution role
-resource "aws_iam_role" "ecs_task_execution_role" {
-  name               = var.ecs_task_execution_role_name
-  assume_role_policy = data.aws_iam_policy_document.ecs_task_execution_role.json
-}
-
-# ECS task execution role policy attachment
-resource "aws_iam_role_policy_attachment" "ecs_task_execution_role" {
-  role       = aws_iam_role.ecs_task_execution_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
-}
-
-# Let ECS read SSM parameters
-resource "aws_iam_role_policy_attachment" "ssm_readonly" {
-  role       = aws_iam_role.ecs_task_execution_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess"
-}
-
 
 ## User for Github Actions
 
@@ -76,7 +43,7 @@ data "aws_iam_policy_document" "github_actions_user" {
       "ecs:UpdateService",
       "ecs:DescribeServices"
     ]
-    resources = [aws_ecs_service.main.id]
+    resources = ["*"]
   }
   statement {
     sid    = "GetAuthorizationToken"
@@ -86,4 +53,17 @@ data "aws_iam_policy_document" "github_actions_user" {
     ]
     resources = ["*"]
   }
+}
+
+# Put user access key into github actions secrets
+resource "github_actions_secret" "access_key" {
+  repository       = "searchneu"
+  secret_name      = "AWS_ACCESS_KEY_ID"
+  plaintext_value  = aws_iam_access_key.github_actions_user.id
+}
+
+resource "github_actions_secret" "secret_key" {
+  repository       = "searchneu"
+  secret_name      = "AWS_SECRET_ACCESS_KEY"
+  plaintext_value  = aws_iam_access_key.github_actions_user.secret
 }

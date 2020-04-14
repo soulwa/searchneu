@@ -1,14 +1,14 @@
-# alb.tf
+# ============= Load Balancer ================
 module "alb" {
   source  = "terraform-aws-modules/alb/aws"
   version = "~> 5.0"
   
-  name = module.main_label.id
+  name = module.label.id
 
   load_balancer_type = "application"
 
-  vpc_id             = aws_vpc.main.id
-  subnets            = aws_subnet.public.*.id
+  vpc_id             = var.vpc_id
+  subnets            = var.public_subnet_ids
   security_groups    = [aws_security_group.lb.id]
   
   target_groups = [
@@ -16,7 +16,7 @@ module "alb" {
       name_prefix      = "def"
       backend_protocol = "HTTP"
       backend_port     = 80
-      vpc_id           = aws_vpc.main.id
+      vpc_id           = var.vpc_id
       target_type      = "ip"
     }
   ]
@@ -48,16 +48,23 @@ module "alb" {
   }
 }
 
-# Get HTTPS cert
-resource "aws_acm_certificate" "cert" {
-  domain_name       = var.domain
-  validation_method = "DNS"
+# ALB Security Group: Edit to restrict access to the application
+resource "aws_security_group" "lb" {
+  name        = "${module.label.id}-load-balancer-security-group"
+  description = "controls access to the ALB"
+  vpc_id      = var.vpc_id
 
-  tags = {
-    Environment = var.stage
+  ingress {
+    protocol    = "tcp"
+    from_port   = 80
+    to_port     = var.app_port
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
-  lifecycle {
-    create_before_destroy = true
+  egress {
+    protocol    = "-1"
+    from_port   = 0
+    to_port     = 0
+    cidr_blocks = ["0.0.0.0/0"]
   }
 }

@@ -1,19 +1,18 @@
-# ecs.tf
-
+# =================== ECS ==================
 resource "aws_ecs_cluster" "main" {
-  name = module.main_label.id
+  name = module.label.id
 }
 
 # ========= Web server ============= 
 module "webserver-container" {
   source          = "git::https://github.com/cloudposse/terraform-aws-ecs-container-definition.git?ref=0.23.0"
-  container_name  = "${module.main_label.id}-webserver"
-  container_image = "${aws_ecr_repository.app.repository_url}:latest"
+  container_name  = "${module.label.id}-webserver"
+  container_image = "${var.ecr_url}:latest"
 
   log_configuration = {
     logDriver = "awslogs"
     options = {
-      awslogs-group         = "/ecs/${module.main_label.id}"
+      awslogs-group         = "/ecs/${module.label.id}"
       awslogs-region        = var.aws_region
       awslogs-stream-prefix = "ecs"
     }
@@ -38,17 +37,17 @@ module "webserver-container" {
 }
 
 resource "aws_ecs_task_definition" "app" {
-  family                   = "${module.main_label.id}-webserver"
+  family                   = "${module.label.id}-webserver"
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
-  cpu                      = var.fargate_cpu
-  memory                   = var.fargate_memory
+  cpu                      = var.webapp_cpu
+  memory                   = var.webapp_memory
   container_definitions    = module.webserver-container.json
 }
 
 resource "aws_ecs_service" "main" {
-  name            = module.main_label.id
+  name            = module.label.id
   cluster         = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.app.arn
   desired_count   = var.app_count
@@ -56,34 +55,34 @@ resource "aws_ecs_service" "main" {
 
   network_configuration {
     security_groups  = [aws_security_group.ecs_tasks.id]
-    subnets          = aws_subnet.private.*.id
+    subnets          = var.private_subnet_ids
     assign_public_ip = false
   }
 
   load_balancer {
     target_group_arn = module.alb.target_group_arns[0]
-    container_name   = "${module.main_label.id}-webserver"
+    container_name   = "${module.label.id}-webserver"
     container_port   = var.app_port
   }
 
-  depends_on = [aws_iam_role_policy_attachment.ecs_task_execution_role, null_resource.enable_long_ecs_resource_ids]
+  depends_on = [aws_iam_role_policy_attachment.ecs_task_execution_role]
 }
 
 # ======== Scraper ===========
 
 module "scrape-container" {
   source          = "git::https://github.com/cloudposse/terraform-aws-ecs-container-definition.git?ref=0.23.0"
-  container_name  = "${module.main_label.id}-scrape"
-  container_image = "${aws_ecr_repository.app.repository_url}:latest"
-  container_cpu   = 1024
-  container_memory= 3072
+  container_name  = "${module.label.id}-scrape"
+  container_image = "${var.ecr_url}:latest"
+  container_cpu   = var.scrape_cpu
+  container_memory= var.scrape_memory
 
   command         = ["yarn", "prod:scrape"]
 
   log_configuration = {
     logDriver = "awslogs"
     options = {
-      awslogs-group         = "/ecs/${module.main_label.id}"
+      awslogs-group         = "/ecs/${module.label.id}"
       awslogs-region        = var.aws_region
       awslogs-stream-prefix = "ecs"
     }
@@ -100,12 +99,12 @@ module "scrape-container" {
 }
 
 resource "aws_ecs_task_definition" "scrape" {
-  family                   = "${module.main_label.id}-scrape"
+  family                   = "${module.label.id}-scrape"
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
-  cpu                      = 1024
-  memory                   = 3072
+  cpu                      = var.scrape_cpu
+  memory                   = var.scrape_memory
   container_definitions    = module.scrape-container.json
 }
 
@@ -125,7 +124,7 @@ module "scrape-scheduled-task" {
   task_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   task_count          = "1"
 
-  subnet_ids         = aws_subnet.private.*.id
+  subnet_ids         = var.private_subnet_ids
   security_group_ids = [aws_security_group.ecs_tasks.id]
 }
 
@@ -183,4 +182,76 @@ resource "aws_ssm_parameter" "default" {
   value           = lookup(local.all_secrets[count.index], "value")
   overwrite       = lookup(local.all_secrets[count.index], "overwrite", "true")
   depends_on      = [module.elasticsearch, aws_db_instance.default]
+}
+
+# ============= Logs =================
+# Set up CloudWatch group and log stream and retain logs for 30 days
+resource "aws_cloudwatch_log_group" "default_log_group" {
+  name              = "/ecs/${module.label.id}"
+  retention_in_days = 30
+
+  tags = {
+    Name = "${module.label.id}-log-group"
+  }
+}
+
+resource "aws_cloudwatch_log_stream" "default_log_stream" {
+  name           = "${module.label.id}-log-stream"
+  log_group_name = aws_cloudwatch_log_group.default_log_group.name
+}
+
+# ================ IAM =========================
+# ECS task execution role data
+data "aws_iam_policy_document" "ecs_task_execution_role" {
+  version = "2012-10-17"
+  statement {
+    sid     = ""
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["ecs-tasks.amazonaws.com"]
+    }
+  }
+}
+
+# ECS task execution role
+resource "aws_iam_role" "ecs_task_execution_role" {
+  name               = "${module.label.id}-task-exec-role"
+  assume_role_policy = data.aws_iam_policy_document.ecs_task_execution_role.json
+}
+
+# ECS task execution role policy attachment
+resource "aws_iam_role_policy_attachment" "ecs_task_execution_role" {
+  role       = aws_iam_role.ecs_task_execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+}
+
+# Let ECS read SSM parameters
+resource "aws_iam_role_policy_attachment" "ssm_readonly" {
+  role       = aws_iam_role.ecs_task_execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess"
+}
+
+
+# Traffic to the ECS cluster should only come from the ALB
+resource "aws_security_group" "ecs_tasks" {
+  name        = "${module.label.id}-ecs-tasks-security-group"
+  description = "allow inbound access from the ALB only"
+  vpc_id      = var.vpc_id
+
+  ingress {
+    protocol        = "tcp"
+    from_port       = var.app_port
+    to_port         = var.app_port
+    security_groups = [aws_security_group.lb.id]
+  }
+
+  egress {
+    protocol    = "-1"
+    from_port   = 0
+    to_port     = 0
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
