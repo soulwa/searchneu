@@ -9,8 +9,8 @@ export default function FeedbackModal() {
   const [selectedFeedback, setSelectedFeedback] = useState([]);
   const [submitted, setSubmitted] = useState(false);
   const modalRef = useRef(null);
-  const keyStr = 'MODAL'
-  const show = useFeedbackSchedule(submitted, keyStr, 86400000);
+  const keyString = 'MODAL'
+  const show = useFeedbackSchedule(submitted, keyString, 86400000);
 
   const feedbackOptions = ['Class time', 'Professor', 'Prereqs', 'Something else'];
 

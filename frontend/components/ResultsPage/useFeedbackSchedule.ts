@@ -1,31 +1,31 @@
 import { useState, useEffect } from 'react';
 
-export default function useFeedbackSchedule(finished: boolean, keyStr: string, timeout: number) : boolean {
+export default function useFeedbackSchedule(finished: boolean, keyString: string, timeout: number) : boolean {
   const [show, setShow] = useState(true);
 
   useEffect(() => {
     if (finished) {
-      setTimeout(() => { localStorage.setItem(keyStr, 'true') }, 2000);
+      setTimeout(() => { localStorage.setItem(keyString, 'true') }, 2000);
     }
-  }, [finished, keyStr]);
+  }, [finished]);
 
   useEffect(() => {
-    if (localStorage.getItem(keyStr)) {
-      if (!localStorage.getItem(`SEEN_${keyStr}`)) {
+    if (localStorage.getItem(keyString)) {
+      if (!localStorage.getItem(`SEEN_${keyString}`)) {
         const today = new Date();
-        localStorage.setItem(`SEEN_${keyStr}`, today.toString());
+        localStorage.setItem(`SEEN_${keyString}`, today.toString());
       } else {
         const current = new Date();
-        if (current.getTime() >= Date.parse(localStorage.getItem(`SEEN_${keyStr}`)) + timeout) {
-          localStorage.removeItem(`SEEN_${keyStr}`);
-          localStorage.removeItem(keyStr);
+        if (current.getTime() >= Date.parse(localStorage.getItem(`SEEN_${keyString}`)) + timeout) {
+          localStorage.removeItem(`SEEN_${keyString}`);
+          localStorage.removeItem(keyString);
         }
       }
     }
-    if (localStorage.getItem(keyStr)) {
+    if (localStorage.getItem(keyString)) {
       setShow(false);
     }
-  }, [keyStr, timeout]);
+  });
 
 
   return show;

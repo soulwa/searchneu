@@ -16,8 +16,8 @@ export default function FeedbackHeader({ searchQuery, selectedFilters, searchRes
   const [yes, setYes] = useState(false);
   const [no, setNo] = useState(false);
   const [feedbackQuery, setFeedbackQuery] = useState('');
-  const keyStr = 'FEEDBACK';
-  const show = useFeedbackSchedule(yes, keyStr, 86400000);
+  const keyString = 'FEEDBACK';
+  const show = useFeedbackSchedule(yes, keyString, 86400000);
 
 
   return (
