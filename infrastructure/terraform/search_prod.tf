@@ -2,7 +2,7 @@ module "prod" {
   source = "./modules/searchneu"
 
   stage              = "prod"
-  domain             = "docker.searchneu.com"
+  domain             = "lmao.searchneu.com"
 
   vpc_id             = aws_vpc.main.id
   public_subnet_ids  = aws_subnet.public.*.id
@@ -13,6 +13,7 @@ module "prod" {
   secrets = var.prod_secrets
 
   cloudflare_zone_id = var.cloudflare_zone_id
+  certificate_arn    = aws_acm_certificate.cert.arn
 
   # depends_on = [null_resource.enable_long_ecs_resource_ids]
 }

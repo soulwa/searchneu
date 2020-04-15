@@ -7,6 +7,10 @@ variable "cloudflare_zone_id" {
   description = "Zone ID of cloudflare"
 }
 
+variable "certificate_arn" {
+  description = "ARN of the https cert granted by ACM"
+}
+
 variable "vpc_id" {
   description = "VPC to put the resources in"
 }

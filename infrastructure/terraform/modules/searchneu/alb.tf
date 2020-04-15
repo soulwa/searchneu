@@ -38,7 +38,7 @@ module "alb" {
     {
       port               = 443
       protocol           = "HTTPS"
-      certificate_arn    = aws_acm_certificate.cert.arn
+      certificate_arn    = var.certificate_arn
       target_group_index = 0
     }
   ]
@@ -67,4 +67,13 @@ resource "aws_security_group" "lb" {
     to_port     = 0
     cidr_blocks = ["0.0.0.0/0"]
   }
+}
+
+# domain record
+resource "cloudflare_record" "alb" {
+  zone_id = var.cloudflare_zone_id
+  name = var.domain
+  type = "CNAME"
+  value = module.alb.this_lb_dns_name
+  proxied = true
 }
