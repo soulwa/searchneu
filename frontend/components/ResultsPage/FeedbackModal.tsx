@@ -2,12 +2,15 @@ import React, { useState, useEffect, useRef } from 'react';
 import LogoInput from '../images/LogoInput';
 import CheckboxGroup from './CheckboxGroup';
 import macros from '../macros';
+import useFeedbackSchedule from './useFeedbackSchedule';
 
 export default function FeedbackModal() {
   const [open, setOpen] = useState(false);
   const [selectedFeedback, setSelectedFeedback] = useState([]);
   const [submitted, setSubmitted] = useState(false);
   const modalRef = useRef(null);
+  const keyStr = 'MODAL'
+  const show = useFeedbackSchedule(submitted, keyStr, 86400000);
 
   const feedbackOptions = ['Class time', 'Professor', 'Prereqs', 'Something else'];
 
@@ -31,6 +34,8 @@ export default function FeedbackModal() {
 
 
   return (
+    show
+    && (
     <div ref={ modalRef } className='FeedbackModal'>
       {open && (
       <div className='FeedbackModal__popout'>
@@ -57,7 +62,7 @@ export default function FeedbackModal() {
             )}
           </CheckboxGroup>
         </div>
-        <div className={ !submitted ? 'FeedbackModal__submit' : 'FeedbackModal__submit--submitted' } role='button' tabIndex={ 0 } onClick={ () => { setSubmitted(true); console.log(selectedFeedback); macros.logAmplitudeEvent('Feedback modal submit', { lookingFor: selectedFeedback }); } }>
+        <div className={ !submitted ? 'FeedbackModal__submit' : 'FeedbackModal__submit--submitted' } role='button' tabIndex={ 0 } onClick={ () => { setSubmitted(true); macros.logAmplitudeEvent('Feedback modal submit', { lookingFor: selectedFeedback }); } }>
           <p>{!submitted ? 'SEND FEEDBACK' : 'THANK YOU!' }</p>
         </div>
       </div>
@@ -67,6 +72,7 @@ export default function FeedbackModal() {
         <p>SearchNEU Feedback</p>
       </div>
     </div>
+    )
 
 
   );
