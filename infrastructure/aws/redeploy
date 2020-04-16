@@ -5,7 +5,7 @@ if [[ ! " prod staging " =~ " $1 " ]]; then
   exit 1
 fi
 CLUSTER="$1-searchneu"
-SERVICE=$CLUSTER # Service and cluster have same name
+SERVICE="$CLUSTER-webserver" # Service and cluster have same name
 
 # Disable aws from sending stdout to less
 export AWS_PAGER=""
