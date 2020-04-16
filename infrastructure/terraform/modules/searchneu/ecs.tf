@@ -16,7 +16,7 @@ module "webserver-container" {
     options = {
       awslogs-group         = "/ecs/${module.label.id}"
       awslogs-region        = var.aws_region
-      awslogs-stream-prefix = "ecs"
+      awslogs-stream-prefix = "webserver"
     }
     secretOptions = null
   }
@@ -32,7 +32,7 @@ module "webserver-container" {
   secrets = local.secretsFrom
 }
 
-resource "aws_ecs_task_definition" "app" {
+resource "aws_ecs_task_definition" "webserver" {
   family                   = "${module.label.id}-webserver"
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   network_mode             = "awsvpc"
@@ -43,9 +43,9 @@ resource "aws_ecs_task_definition" "app" {
 }
 
 resource "aws_ecs_service" "main" {
-  name            = module.label.id
+  name            = "${module.label.id}-webserver"
   cluster         = aws_ecs_cluster.main.id
-  task_definition = aws_ecs_task_definition.app.arn
+  task_definition = aws_ecs_task_definition.webserver.arn
   desired_count   = var.app_count
   launch_type     = "FARGATE"
 
@@ -80,7 +80,7 @@ module "scrape-container" {
     options = {
       awslogs-group         = "/ecs/${module.label.id}"
       awslogs-region        = var.aws_region
-      awslogs-stream-prefix = "ecs"
+      awslogs-stream-prefix = "scrape"
     }
     secretOptions = null
   }
@@ -118,6 +118,54 @@ module "scrape-scheduled-task" {
   security_group_ids = [aws_security_group.ecs_tasks.id]
 }
 
+# =============== Updater service ================
+
+module "update-container" {
+  source          = "git::https://github.com/cloudposse/terraform-aws-ecs-container-definition.git?ref=0.23.0"
+  container_name  = "${module.label.id}-update"
+  container_image = "${var.ecr_url}:latest"
+  container_cpu   = var.webapp_cpu
+  container_memory= var.webapp_memory
+
+  command         = ["yarn", "prod:start:updater"]
+
+  log_configuration = {
+    logDriver = "awslogs"
+    options = {
+      awslogs-group         = "/ecs/${module.label.id}"
+      awslogs-region        = var.aws_region
+      awslogs-stream-prefix = "scrape"
+    }
+    secretOptions = null
+  }
+  
+  secrets = local.secretsFrom
+}
+
+resource "aws_ecs_task_definition" "update" {
+  family                   = "${module.label.id}-update"
+  execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
+  network_mode             = "awsvpc"
+  requires_compatibilities = ["FARGATE"]
+  cpu                      = var.webapp_cpu
+  memory                   = var.webapp_memory
+  container_definitions    = module.update-container.json
+}
+
+resource "aws_ecs_service" "update" {
+  name            = "${module.label.id}-update"
+  cluster         = aws_ecs_cluster.main.id
+  task_definition = aws_ecs_task_definition.update.arn
+  desired_count   = 1
+  launch_type     = "FARGATE"
+
+  network_configuration {
+    security_groups  = [aws_security_group.ecs_tasks.id]
+    subnets          = var.private_subnet_ids
+    assign_public_ip = false
+  }
+  depends_on = [aws_iam_role_policy_attachment.ecs_task_execution_role]
+}
 
 # =============== Secrets ==================
 
