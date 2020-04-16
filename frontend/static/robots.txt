@@ -12,7 +12,7 @@ Disallow:
 #
 # Everyone else is banned.  If you operate a search engine and would like to crawl Search NEU,
 # please contact hey@searchneu.com before crawling!
-# This was copied from bluegolf.com/robots.txt
+# This was modeled after bluegolf.com/robots.txt
 #
 
 User-agent: *
