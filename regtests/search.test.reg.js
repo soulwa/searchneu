@@ -1,17 +1,19 @@
+/**
+ * @jest-environment node
+ */
+// the above is necessary to make HTTP requests
+
 import _ from 'lodash';
-import Keys from '../../common/Keys';
-import request from 'request';
+import axios from 'axios';
+import Keys from '../common/Keys';
 
 function getFirstClassResult(results) {
-  console.log(results.results);
-  return results.results[0].class;
+  return results.data[0].class;
 }
 
 async function prodSearch(query, termId, min, max, filters = {}) {
-  const queryUrl = `searchneu.com/search?query=${query}&termId=${termId}&minIndex=${min}&maxIndex=${max}`
-  console.log(queryUrl);
-  //return request.get(
-  return request.get(queryUrl);
+  const queryUrl = `http://searchneu.com/search?query=${query}&termId=${termId}&minIndex=${min}&maxIndex=${max}`
+  return axios.get(queryUrl);
 }
 
 describe('search', () => {
