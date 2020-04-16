@@ -9,6 +9,10 @@ User-agent: Twitterbot
 User-agent: DuckDuckBot
 Disallow: 
 
+# There's no point in allowing spiders to hit the api
+# It will just generate logs unnecessarily
+Disallow: /data
+
 #
 # Everyone else is banned.  If you operate a search engine and would like to crawl Search NEU,
 # please contact hey@searchneu.com before crawling!
@@ -23,10 +27,5 @@ Disallow: /
 #
 User-agent: Aboundexbot
 Disallow: /
-
-# There's no point in allowing spiders to hit the api
-# It will just generate logs unnecessarily
-User-agent: *
-Disallow: /data
 
 Sitemap: https://searchneu.com/sitemap.xml
