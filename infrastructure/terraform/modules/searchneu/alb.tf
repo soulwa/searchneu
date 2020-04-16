@@ -68,12 +68,3 @@ resource "aws_security_group" "lb" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
-
-# domain record
-resource "cloudflare_record" "alb" {
-  zone_id = var.cloudflare_zone_id
-  name = var.domain
-  type = "CNAME"
-  value = module.alb.this_lb_dns_name
-  proxied = true
-}

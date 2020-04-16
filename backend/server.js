@@ -253,7 +253,8 @@ app.get('/search', wrap(async (req, res) => {
 
   macros.logAmplitudeEvent('Backend Search', analytics);
 
-  macros.log(getTime(), getIpPath(req), `Search for ${req.query.query} from ${minIndex} to ${maxIndex} took ${took.total} total. Hydrate from postgres took ${took.hydrate}. ES reports ${took.es} internally. Stringify took ${Date.now() - midTime} with ${searchContent.length} results`);
+  macros.log(getTime(), getIpPath(req));
+  macros.log(`Search for ${req.query.query} from ${minIndex} to ${maxIndex} took ${took.total} total. Hydrate from postgres took ${took.hydrate}. ES reports ${took.es} internally. Stringify took ${Date.now() - midTime} with ${searchContent.length} results`);
 
   // Set the header for application/json and send the data.
   res.setHeader('Content-Type', 'application/json; charset=UTF-8');

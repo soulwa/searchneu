@@ -31,10 +31,6 @@ variable "stage" {
   description = "Stage/environment. Should be prod or staging"
 }
 
-variable "domain" {
-  description = "Domain name to deploy to and get https cert for"
-}
-
 variable "ecr_url" {
   description = "url of ecr repo for project image"
 }
