@@ -20,7 +20,7 @@ jobs:
           ./infrastructure/aws/push-image
       - name: Deploy to Amazon ECS service
         run: |
-          ./infrastructure/aws/redeploy prod
+          ./infrastructure/aws/redeploy staging
       - name: Logout of Amazon ECR
         if: always()
         run: docker logout ${{ steps.login-ecr.outputs.registry }}
