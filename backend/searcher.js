@@ -241,15 +241,21 @@ class Searcher {
    */
   async search(query, termId, min, max, filters = {}) {
     await this.initializeSubjects();
+    const start = Date.now();
     const {
       output, resultCount, took, aggregations,
     } = await this.getSearchResults(query, termId, min, max, filters);
+    const startHydrate = Date.now();
     const results = await (new HydrateSerializer(Section)).bulkSerialize(output);
 
     return {
       searchContent: results,
       resultCount,
-      took,
+      took: {
+        total: Date.now() - start,
+        hydrate: Date.now() - startHydrate,
+        es: took,
+      },
       aggregations,
     };
   }

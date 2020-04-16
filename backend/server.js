@@ -25,7 +25,6 @@ import webpackConfig from './webpack.config.babel';
 import macros from './macros';
 import notifyer from './notifyer';
 import Updater from './updater';
-import database from './database';
 import graphql from './graphql';
 import HydrateCourseSerializer from './database/serializers/hydrateCourseSerializer';
 
@@ -245,14 +244,16 @@ app.get('/search', wrap(async (req, res) => {
 
   // Not sure I am logging all the necessary analytics
   const analytics = {
-    searchTime: took,
+    searchTime: took.total,
+    esTime: took.es,
+    hydateTime: took.hydrate,
     stringifyTime: Date.now() - midTime,
     resultCount: resultCount,
   };
 
   macros.logAmplitudeEvent('Backend Search', analytics);
 
-  macros.log(getTime(), getIpPath(req), 'Search for', req.query.query, 'from', minIndex, 'to', maxIndex, 'took', took, 'ms and stringify took', Date.now() - midTime, 'with', analytics.resultCount, 'results');
+  macros.log(getTime(), getIpPath(req), `Search for ${req.query.query} from ${minIndex} to ${maxIndex} took ${took.total} total. Hydrate (end to end) took ${took.hydrate}. ES reports ${took.es} ms internally. Stringify took ${Date.now() - midTime} with ${resultCount} results`);
 
   // Set the header for application/json and send the data.
   res.setHeader('Content-Type', 'application/json; charset=UTF-8');
