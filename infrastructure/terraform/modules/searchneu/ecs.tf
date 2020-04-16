@@ -27,13 +27,7 @@ module "webserver-container" {
     }
   ]
   
-  secrets = [
-    for ssmParam in aws_ssm_parameter.default:
-    {
-      name = ssmParam.name
-      valueFrom = ssmParam.arn
-    }
-  ]
+  secrets = local.secretsFrom
 }
 
 resource "aws_ecs_task_definition" "app" {
@@ -89,13 +83,7 @@ module "scrape-container" {
     secretOptions = null
   }
   
-  secrets = [
-    for ssmParam in aws_ssm_parameter.default:
-    {
-      name = ssmParam.name
-      valueFrom = ssmParam.arn
-    }
-  ]
+  secrets = local.secretsFrom
 }
 
 resource "aws_ecs_task_definition" "scrape" {
@@ -112,7 +100,7 @@ module "scrape-scheduled-task" {
   source  = "baikonur-oss/fargate-scheduled-task/aws"
   version = "v2.0.2"
 
-  name                = "scrape"
+  name                = "${module.label.id}-scrape"
   schedule_expression = "cron(0 0 * * ? *)"
   is_enabled          = "true"
 
@@ -170,13 +158,21 @@ locals {
       description = lookup(lookup(local.all_secrets_name_map, key), "description")
     }
   ]
+  # Secrets object that can be given to container definitions
+  secretsFrom = [
+    for ssmParam in aws_ssm_parameter.default:
+    {
+      name = split("/", ssmParam.name)[2]
+      valueFrom = ssmParam.arn
+    }
+  ]
 }
 # Secrets to put in env
 # Maybe use a KMS for better security?
 # Also this module https://github.com/cloudposse/terraform-aws-ssm-parameter-store is nice but not up to date with Terraform 0.12
 resource "aws_ssm_parameter" "default" {
   count           = length(var.secrets) + 5
-  name            = lookup(local.all_secrets[count.index], "name")
+  name            = "/${var.stage}/${lookup(local.all_secrets[count.index], "name")}"
   description     = lookup(local.all_secrets[count.index], "description", lookup(local.all_secrets[count.index], "name"))
   type            = "SecureString"
   value           = lookup(local.all_secrets[count.index], "value")

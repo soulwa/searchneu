@@ -31,8 +31,13 @@ variable "name" {
 }
 
 variable "prod_secrets" {
-  description = "Secrets to put in SSM Parameter Store and add as environment variables"
+  description = "Secrets to put in SSM Parameter Store and add as environment variables to prod"
 }
+
+variable "staging_secrets" {
+  description = "Secrets to put in SSM Parameter Store and add as environment variables to staging"
+}
+
 
 # Docker + ALB Settings
 variable "az_count" {

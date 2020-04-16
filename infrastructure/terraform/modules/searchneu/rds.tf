@@ -21,7 +21,7 @@ resource "random_password" "db_pass" {
 }
 
 resource "aws_db_subnet_group" "default" {
-  name       = "main"
+  name       = module.label.id
   subnet_ids = var.private_subnet_ids
 }
 
