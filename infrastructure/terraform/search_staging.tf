@@ -14,4 +14,6 @@ module "staging" {
 
   cloudflare_zone_id = var.cloudflare_zone_id
   certificate_arn    = aws_acm_certificate.cert.arn
+
+  jumphost_sg_id     = aws_security_group.jumphost.id
 }

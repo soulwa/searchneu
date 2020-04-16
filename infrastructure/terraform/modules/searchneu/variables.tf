@@ -23,6 +23,10 @@ variable "private_subnet_ids" {
   description = "Subnet IDs to put the databases in (should be private subnets)"
 }
 
+variable "jumphost_sg_id" {
+  description = "security group of the jumphost. will give access to DBs from this sg"
+}
+
 variable "stage" {
   description = "Stage/environment. Should be prod or staging"
 }
