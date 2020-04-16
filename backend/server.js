@@ -24,7 +24,7 @@ import Request from './scrapers/request';
 import webpackConfig from './webpack.config.babel';
 import macros from './macros';
 import notifyer from './notifyer';
-import Updater from './updater';
+import database from './database';
 import graphql from './graphql';
 import HydrateCourseSerializer from './database/serializers/hydrateCourseSerializer';
 
