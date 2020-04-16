@@ -244,4 +244,8 @@ class Updater {
   }
 }
 
+if (require.main === module) {
+  Updater.create().start();
+}
+
 export default Updater;

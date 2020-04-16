@@ -174,7 +174,6 @@ class Searcher {
     const classFilters = _(filters).pick(Object.keys(this.filters)).toPairs().map(([key, val]) => this.filters[key].create(val))
       .value();
 
-    macros.log(classFilters);
     // very likely this doesn't work
     const aggQuery = !aggregation ? undefined : {
       [aggregation]: {

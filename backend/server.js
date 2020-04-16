@@ -57,8 +57,6 @@ const MAX_HOLD_TIME_FOR_GET_USER_DATA_REQS = 3000;
 // The interval id that fires when user data reqs are awaiting cleanup.
 let getUserDataInterval = null;
 
-// Start updater interval
-Updater.create().start();
 
 // Verify that the webhooks are coming from facebook
 // This needs to be above bodyParser for some reason
