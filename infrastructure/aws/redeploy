@@ -5,11 +5,19 @@ if [[ ! " prod staging " =~ " $1 " ]]; then
   exit 1
 fi
 CLUSTER="$1-searchneu"
-SERVICE="$CLUSTER-webserver" # Service and cluster have same name
+SERVICE="$CLUSTER-webserver" 
+SERVICE2="$CLUSTER-update" 
 
 # Disable aws from sending stdout to less
 export AWS_PAGER=""
 
 echo "Redeploying cluster $CLUSTER with last pushed image"
 
-aws ecs update-service --cluster $CLUSTER --service $SERVICE --force-new-deployment
+if [[ "prod" = "$1" ]]; then
+  # Add prod tag to image
+  MANIFEST=$(aws ecr batch-get-image --repository-name searchneu --image-ids imageTag=latest --query 'images[].imageManifest' --output text)
+  aws ecr put-image --repository-name searchneu --image-tag prod --image-manifest "$MANIFEST"
+fi
+
+aws ecs update-service --cluster $CLUSTER --service $SERVICE --force-new-deployment 
+aws ecs update-service --cluster $CLUSTER --service $SERVICE2 --force-new-deployment

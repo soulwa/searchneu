@@ -7,7 +7,7 @@ resource "aws_ecs_cluster" "main" {
 module "webserver-container" {
   source          = "git::https://github.com/cloudposse/terraform-aws-ecs-container-definition.git?ref=0.23.0"
   container_name  = "${module.label.id}-webserver"
-  container_image = "${var.ecr_url}:latest"
+  container_image = "${var.ecr_url}:${module.label.stage}"
   container_cpu   = var.webapp_cpu
   container_memory= var.webapp_memory
 
@@ -69,7 +69,7 @@ resource "aws_ecs_service" "main" {
 module "scrape-container" {
   source          = "git::https://github.com/cloudposse/terraform-aws-ecs-container-definition.git?ref=0.23.0"
   container_name  = "${module.label.id}-scrape"
-  container_image = "${var.ecr_url}:latest"
+  container_image = "${var.ecr_url}:${module.label.stage}"
   container_cpu   = var.scrape_cpu
   container_memory= var.scrape_memory
 
@@ -123,7 +123,7 @@ module "scrape-scheduled-task" {
 module "update-container" {
   source          = "git::https://github.com/cloudposse/terraform-aws-ecs-container-definition.git?ref=0.23.0"
   container_name  = "${module.label.id}-update"
-  container_image = "${var.ecr_url}:latest"
+  container_image = "${var.ecr_url}:${module.label.stage}"
   container_cpu   = var.webapp_cpu
   container_memory= var.webapp_memory
 
