@@ -5,8 +5,7 @@ if [[ ! " prod staging " =~ " $1 " ]]; then
   exit 1
 fi
 CLUSTER="$1-searchneu"
-SERVICE="$CLUSTER-webserver" 
-SERVICE2="$CLUSTER-update" 
+SERVICES=( "$CLUSTER-webserver" "$CLUSTER-update" )
 
 # Disable aws from sending stdout to less
 export AWS_PAGER=""
@@ -25,6 +24,8 @@ if [[ "prod" = "$1" ]]; then
 fi
 
 echo "Forcing new deployment"
-aws ecs update-service --cluster $CLUSTER --service $SERVICE --force-new-deployment  > /dev/null
-aws ecs update-service --cluster $CLUSTER --service $SERVICE2 --force-new-deployment > /dev/null
+for s in "${SERVICES[@]}"
+do
+  aws ecs update-service --cluster $CLUSTER --service $s --force-new-deployment  > /dev/null
+done
 echo "Check AWS Console for logs"
