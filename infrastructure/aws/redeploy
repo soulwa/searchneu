@@ -14,10 +14,17 @@ export AWS_PAGER=""
 echo "Redeploying cluster $CLUSTER with last pushed image"
 
 if [[ "prod" = "$1" ]]; then
-  # Add prod tag to image
-  MANIFEST=$(aws ecr batch-get-image --repository-name searchneu --image-ids imageTag=latest --query 'images[].imageManifest' --output text)
-  aws ecr put-image --repository-name searchneu --image-tag prod --image-manifest "$MANIFEST"
+  # Check if prod and staging tag are already at the same point
+  IMAGE_META="$( aws ecr describe-images --repository-name searchneu --image-ids imageTag=staging,imageTag=prod 2> /dev/null )"
+  # If not, add prod tag to staging image
+  if [[ $? -ne 0 ]]; then
+    echo "Adding prod tag to staging image"
+    MANIFEST=$(aws ecr batch-get-image --repository-name searchneu --image-ids imageTag=staging --query 'images[].imageManifest' --output text)
+    aws ecr put-image --repository-name searchneu --image-tag prod --image-manifest "$MANIFEST"
+  fi
 fi
 
-aws ecs update-service --cluster $CLUSTER --service $SERVICE --force-new-deployment 
-aws ecs update-service --cluster $CLUSTER --service $SERVICE2 --force-new-deployment
+echo "Forcing new deployment"
+aws ecs update-service --cluster $CLUSTER --service $SERVICE --force-new-deployment  > /dev/null
+aws ecs update-service --cluster $CLUSTER --service $SERVICE2 --force-new-deployment > /dev/null
+echo "Check AWS Console for logs"
