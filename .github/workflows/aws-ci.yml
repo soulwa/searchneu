@@ -2,7 +2,7 @@ name: Push to AWS
 on:
   push:
     branches:
-      - docker
+      - master
 jobs:
   push-aws:
     name: Push to AWS
