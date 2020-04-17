@@ -149,6 +149,7 @@ class Updater {
 
     macros.logAmplitudeEvent('Updater', {
       totalTime: totalTime,
+      sent: notifications.length,
     });
   }
 

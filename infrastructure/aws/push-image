@@ -6,6 +6,5 @@ IMG=$REPO:$TAG
 
 aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $ACCOUNTID.dkr.ecr.us-east-1.amazonaws.com
 docker build -t $IMG .
-docker push $IMG
 docker tag $IMG $REPO:staging
-docker push $REPO:staging
+docker push $REPO
