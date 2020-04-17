@@ -1,10 +1,11 @@
-node_modules
-public
-cache
-docs
-dist
-poster
+node_modules/
+public/
+cache/
+docs/
+dist/
+poster/
 
-frontend
-backend
-common
+frontend/
+backend/
+common/
+infrastructure/terraform/.terraform/

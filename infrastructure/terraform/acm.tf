@@ -13,6 +13,6 @@ resource "cloudflare_record" "cert" {
   zone_id = var.cloudflare_zone_id
   name = aws_acm_certificate.cert.domain_validation_options.0.resource_record_name
   type = aws_acm_certificate.cert.domain_validation_options.0.resource_record_type
-  value = aws_acm_certificate.cert.domain_validation_options.0.resource_record_value
+  value = trimsuffix(aws_acm_certificate.cert.domain_validation_options.0.resource_record_value, ".")
   ttl = 1
 }
