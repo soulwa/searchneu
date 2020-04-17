@@ -34,20 +34,27 @@ resource "aws_subnet" "public" {
   }
 }
 
-# Endpoint
-resource "aws_vpc_endpoint" "ecr" {
-  vpc_id       = aws_vpc.main.id
-  service_name = "com.amazonaws.${var.aws_region}.ecr.dkr"
-}
-
 # Internet Gateway for the public subnet
 resource "aws_internet_gateway" "gw" {
   vpc_id = aws_vpc.main.id
 }
 
 # Route the public subnet traffic through the IGW
-resource "aws_route" "internet_access" {
-  route_table_id         = aws_vpc.main.main_route_table_id
-  destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = aws_internet_gateway.gw.id
+resource "aws_route_table" "public" {
+  vpc_id = aws_vpc.main.id
+
+  route {
+      cidr_block = "0.0.0.0/0"
+      gateway_id = aws_internet_gateway.gw.id
+  }
+
+  tags = {
+      Name = "Public Subnet"
+  }
+}
+
+resource "aws_route_table_association" "public" {
+  count = var.az_count
+  subnet_id = element(aws_subnet.public.*.id, count.index)
+  route_table_id = aws_route_table.public.id
 }
