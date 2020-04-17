@@ -134,7 +134,7 @@ module "update-container" {
     options = {
       awslogs-group         = "/ecs/${module.label.id}"
       awslogs-region        = var.aws_region
-      awslogs-stream-prefix = "scrape"
+      awslogs-stream-prefix = "update"
     }
     secretOptions = null
   }
