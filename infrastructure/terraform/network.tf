@@ -34,6 +34,12 @@ resource "aws_subnet" "public" {
   }
 }
 
+# Endpoint
+resource "aws_vpc_endpoint" "ecr" {
+  vpc_id       = aws_vpc.main.id
+  service_name = "com.amazonaws.${var.aws_region}.ecr.dkr"
+}
+
 # Internet Gateway for the public subnet
 resource "aws_internet_gateway" "gw" {
   vpc_id = aws_vpc.main.id
