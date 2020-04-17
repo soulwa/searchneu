@@ -4,10 +4,6 @@ variable "aws_region" {
   default     = "us-east-1"
 }
 
-variable "aws_profile" {
-  description = "The profile to use for AWS specified in ~/.aws/credentials"
-}
-
 # Cloudflare
 
 variable "cloudflare_api_token" {
