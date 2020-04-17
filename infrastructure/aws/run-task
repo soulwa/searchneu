@@ -7,7 +7,7 @@ if [[ ! " prod staging " =~ " $1 " ]]; then
   exit 1
 fi
 CLUSTER="$1-searchneu"
-SERVICE=$CLUSTER
+SERVICE=$CLUSTER-webserver
 TASK=$CLUSTER-webserver
 
 # Disable aws from sending stdout to less
