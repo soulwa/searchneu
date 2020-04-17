@@ -17,8 +17,10 @@ module.exports = {
   ],
   testPathIgnorePatterns: [
     '<rootDir>/regtests/jest.config.js',
+    '<rootDir>/regtests/jestSetupFile.js',
   ],
   setupFiles: [
     '<rootDir>/regtests/jestSetupFile.js',
   ],
+  testEnvironment: 'node',
 };
