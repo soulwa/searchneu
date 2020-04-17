@@ -4,7 +4,6 @@
  */
 
 import path from 'path';
-import mkdirp from 'mkdirp-promise';
 import fs from 'fs-extra';
 
 import macros from '../../macros';
@@ -73,12 +72,12 @@ class TermDump {
       }
 
       const folderPath = path.join(macros.PUBLIC_DIR, 'getTermDump', value.host);
-      promises.push(mkdirp(folderPath).then(() => {
+      promises.push(fs.ensureDir(folderPath).then(() => {
         return fs.writeFile(path.join(folderPath, `${value.termId}.json`), JSON.stringify(value));
       }));
     }
     const outerFolderPath = path.join(macros.PUBLIC_DIR, 'getTermDump');
-    promises.push(mkdirp(outerFolderPath).then(() => {
+    promises.push(fs.ensureDir(outerFolderPath).then(() => {
       return fs.writeFile(path.join(outerFolderPath, 'allTerms.json'), JSON.stringify(termDump));
     }));
     return Promise.all(promises);

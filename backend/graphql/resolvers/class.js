@@ -17,7 +17,7 @@ const getLatestClassOccurrence = async (host, subject, classId) => {
 }
 
 const getAllClassOccurrences = async (host, subject, classId) => {
-  const results = await Course.findAll({ where: { host, subject, classId } });
+  const results = await Course.findAll({ where: { host, subject, classId }, order: [['termId', 'DESC']] });
   return serializeValues(results);
 }
 

@@ -6,13 +6,10 @@ Object {
     "class": Object {
       "allOccurrences": Array [
         Object {
-          "termId": 201830,
-        },
-        Object {
           "termId": 201930,
         },
         Object {
-          "termId": 202030,
+          "termId": 201830,
         },
       ],
       "name": "Fundamentals of Computer Science 1",
@@ -33,7 +30,7 @@ Object {
   "data": Object {
     "class": Object {
       "latestOccurrence": Object {
-        "termId": 202030,
+        "termId": 201930,
       },
       "name": "Fundamentals of Computer Science 1",
     },

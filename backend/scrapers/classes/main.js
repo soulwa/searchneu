@@ -7,7 +7,6 @@ import URI from 'urijs';
 
 import cache from '../cache';
 import macros from '../../macros';
-import termDump from './termDump';
 import differentCollegeUrls from './differentCollegeUrls';
 import bannerv9CollegeUrls from './bannerv9CollegeUrls';
 
@@ -85,6 +84,13 @@ class Main {
     }
 
     const cacheKey = collegeAbbrs.join(',');
+    if (macros.DEV) {
+      const cached = await cache.get(macros.DEV_DATA_DIR, 'classes', cacheKey);
+      if (cached) {
+        macros.log('using cached class data - not rescraping');
+        return cached;
+      }
+    }
 
     const bannerv8Urls = this.getUrlsFromCollegeAbbrs(collegeAbbrs, differentCollegeUrls);
     if (bannerv8Urls.length > 1) {
@@ -105,9 +111,6 @@ class Main {
     macros.warn('SCRAPEd');
 
     const dump = this.runProcessors(bannerv9ParserOutput);
-    macros.warn('BOUT TO DUMP')
-
-    await termDump.main(dump);
 
     if (macros.DEV) {
       await cache.set(macros.DEV_DATA_DIR, 'classes', cacheKey, dump);

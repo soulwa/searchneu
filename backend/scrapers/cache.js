@@ -5,7 +5,6 @@
 
 import path from 'path';
 import fs from 'fs-extra';
-import mkdirp from 'mkdirp-promise';
 import msgpackImport from 'msgpack5';
 import _ from 'lodash';
 
@@ -93,7 +92,7 @@ class Cache {
       return undefined;
     }
 
-    await mkdirp(path.dirname(filePath));
+    await fs.ensureDir(path.dirname(filePath));
 
     // Check to see if the msgpack file exists.
     const msgPackFileExtension = `${filePath}.msgpack`;
@@ -149,7 +148,6 @@ class Cache {
     this.ensureLoaded(filePath);
 
     const dataMap = await this.dataPromiseMap[filePath];
-
     return dataMap[key];
   }
 

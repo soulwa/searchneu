@@ -5,7 +5,7 @@
 
 import URI from 'urijs';
 
-import asyncjs from 'async';
+import retry from 'async-retry';
 import macros from './macros';
 
 // All the requests from the frontend to the backend go through this file.
@@ -116,29 +116,16 @@ class Request {
 
   async getFromInternetWithRetry(config) {
     let times = 3;
-    if (config.retryTimes) {
+    if (config.retryTimes !== undefined) {
       times = config.retryTimes;
     }
 
-    return new Promise((resolve, reject) => {
-      asyncjs.retry({
-        times: times,
-        interval: 500,
-      }, async (callback) => {
-        let resp;
-        try {
-          resp = await this.getFromInternet(config);
-          callback(null, resp);
-        } catch (e) {
-          callback(e);
-        }
-      }, (err, resp) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(resp);
-        }
-      });
+    return retry(async () => {
+      return this.getFromInternet(config);
+    }, {
+      retries: times,
+      minTimeout: 500,
+      maxTimeout: 500,
     });
   }
 

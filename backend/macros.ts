@@ -45,14 +45,15 @@ while (1) {
 }
 
 type EnvKeys = 'elasticURL'
+| 'dbName'
+| 'dbHost'
+// Secrets:
+| 'dbUsername'
+| 'dbPassword'
 | 'rollbarPostServerItemToken'
 | 'fbToken'
 | 'fbVerifyToken'
 | 'fbAppSecret'
-| 'dbUsername'
-| 'dbPassword'
-| 'dbName'
-| 'dbHost'
 // Only for dev:
 | 'fbMessengerId';
 

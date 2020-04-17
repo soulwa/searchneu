@@ -24,7 +24,6 @@ import Request from './scrapers/request';
 import webpackConfig from './webpack.config.babel';
 import macros from './macros';
 import notifyer from './notifyer';
-import Updater from './updater';
 import database from './database';
 import graphql from './graphql';
 import HydrateCourseSerializer from './database/serializers/hydrateCourseSerializer';
@@ -57,8 +56,6 @@ const MAX_HOLD_TIME_FOR_GET_USER_DATA_REQS = 3000;
 // The interval id that fires when user data reqs are awaiting cleanup.
 let getUserDataInterval = null;
 
-// Start updater interval
-Updater.create().start();
 
 // Verify that the webhooks are coming from facebook
 // This needs to be above bodyParser for some reason
@@ -169,32 +166,6 @@ function getTime() {
   return moment().format('hh:mm:ss a');
 }
 
-
-// Http to https redirect.
-app.use((req, res, next) => {
-  const remoteIp = getIpPath(req);
-
-  // If this is https request, done.
-  if (req.protocol === 'https') {
-    next();
-
-    // If we are behind a cloudflare proxy and cloudflare served a https response, done.
-  } else if (req.headers['x-forwarded-proto'] && req.headers['x-forwarded-proto'] === 'https') {
-    next();
-
-    // This is development mode
-  } else if (macros.DEV) {
-    next();
-
-    // This is prod and still on http, redirect to https.
-  } else {
-    // Cache the http to https redirect for 2 months.
-    res.setHeader('Cache-Control', 'public, max-age=5256000');
-    macros.log(getTime(), remoteIp, 'redirecting to https');
-    res.redirect(`https://${req.get('host')}${req.originalUrl}`);
-  }
-});
-
 graphql.applyMiddleware({ app: app });
 
 app.get('/search', wrap(async (req, res) => {
@@ -273,14 +244,17 @@ app.get('/search', wrap(async (req, res) => {
 
   // Not sure I am logging all the necessary analytics
   const analytics = {
-    searchTime: took,
+    searchTime: took.total,
+    esTime: took.es,
+    hydateTime: took.hydrate,
     stringifyTime: Date.now() - midTime,
     resultCount: resultCount,
   };
 
   macros.logAmplitudeEvent('Backend Search', analytics);
 
-  macros.log(getTime(), getIpPath(req), 'Search for', req.query.query, 'from', minIndex, 'to', maxIndex, 'took', took, 'ms and stringify took', Date.now() - midTime, 'with', analytics.resultCount, 'results');
+  macros.log(getTime(), getIpPath(req));
+  macros.log(`Search for ${req.query.query} from ${minIndex} to ${maxIndex} took ${took.total} total. Hydrate from postgres took ${took.hydrate}. ES reports ${took.es} internally. Stringify took ${Date.now() - midTime} with ${searchContent.length} results`);
 
   // Set the header for application/json and send the data.
   res.setHeader('Content-Type', 'application/json; charset=UTF-8');

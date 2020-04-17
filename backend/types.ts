@@ -36,7 +36,7 @@ export interface Course {
 }
 
 // A co or pre requisite object.
-export type Requisite = BooleanReq | CourseReq;
+export type Requisite = string | BooleanReq | CourseReq;
 export interface BooleanReq {
   type: 'and' | 'or';
   values: Requisite[];
@@ -45,6 +45,12 @@ export interface CourseReq {
   classId: string;
   subject: string;
   missing?: true;
+}
+export function isBooleanReq(req: Requisite): req is BooleanReq {
+  return (req as BooleanReq).type !== undefined;
+}
+export function isCourseReq(req: Requisite): req is CourseReq {
+  return (req as CourseReq).classId !== undefined;
 }
 
 // A section of a course

@@ -9,7 +9,7 @@
 
 import request from 'request-promise-native';
 import URI from 'urijs';
-import asyncjs from 'async';
+import retry from 'async-retry';
 import objectHash from 'object-hash';
 import moment from 'moment';
 import _ from 'lodash';
@@ -398,72 +398,65 @@ class Request {
       retryCount = config.retryCount;
     }
 
-    return new Promise((resolve, reject) => {
-      let tryCount = 0;
+    let tryCount = 0;
 
-      let requestDuration;
+    const timeout = RETRY_DELAY + Math.round(Math.random() * RETRY_DELAY_DELTA);
+    let requestDuration;
 
-      asyncjs.retry({
-        times: retryCount,
-        interval: RETRY_DELAY + Math.round(Math.random() * RETRY_DELAY_DELTA),
-      }, async (callback) => {
-        let response;
-        tryCount++;
-        try {
-          const requestStart = Date.now();
-          response = await this.fireRequest(config);
-          requestDuration = Date.now() - requestStart;
-          this.analytics[hostname].totalGoodRequests++;
-        } catch (err) {
-          // Most sites just give a ECONNRESET or ETIMEDOUT, but dccc also gives a EPROTO and ECONNREFUSED.
-          // This will retry for any error code.
+    return retry(async () => {
+      let response;
+      tryCount++;
+      try {
+        const requestStart = Date.now();
+        response = await this.fireRequest(config);
+        requestDuration = Date.now() - requestStart;
+        this.analytics[hostname].totalGoodRequests++;
+      } catch (err) {
+        // Most sites just give a ECONNRESET or ETIMEDOUT, but dccc also gives a EPROTO and ECONNREFUSED.
+        // This will retry for any error code.
 
-          this.analytics[hostname].totalErrors++;
-          if (!macros.PROD || tryCount > 5) {
-            macros.log('Try#:', tryCount, 'Code:', err.statusCode || err.RequestError || err.Error || err.message || err, ' Open request count: ', this.openRequests, 'Url:', config.url);
-          }
-
-          if (err.response) {
-            macros.verbose(err.response.body);
-          } else {
-            macros.verbose(err.message);
-          }
-
-          callback(err);
-          return;
+        this.analytics[hostname].totalErrors++;
+        if (!macros.PROD || tryCount > 5) {
+          macros.log('Try#:', tryCount, 'Code:', err.statusCode || err.RequestError || err.Error || err.message || err, ' Open request count: ', this.openRequests, 'Url:', config.url);
         }
 
-        // Ensure that body contains given string.
-        if (config.requiredInBody && !this.doAnyStringsInArray(config.requiredInBody, response.body)) {
-          macros.log('Try#:', tryCount, 'Warning, body did not contain specified text', response.body.length, response.statusCode, this.openRequests, config.url);
-          callback('Body missing required text.');
-          return;
+        if (err.response) {
+          macros.verbose(err.response.body);
+        } else {
+          macros.verbose(err.message);
         }
 
-        if (response.body.length < 4000 && !config.shortBodyWarning === false) {
-          macros.log('Warning, short body', config.url, response.body, this.openRequests);
-        }
+        throw err;
+      }
 
-        callback(null, response);
-      }, async (err, response) => {
-        if (err) {
-          reject(err);
-          return;
-        }
+      // Ensure that body contains given string.
+      if (config.requiredInBody && !this.doAnyStringsInArray(config.requiredInBody, response.body)) {
+        macros.log('Try#:', tryCount, 'Warning, body did not contain specified text', response.body.length, response.statusCode, this.openRequests, config.url);
+        throw new Error('Body missing required text.');
+      }
 
-        // Save the response to a file for development
-        if (macros.DEV && config.cache) {
-          cache.set(macros.REQUESTS_CACHE_DIR, config.cacheName, newKey, response.toJSON(), true);
-        }
+      if (response.body.length < 4000 && !config.shortBodyWarning === false) {
+        macros.log('Warning, short body', config.url, response.body, this.openRequests);
+      }
 
-        // Don't log this on travis because it causes more than 4 MB to be logged and travis will kill the job
-        this.analytics[hostname].totalBytesDownloaded += response.body.length;
-        if (!macros.PROD) {
-          macros.log('Parsed', response.body.length, 'in', requestDuration, 'ms from ', config.url);
-        }
+      // Save the response to a file for development
+      if (macros.DEV && config.cache) {
+        cache.set(macros.REQUESTS_CACHE_DIR, config.cacheName, newKey, response.toJSON(), true);
+      }
 
-        resolve(response);
-      });
+      // Don't log this on travis because it causes more than 4 MB to be logged and travis will kill the job
+      this.analytics[hostname].totalBytesDownloaded += response.body.length;
+      if (!macros.PROD) {
+        macros.log('Parsed', response.body.length, 'in', requestDuration, 'ms from ', config.url);
+      }
+
+      return response;
+    }, {
+      retries: retryCount,
+      minTimeout: timeout,
+      maxTimeout: timeout,
+      factor: 1,
+      randomize: true,
     });
   }
 }

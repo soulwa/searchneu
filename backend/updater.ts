@@ -86,7 +86,6 @@ class Updater {
   // Update classes and sections users are watching and notify them if seats have opened up
   async update() {
     macros.log('updating');
-    if (macros.DEV) return;
 
     const startTime = Date.now();
 
@@ -146,10 +145,11 @@ class Updater {
 
     const totalTime = Date.now() - startTime;
 
-    macros.log('Done running updater onInterval. It took', totalTime, 'ms.');
+    macros.log(`Done running updater onInterval. It took ${totalTime} ms. Updated ${sections.length} sections and sent ${notifications.length} messages.`);
 
     macros.logAmplitudeEvent('Updater', {
       totalTime: totalTime,
+      sent: notifications.length,
     });
   }
 
@@ -242,6 +242,10 @@ class Updater {
       userToMsg[userId].push(message);
     });
   }
+}
+
+if (require.main === module) {
+  Updater.create().start();
 }
 
 export default Updater;
