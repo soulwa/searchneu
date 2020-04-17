@@ -51,7 +51,7 @@ resource "aws_ecs_service" "main" {
 
   network_configuration {
     security_groups  = [aws_security_group.ecs_tasks.id]
-    subnets          = var.private_subnet_ids
+    subnets          = var.public_subnet_ids
     assign_public_ip = false
   }
 
@@ -114,7 +114,7 @@ module "scrape-scheduled-task" {
   task_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   task_count          = "1"
 
-  subnet_ids         = var.private_subnet_ids
+  subnet_ids         = var.public_subnet_ids
   security_group_ids = [aws_security_group.ecs_tasks.id]
 }
 
@@ -161,7 +161,7 @@ resource "aws_ecs_service" "update" {
 
   network_configuration {
     security_groups  = [aws_security_group.ecs_tasks.id]
-    subnets          = var.private_subnet_ids
+    subnets          = var.public_subnet_ids
     assign_public_ip = false
   }
   depends_on = [aws_iam_role_policy_attachment.ecs_task_execution_role]
