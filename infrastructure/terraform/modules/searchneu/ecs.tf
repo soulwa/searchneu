@@ -52,7 +52,7 @@ resource "aws_ecs_service" "main" {
   network_configuration {
     security_groups  = [aws_security_group.ecs_tasks.id]
     subnets          = var.public_subnet_ids
-    assign_public_ip = false
+    assign_public_ip = true
   }
 
   load_balancer {
@@ -162,7 +162,7 @@ resource "aws_ecs_service" "update" {
   network_configuration {
     security_groups  = [aws_security_group.ecs_tasks.id]
     subnets          = var.public_subnet_ids
-    assign_public_ip = false
+    assign_public_ip = true
   }
   depends_on = [aws_iam_role_policy_attachment.ecs_task_execution_role]
 }
