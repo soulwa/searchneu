@@ -6,18 +6,9 @@ variable "aws_region" {
 
 # Cloudflare
 
-variable "cloudflare_api_token" {
-  description = "cloudflare token"
-} 
-
 variable "cloudflare_zone_id" {
   description = "cloudflare zone id"
 } 
-
-# Github
-variable "github_token" {
-  description = "github personal access token"
-}
 
 # Application Settings
 
