@@ -7,8 +7,10 @@ export default function useFeedbackSchedule(finished: boolean, keyString: string
     if (finished) {
       setTimeout(() => { localStorage.setItem(keyString, 'true') }, 2000);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [finished]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (localStorage.getItem(keyString)) {
       if (!localStorage.getItem(`SEEN_${keyString}`)) {
