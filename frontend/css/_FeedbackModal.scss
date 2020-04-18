@@ -15,7 +15,7 @@
 
       &:hover {
         cursor: pointer;
-        box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 0 5px rgba(51, 142, 241, 0.5);
       }
       
       &:focus {
@@ -86,9 +86,9 @@
   }
 
   &__checkBoxes {
-    width: 180px;
+    width: 200px;
     margin-left: 12px;
-    margin-top: 16px;
+    margin-top: 12px;
   }
 
   &__checkboxElement {
@@ -98,12 +98,18 @@
     align-items: center;
     margin-left: 2px;
     margin-bottom: 5px;
+    width: 200px;
+    border-radius: 3px;
+    &:hover {
+      background: #EAEAEA;
+
+    }
     
 
   }
 
   &__checkboxText {
-    padding-left: 28px;
+    padding-left: 38px;
     flex-grow: 1;
     cursor: pointer;
     user-select: none;
@@ -118,7 +124,7 @@
     display: block;
     position: absolute;
     top: 3px;
-    left: 0;
+    left: 8px;
     height: 16px;
     width: 16px;
     background-color: transparent;
