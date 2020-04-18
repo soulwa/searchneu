@@ -115,7 +115,7 @@ export default function Results() {
         />
       </div>
       {isReady && results.length > 0 && <FeedbackHeader searchQuery={ query } selectedFilters={ filters } searchResults={ results } />}
-      {!macros.isMobile && <FeedbackModal/>}
+      {!macros.isMobile && <FeedbackModal />}
       <div className='Results_Container'>
         {!macros.isMobile && (
           <>
