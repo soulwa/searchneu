@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { ClassRange } from './filters';
-import '../../css/_Filters.scss';
 
 interface RangeFilterProps {
   title: string,
@@ -26,7 +25,7 @@ export default function RangeFilter({ title, selected, setActive }: RangeFilterP
       <div className='RangeFilter__input'>
         <div className='RangeFilter__range-min'>
           <input
-            type='string'
+            type='number'
             className='RangeFilter__input-box'
             placeholder='Min'
             value={ controlledInput.min }
@@ -35,7 +34,7 @@ export default function RangeFilter({ title, selected, setActive }: RangeFilterP
         </div>
         <div className='RangeFilter__range-max'>
           <input
-            type='string'
+            type='number'
             className='RangeFilter__input-box'
             placeholder='Max'
             value={ controlledInput.max }
