@@ -16,6 +16,7 @@ interface ResultsLoaderProps {
 }
 
 function ResultsLoader({ results, loadMore }: ResultsLoaderProps) {
+  macros.log('resssullts', results);
   return (
     <InfiniteScroll
       dataLength={ results.length }

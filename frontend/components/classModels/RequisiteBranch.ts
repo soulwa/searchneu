@@ -3,7 +3,7 @@
  * See the license file in the root folder for details.
  */
 import macros from '../macros';
-import { Course } from '../types';
+import Course from "./Course";
 
 export enum ReqTypeType {
   AND = 'and',
@@ -18,7 +18,6 @@ export interface ReqType {
 export interface ReqFor {
   values : any[]
 }
-
 
 // This class holds a branch in the prerequisite or corequisite graph. For instance, if
 // a clas's prereqs are ((a or b) and (c or d)), then
@@ -37,6 +36,7 @@ class RequisiteBranch {
       }
     });
 
+    macros.log('values, values', values);
     this.prereqs = {
       type: data.type,
       values: values,
@@ -49,7 +49,7 @@ class RequisiteBranch {
     };
   }
 
-  compareTo(other : RequisiteBranch) {
+  compareTo(other : RequisiteBranch) : number {
     if (!(other instanceof RequisiteBranch)) {
       return -1;
     }

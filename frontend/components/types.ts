@@ -6,6 +6,8 @@
  */
 
 import { FilterOptions } from './ResultsPage/filters';
+import Course from './classModels/Course';
+import Section from './classModels/Section';
 
 // ======= Search Results ========
 // Represents the course and employee data returned by /search
@@ -14,9 +16,13 @@ export interface SearchResult {
   filterOptions: FilterOptions,
 }
 
-export type Course = any; //TODO
+export type CourseResult = {
+  class: Course,
+  sections: Section[]
+  type: string
+}
 export type Employee = any;
-export type SearchItem = Course | Employee;
+export type SearchItem = CourseResult | Employee;
 
 export function BLANK_SEARCH_RESULT(): SearchResult {
   return { results: [], filterOptions: { nupath: [], subject: [], classType: [] } }

@@ -18,7 +18,7 @@ class Section {
 
   dataStatus : string;
 
-  lastUpdateTime : any; // TODO: can anyone figure this out? I can't find an instance -- probably related to notifs broken
+  lastUpdateTime : number;
 
   meetings: Meeting[];
 
@@ -34,7 +34,7 @@ class Section {
 
   seatsCapacity : number;
 
-  hasWaitList : number;
+  wasHasWaitLisTNeedsBetterName : number; // TODO
 
   honors : boolean;
 
@@ -69,7 +69,7 @@ class Section {
   getAllMeetingMoments(ignoreExams = true) : MomentTuple[] {
     let retVal = [];
     this.meetings.forEach((meeting) => {
-      if (ignoreExams && meeting.getIsExam()) {
+      if (ignoreExams && meeting.isExam()) {
         return;
       }
 
@@ -87,7 +87,6 @@ class Section {
   getWeekDaysAsBooleans() : boolean[] {
     const retVal = [false, false, false, false, false, false, false];
 
-
     this.getAllMeetingMoments().forEach((time) => {
       retVal[time.start.day()] = true;
     });
@@ -100,62 +99,48 @@ class Section {
     this.getAllMeetingMoments().forEach((time) => {
       weekdaySet.add(time.start.format('dddd'));
     });
-
     return Array.from(weekdaySet);
   }
 
   //returns true if has exam, else false
   getHasExam() : boolean {
-    return this.meetings.some((meeting) => { return meeting.getIsExam(); });
+    return this.meetings.some((meeting) => { return meeting.isExam(); });
   }
 
   //returns the {start:end:} moment object of the first exam found
   //else returns null
-  getExamMeeting() {
-    for (let i = 0; i < this.meetings.length; i++) {
-      const meeting = this.meetings[i];
-      if (meeting.getIsExam()) {
-        if (meeting.times.length > 0) {
-          return meeting;
-        }
-      }
-    }
-    return null;
+  getExamMeeting() : Meeting {
+    return this.meetings.find((meeting) => {
+      return meeting.isExam() && meeting.times.length > 0
+    });
   }
 
   // Unique list of all professors in all meetings, sorted alphabetically
-  getProfs() {
+  getProfs() : string[] {
     return Array.from(this.profs).sort();
   }
 
-  getLocations(ignoreExams = true) {
-    const retVal = [];
+  getLocations(ignoreExams = true) : string[] {
+    const meetingLocations = [];
     this.meetings.forEach((meeting) => {
-      if (ignoreExams && meeting.getIsExam()) {
-        return;
-      }
-
-      const where = meeting.where;
-      if (!retVal.includes(where)) {
-        retVal.push(where);
+      if (!(ignoreExams && meeting.isExam())) {
+        meetingLocations.push(meeting.where);
       }
     });
+    const retVal = _.uniq(meetingLocations);
 
     // If it is at least 1 long with TBAs remove, return the array without any TBAs
     // Eg ["TBA", "Richards Hall 201" ] -> ["Richards Hall 201"]
     const noTBAs = _.pull(retVal.slice(0), 'TBA');
-    if (noTBAs.length > 0) {
-      return noTBAs;
-    }
 
-    return retVal;
+    return (noTBAs || retVal);
   }
 
-  getHasWaitList() {
+  hasWaitList() : boolean {
     return this.waitCapacity > 0 || this.waitRemaining > 0;
   }
 
-  updateWithData(data) {
+  updateWithData(data) : void {
     for (const attrName of Object.keys(data)) {
       if ((typeof data[attrName]) === 'function') {
         macros.error('given fn??', data, this, this.constructor.name);
@@ -176,7 +161,7 @@ class Section {
   }
 
   //TODO : there has to be a way to make this *so much better*, but there are sooo many special cases omo
-  compareTo(other) {
+  compareTo(other) : number {
     if (this.online && !other.online) {
       return 1;
     }

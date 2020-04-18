@@ -51,7 +51,7 @@ beforeEach(() => {
 it('Testing basic getters on meeting', () => {
   expect(meeting.getBuilding()).toBe('Robinson Hall');
   expect(meeting.getHoursPerWeek()).toBe(3.3);
-  expect(meeting.getIsExam()).toBe(false);
+  expect(meeting.isExam()).toBe(false);
   expect(meeting.getIsHidden()).toBe(false);
   expect(meeting.getMeetsOnWeekends()).toBe(false);
   expect(meeting.getWeekdayStrings()).toStrictEqual(['Tuesday', 'Friday']);
@@ -67,7 +67,7 @@ it('Testing getMeetsOnDay', () => {
 it('Testing basic getters on exam', () => {
   expect(exam.getBuilding()).toBe('Mugar Life Science Building');
   expect(exam.getHoursPerWeek()).toBe(2);
-  expect(exam.getIsExam()).toBe(true);
+  expect(exam.isExam()).toBe(true);
   expect(exam.getIsHidden()).toBe(false);
   expect(exam.getMeetsOnWeekends()).toBe(false);
   expect(exam.getWeekdayStrings()).toStrictEqual(['Thursday']);

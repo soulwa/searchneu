@@ -152,7 +152,7 @@ class Meeting {
     return this.getHoursPerWeek() === 0;
   }
 
-  getIsExam() : boolean {
+  isExam() : boolean {
     // this could be improved by scraping more data...
     return this.startDate.unix() === this.endDate.unix();
   }
@@ -163,7 +163,7 @@ class Meeting {
   }
 
   getMeetsOnWeekends() : boolean {
-    return !this.getIsExam()
+    return !this.isExam()
         && this.getMeetsOnDay(DayOfWeek.SUNDAY) || this.getMeetsOnDay(DayOfWeek.SATURDAY);
   }
 }

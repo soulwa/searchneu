@@ -28,7 +28,7 @@ it('testing basic getters', () => {
   expect(section.getExamMeeting()).toStrictEqual(new Meeting(mockData.probStatsExamConfig));
   expect(section.getHasExam()).toBeTruthy();
   expect(section.getHash()).toStrictEqual('neu.edu/202030/MATH/3081/30270');
-  expect(section.getHasWaitList()).toBeFalsy();
+  expect(section.hasWaitList()).toBeFalsy();
   expect(section.getProfs()).toStrictEqual(['Aaron Hoffman']);
   expect(section.getLocations()).toStrictEqual(['West Village G 104']);
   expect(section.getLocations(false)).toStrictEqual(['West Village G 104', 'Ell Hall AUD']);

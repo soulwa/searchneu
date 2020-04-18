@@ -45,7 +45,7 @@ class Course {
 
   subject : string;
 
-  lastUpdateTime : any;
+  lastUpdateTime : number;
 
   hasWaitList : boolean;
 
@@ -84,7 +84,7 @@ class Course {
     };
   }
 
-  static create(config) {
+  static create(config) : Course {
     if (!config) {
       macros.error('Passed null config?', config);
       return null;
@@ -97,11 +97,6 @@ class Course {
   // Returns a hash of this object used for referencing this instance - eg neu.edu/201910/CS/2500
   getHash() : string {
     return Keys.getClassHash(this);
-  }
-
-  loadFromClassMap(classMap) {
-    macros.log('classMap', classMap);
-    this.updateWithData(classMap[this.getHash()]);
   }
 
   convertServerRequisites(data) : Course {
@@ -138,7 +133,7 @@ class Course {
         values: newValues,
       });
 
-    // Need to create a new Class()
+    // Need to create a new Course()
     } else {
       //basic string
       if ((typeof data) === 'string') {
@@ -150,7 +145,7 @@ class Course {
       }
       // else data is a normal class that has a .subject and a .classId
 
-      //the leafs of the prereq trees returned from the server dosent have host or termId,
+      //the leafs of the prereq trees returned from the server doesn't have host or termId,
       //but it is the same as the class that returned it,
       //so copy over the values
       if (!data.host) {
@@ -172,7 +167,7 @@ class Course {
     return retVal;
   }
 
-  removeMissingClasses(data) {
+  removeMissingClasses(data) : ReqType {
     if (data.values) {
       const retVal = [];
       const subClassesHash = {};
@@ -189,7 +184,6 @@ class Course {
           }
           subClassesHash[key] = true;
         }
-
 
         subData = this.removeMissingClasses(subData);
 
@@ -224,10 +218,8 @@ class Course {
         stack = stack.concat(curr.prereqs.values.slice(0));
       }
     }
-
     this.coreqs.values = classes;
   }
-
 
   // called once
   updateWithData(config) {
@@ -244,7 +236,6 @@ class Course {
       //dont copy over some attr
       //these are copied below and processed a bit
       if (_(['coreqs', 'prereqs', 'download']).includes(attrName) || config[attrName] === undefined) {
-        continue;
       } else {
         this[attrName] = config[attrName];
       }
@@ -260,7 +251,7 @@ class Course {
 
     if (config.prereqs) {
       if (!config.prereqs.values || !config.prereqs.type) {
-        macros.error('prereqs need values ad type');
+        macros.error('prereqs need values and type');
       } else {
         this.prereqs.type = config.prereqs.type;
         this.prereqs.values = [];
@@ -278,7 +269,7 @@ class Course {
 
     if (config.coreqs) {
       if (!config.coreqs.values || !config.coreqs.type) {
-        macros.error('coreqs need values ad type');
+        macros.error('coreqs need values and type');
       } else {
         this.coreqs.type = config.coreqs.type;
         this.coreqs.values = [];
@@ -362,34 +353,17 @@ class Course {
 
 
   getHeighestProfCount() : number {
-    let count = 0;
-
-    this.sections.forEach((section) => {
-      if (section.profs) {
-        count = Math.max(section.profs.length, count);
-      }
-    });
-    return count;
+    return Math.max(...this.sections.map((section) => {
+      return section.profs.length;
+    }));
   }
 
   getPrettyClassId() {
-    if (!this.classId) {
-      return null;
-    }
-
-    let prettyClassId = this.classId;
-    while (prettyClassId.startsWith('0') && prettyClassId.length > 1) {
-      prettyClassId = prettyClassId.slice(1);
-    }
-    return prettyClassId;
+    return this.classId ? parseInt(this.classId, 10).toString() : null;
   }
 
-  getLastUpdateString() {
-    if (this.lastUpdateTime) {
-      return moment(this.lastUpdateTime).fromNow();
-    }
-
-    return null;
+  getLastUpdateString() : string {
+    return this.lastUpdateTime ? moment(this.lastUpdateTime).fromNow() : null;
   }
 
   //returns true if any sections have an exam, else false
@@ -397,17 +371,16 @@ class Course {
     return this.sections.some((section) => { return section.getHasExam(); });
   }
 
-  isAtLeastOneSectionFull() {
-    for (let i = 0; i < this.sections.length; i++) {
-      if (this.sections[i].seatsRemaining <= 0 && this.sections[i].seatsCapacity > 0) {
-        return true;
-      }
-    }
-    return false;
+  isAtLeastOneSectionFull() : boolean {
+    return this.sections.some((e) => {
+      return e.seatsRemaining <= 0 && e.seatsCapacity > 0
+    });
   }
 
-  // Use this function to load sections from a list of server data of sections.
-  // The given sections must all have crns in the class
+  /**
+   * Creates and loads sections from the list of sections the server gives
+   * @param serverList
+   */
   loadSectionsFromServerList(serverList) {
     this.sections = [];
 
@@ -425,10 +398,10 @@ class Course {
 
   // This runs when just after the sections are done loading. This would be at the bottom of this.loadSections*, but was moved to a separate function
   // so code is not duplicated.
-  finishLoadingSections() {
+  finishLoadingSections() : void {
     let hasWaitList = 0;
     this.sections.forEach((section) => {
-      hasWaitList += section.hasWaitList;
+      hasWaitList += section.wasHasWaitLisTNeedsBetterName;
     });
 
     this.hasWaitList = hasWaitList > this.sections.length / 2;
@@ -439,31 +412,26 @@ class Course {
     });
   }
 
-  getHasWaitList() {
-    for (let i = this.sections.length - 1; i >= 0; i--) {
-      if (this.sections[i].getHasWaitList()) {
-        return true;
-      }
-    }
-    return false;
+  getHasWaitList() : boolean {
+    return this.sections.some((e) => {
+      return e.hasWaitList();
+    });
   }
 
   getHasOnlineSections() : boolean {
-    for (let i = this.sections.length - 1; i >= 0; i--) {
-      if (this.sections[i].online) {
-        return true;
-      }
-    }
-    return false;
+    return this.sections.some((e) => {
+      return e.online;
+    });
   }
 
-  getHasHonorsSections() {
-    for (let i = this.sections.length - 1; i >= 0; i--) {
-      if (this.sections[i].honors) {
-        return true;
-      }
-    }
-    return false;
+  getHasHonorsSections() : boolean {
+    return this.sections.some((e) => {
+      return e.honors;
+    });
+  }
+
+  loadFromClassMap(classMap) : void {
+    this.updateWithData(classMap[this.getHash()]);
   }
 }
 export default Course;
