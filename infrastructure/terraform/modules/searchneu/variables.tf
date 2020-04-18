@@ -3,14 +3,6 @@ variable "aws_region" {
   default     = "us-east-1"
 }
 
-variable "cloudflare_zone_id" {
-  description = "Zone ID of cloudflare"
-}
-
-variable "certificate_arn" {
-  description = "ARN of the https cert granted by ACM"
-}
-
 variable "vpc_id" {
   description = "VPC to put the resources in"
 }
@@ -25,6 +17,27 @@ variable "private_subnet_ids" {
 
 variable "jumphost_sg_id" {
   description = "security group of the jumphost. will give access to DBs from this sg"
+}
+
+# Domain + ALB
+variable "alb_listener_arn" {
+  description = "arn of alb https listener"
+}
+
+variable "alb_sg_id" {
+  description = "id of the security group containing the ALB so we can whitelist traffic"
+}
+
+variable "alb_dns_name" {
+  description = "alb dns name to setup cname to"
+}
+
+variable "domains" {
+  description = "domains to put this env on. ALB needs to already have certs for it"
+}
+
+variable "cloudflare_zone_id" {
+  description = "Zone ID of cloudflare"
 }
 
 variable "stage" {

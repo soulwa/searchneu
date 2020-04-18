@@ -3,23 +3,13 @@ module "alb" {
   source  = "terraform-aws-modules/alb/aws"
   version = "~> 5.0"
   
-  name = module.label.id
+  name = "searchneu"
 
   load_balancer_type = "application"
 
-  vpc_id             = var.vpc_id
-  subnets            = var.public_subnet_ids
+  vpc_id             = aws_vpc.main.id
+  subnets            = aws_subnet.public.*.id
   security_groups    = [aws_security_group.lb.id]
-  
-  target_groups = [
-    {
-      name_prefix      = "def"
-      backend_protocol = "HTTP"
-      backend_port     = 80
-      vpc_id           = var.vpc_id
-      target_type      = "ip"
-    }
-  ]
 
   http_tcp_listeners = [
     {
@@ -34,30 +24,35 @@ module "alb" {
     }
   ]
 
+  # Set default action to 404
   https_listeners = [
     {
       port               = 443
       protocol           = "HTTPS"
-      certificate_arn    = var.certificate_arn
-      target_group_index = 0
+      certificate_arn    = aws_acm_certificate.cert.arn
+      action_type        = "fixed-response"
+      fixed_response = {
+        content_type = "text/html"
+        status_code  = "404"
+      }
     }
   ]
 
   tags = {
-    Environment = var.stage
+    Description = "Load balance traffic to all envs"
   }
 }
 
 # ALB Security Group: Edit to restrict access to the application
 resource "aws_security_group" "lb" {
-  name        = "${module.label.id}-load-balancer-security-group"
+  name        = "load-balancer-security-group"
   description = "controls access to the ALB"
-  vpc_id      = var.vpc_id
+  vpc_id      = aws_vpc.main.id
 
   ingress {
     protocol    = "tcp"
     from_port   = 80
-    to_port     = var.app_port
+    to_port     = 80
     cidr_blocks = ["0.0.0.0/0"]
   }
 

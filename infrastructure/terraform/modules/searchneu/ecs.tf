@@ -56,7 +56,7 @@ resource "aws_ecs_service" "main" {
   }
 
   load_balancer {
-    target_group_arn = module.alb.target_group_arns[0]
+    target_group_arn = aws_lb_target_group.webserver.arn
     container_name   = "${module.label.id}-webserver"
     container_port   = var.app_port
   }
@@ -291,7 +291,7 @@ resource "aws_security_group" "ecs_tasks" {
     protocol        = "tcp"
     from_port       = var.app_port
     to_port         = var.app_port
-    security_groups = [aws_security_group.lb.id]
+    security_groups = [var.alb_sg_id]
   }
 
   egress {
