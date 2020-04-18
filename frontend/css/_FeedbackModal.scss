@@ -1,33 +1,32 @@
 .FeedbackModal {
-  
   &__pill {
-      position: fixed;
-      bottom: 2%;
-      right: 2%;
-      z-index: 30;
-      display: flex;
-      align-items: center;
-      height: 32px;
-      width: 160px;
-      border: 1px solid rgba(79, 79, 79, 0.5);
-      border-radius: 20px;
-      background: #FFFFFF;
+    position: fixed;
+    bottom: 2%;
+    right: 2%;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    height: 32px;
+    width: 160px;
+    border: 1px solid rgba(79, 79, 79, 0.5);
+    border-radius: 20px;
+    background: #fff;
 
-      &:hover {
-        cursor: pointer;
-        box-shadow: 0 0 5px rgba(51, 142, 241, 0.5);
-      }
-      
-      &:focus {
-        outline: none;
-      }
+    &:hover {
+      cursor: pointer;
+      box-shadow: 0 0 5px rgba(51, 142, 241, 0.5);
+    }
 
-
+    &:focus {
+      outline: none;
+    }
   }
+
   &__pill > svg {
     position: relative;
-    left: 4%
+    left: 4%;
   }
+
   &__pill > p {
     position: relative;
     left: 7%;
@@ -47,15 +46,15 @@
     right: 1.5%;
     width: 224px;
     height: 284px;
-    background: #F6F6F6;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.25);
+    background: #f6f6f6;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.25);
     border-radius: 3px;
   }
 
   &__popoutHeader {
     height: 38px;
-    background: #0A3767;
-    border-radius: 3px 3px 0px 0px;
+    background: #0a3767;
+    border-radius: 3px 3px 0 0;
     display: flex;
     align-items: center;
   }
@@ -71,10 +70,9 @@
     display: flex;
     align-items: center;
     height: 60px;
-    border-bottom: 1px solid #DBD9D9
-  
-
+    border-bottom: 1px solid #dbd9d9;
   }
+
   &__popoutSubHeader > p {
     color: black;
     margin-left: 14px;
@@ -82,7 +80,6 @@
     font-size: 16px;
     line-height: 23px;
     user-select: none;
-
   }
 
   &__checkBoxes {
@@ -100,12 +97,10 @@
     margin-bottom: 5px;
     width: 200px;
     border-radius: 3px;
+
     &:hover {
-      background: #EAEAEA;
-
+      background: #eaeaea;
     }
-    
-
   }
 
   &__checkboxText {
@@ -162,10 +157,10 @@
   }
 
   &__checkboxText > input:checked + .FeedbackModal__checkboxBox {
-    background: #338EF1;
-    border-color: #338EF1;
+    background: #338ef1;
+    border-color: #338ef1;
   }
-  
+
   &__checkboxText:hover > input:not(:checked) + .FeedbackModal__checkboxBox {
     background-color: rgba(51, 142, 241, 0.1);
     border: 1px solid rgba(0, 0, 0, 0.8);
@@ -176,7 +171,7 @@
   }
 
   &__submit {
-    background: #338EF1;
+    background: #338ef1;
     width: 210px;
     height: 24px;
     border-radius: 4px;
@@ -192,7 +187,7 @@
     }
 
     &--submitted {
-      background:  #81C860;
+      background: #81c860;
       width: 210px;
       height: 24px;
       border-radius: 4px;
@@ -202,12 +197,11 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      
+
       &:focus {
         outline: none;
       }
     }
-
   }
 
   &__submit--submitted > p {
@@ -216,7 +210,6 @@
     text-align: center;
     align-self: center;
     user-select: none;
-
   }
 
   &__submit > p {
@@ -226,6 +219,4 @@
     align-self: center;
     user-select: none;
   }
-
-
 }
