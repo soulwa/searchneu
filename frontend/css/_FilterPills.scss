@@ -17,15 +17,20 @@
   }
 
   &__clear {
-    cursor: pointer;
-    color: #d41b2c;
     padding: 0 10px;
-    line-height: 30px;
   }
+}
 
-  &__clear:hover {
-    text-decoration: underline;
-  }
+/* any class that ends with __clear will have these rules: */
+div [class$="__clear"] {
+  display: inline;
+  cursor: pointer;
+  color: #d41b2c;
+  line-height: 30px;
+}
+
+div [class$="__clear"]:hover {
+  text-decoration: underline;
 }
 
 .FilterPill {

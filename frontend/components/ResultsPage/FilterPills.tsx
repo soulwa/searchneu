@@ -28,7 +28,7 @@ function FilterPill({ verbose, compact, onClose }: PillProps) {
   )
 }
 
-interface FilterPillsProps {
+ interface FilterPillsProps {
   filters: FilterSelection
   setFilters: (f: FilterSelection) => void
 }
