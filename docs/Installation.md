@@ -141,7 +141,7 @@ babel-node simplifyProfList.js
 
 ### Build the code for production
 
-This command will build the frontend and backend for production. This will transform the ES6 to ES5 so it will run in `node` directly, (without `babel-node`) and in many different browsers. When you push a branch, travis will make sure that `yarn build` works. 
+This command will build the frontend and backend for production. This will transform the ES6 to ES5 so it will run in `node` directly, (without `babel-node`) and in many different browsers. 
 
 ```bash
 yarn build
