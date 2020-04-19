@@ -1012,7 +1012,7 @@ app.get('/data/*', wrap(async (req, res, next) => {
 
 app.use(express.static('public'));
 
-app.get('/sitemap.xml', wrap(async (req, res, next) => res.send(await generateSitemap())))
+app.get('/sitemap.xml', wrap(async (req, res) => res.send(await generateSitemap())))
 
 // Google Search Console Site Verification.
 // I could make this a static file... but it is never going to change so though this would be easier.
