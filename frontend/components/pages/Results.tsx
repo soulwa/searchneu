@@ -133,7 +133,7 @@ export default function Results() {
           { filtersApplied
           && <FilterPills filters={ filters } setFilters={ setQParams } />}
           {!isReady && <div style={{ visibility: 'hidden' }} />}
-          {isReady && results.length === 0 && <EmptyResultsContainer query ={ query } filtersApplied= { filtersApplied } setFilters= { setQParams } /> }
+          {isReady && results.length === 0 && <EmptyResultsContainer query={ query } filtersApplied={ filtersApplied } setFilters={ setQParams } /> }
           {isReady && results.length > 0
             && (
               <ResultsLoader
