@@ -27,6 +27,7 @@ import notifyer from './notifyer';
 import database from './database';
 import graphql from './graphql';
 import HydrateCourseSerializer from './database/serializers/hydrateCourseSerializer';
+import generateSitemap from './generateSitemap';
 
 // This file manages every endpoint in the backend
 // and calls out to respective files depending on what was called
@@ -1010,6 +1011,8 @@ app.get('/data/*', wrap(async (req, res, next) => {
 
 
 app.use(express.static('public'));
+
+app.get('/sitemap.xml', wrap(async (req, res, next) => res.send(await generateSitemap())))
 
 // Google Search Console Site Verification.
 // I could make this a static file... but it is never going to change so though this would be easier.
