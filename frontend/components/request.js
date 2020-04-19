@@ -32,15 +32,6 @@ import macros from './macros';
 
 // Prefix to store keys in localstorage
 
-// These are just for analytics over web requests with Grafana + Kibana.
-// No user info (email, name, etc) is recorded.
-const sessionToken = String(Math.random()).slice(2);
-const pageLoadTime = Date.now();
-if (!window.localStorage.analyticsId) {
-  window.localStorage.analyticsId = String(Math.random()).slice(2);
-}
-const analyticsId = window.localStorage.analyticsId;
-
 class Request {
   async getFromInternet(config) {
     return new Promise((resolve, reject) => {
@@ -94,14 +85,6 @@ class Request {
 
       // Add the session token to the request.
       const url = new URI(config.url);
-      url.addQuery('sessionToken', sessionToken);
-      url.addQuery('analyticsId', analyticsId);
-      url.addQuery('pageLoadTime', pageLoadTime);
-      url.addQuery('windowInnerWidth', window.innerWidth);
-      url.addQuery('windowInnerHeight', window.innerHeight);
-      url.addQuery('windowScrollY', window.scrollY);
-      url.addQuery('clientNow', Date.now());
-
       xmlhttp.open(config.method, url.toString(), true);
 
       if (config.method === 'POST') {
