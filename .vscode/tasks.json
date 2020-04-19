@@ -1,0 +1,9 @@
+{
+  "version": "2.0.0",
+  "tasks": [{
+    "label": "build babel backend",
+    "type": "shell",
+    "command": "npx babel --extensions '.js,.ts' backend -d dist/backend -D -s; npx babel --extensions '.js,.ts' common -d dist/common -s",
+    "group": "build"
+  }]
+}
