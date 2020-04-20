@@ -10,7 +10,7 @@ export default function FeedbackModal() {
   const [submitted, setSubmitted] = useState(false);
   const modalRef = useRef(null);
   const keyString = 'MODAL'
-  const show = useFeedbackSchedule(submitted, keyString, 86400000);
+  const [show, setFinished] = useFeedbackSchedule(keyString, 86400000);
 
   const feedbackOptions = ['Class time', 'Professor', 'Prereqs', 'Something else'];
 
@@ -62,7 +62,7 @@ export default function FeedbackModal() {
             )}
           </CheckboxGroup>
         </div>
-        <div className={ !submitted ? 'FeedbackModal__submit' : 'FeedbackModal__submit--submitted' } role='button' tabIndex={ 0 } onClick={ () => { setSubmitted(true); macros.logAmplitudeEvent('Feedback modal submit', { lookingFor: selectedFeedback }); } }>
+        <div className={ !submitted ? 'FeedbackModal__submit' : 'FeedbackModal__submit--submitted' } role='button' tabIndex={ 0 } onClick={ () => { setSubmitted(true); setFinished(); macros.logAmplitudeEvent('Feedback modal submit', { lookingFor: selectedFeedback }); } }>
           <p>{!submitted ? 'SEND FEEDBACK' : 'THANK YOU!' }</p>
         </div>
       </div>

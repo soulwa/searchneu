@@ -1,14 +1,12 @@
 import { useState, useEffect } from 'react';
 
-export default function useFeedbackSchedule(finished: boolean, keyString: string, timeout: number) : boolean {
+export default function useFeedbackSchedule(keyString: string, timeout: number) : [boolean, () => void] {
   const [show, setShow] = useState(true);
 
-  useEffect(() => {
-    if (finished) {
-      setTimeout(() => { localStorage.setItem(keyString, 'true') }, 2000);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [finished]);
+  const setFinished = () => {
+    setTimeout(() => { localStorage.setItem(keyString, 'true') }, 2000);
+  }
+
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
@@ -30,5 +28,5 @@ export default function useFeedbackSchedule(finished: boolean, keyString: string
   });
 
 
-  return show;
+  return [show, setFinished];
 }

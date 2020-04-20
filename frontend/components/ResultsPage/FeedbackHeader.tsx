@@ -17,7 +17,7 @@ export default function FeedbackHeader({ searchQuery, selectedFilters, searchRes
   const [no, setNo] = useState(false);
   const [feedbackQuery, setFeedbackQuery] = useState('');
   const keyString = 'FEEDBACK';
-  const show = useFeedbackSchedule(yes, keyString, 86400000);
+  const [show, setFinished] = useFeedbackSchedule(keyString, 86400000);
 
 
   return (
@@ -39,6 +39,7 @@ export default function FeedbackHeader({ searchQuery, selectedFilters, searchRes
                     macros.logAmplitudeEvent('Feedback header click', {
                       isYes: true, searchQuery: searchQuery, selectedFilters: selectedFilters, searchResults: searchResults.slice(0, 3),
                     });
+                    setFinished();
                   } }
                 >
                   {macros.isMobile ? 'Y' : 'Yes'}
@@ -75,6 +76,7 @@ export default function FeedbackHeader({ searchQuery, selectedFilters, searchRes
                     if (event.key === 'Enter') {
                       setYes(true);
                       setNo(false);
+                      setFinished();
                       macros.logAmplitudeEvent('Feedback header user enter input', {
                         feedbackQuery: feedbackQuery, searchQuery: searchQuery, selectedFilters: selectedFilters, searchResults: searchResults.slice(0, 3),
                       })
