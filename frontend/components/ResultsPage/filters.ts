@@ -59,12 +59,17 @@ const CLASSTYPE_SPEC: FilterSpec<'Checkboxes'> = {
 const CLASSIDRANGE_SPEC: FilterSpec<'Range'> = {
   category: FilterCategories.Range, default: { min:'', max:'' }, display: 'Course Number', order: 5,
 }
+const CAMPUS_SPEC: FilterSpec<'Checkboxes'> = {
+  category: FilterCategories.Checkboxes, default: [], display: 'Campus', order: 6,
+}
+
 export const FILTER_SPECS = {
   online: ONLINE_SPEC,
   nupath: NUPATH_SPEC,
   subject: SUBJECT_SPEC,
   classType: CLASSTYPE_SPEC,
   classIdRange: CLASSIDRANGE_SPEC,
+  campus: CAMPUS_SPEC,
 }
 
 // A specification for a filter of category C. Needed for conditional types
