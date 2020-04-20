@@ -149,91 +149,43 @@ describe('search', () => {
     });
   });
 
-  // TODO your macro for later:
-  // /it(wV%yNw%pko/searcher.searchdt(iprodSearch:w/it(wV%jdhN
-
   describe('filter aggregations', () => {
-    it('gives no aggregations', async () => {
-      expect((await prodSearch('fundies', '202110', 0, 10, {})).data.filterOptions).toEqual({});
+    let unfilteredAggregations;
+    beforeEach(async () => {
+      unfilteredAggregations = (await prodSearch('', '2020110', 0, 1)).data.filterOptions;
     });
 
-    it('gives multiple aggregations for a single filter with multiple options', async () => {
-      const filters = { nupath: ['NU Core/NUpath Adv Writ Dscpl', 'NUpath Interpreting Culture'] };
-      expect((await prodSearch('science', '202110', 0, 10, filters)).data.filterOptions).toEqual({
-        // these guys should be OR'd. When getting their aggregation, ignore the selection of other filters of their kind.
-        nupath: [
-          {
-            value: 'NU Core/NUpath Adv Writ Dscpl',
-            count: 30,
-          },
-          {
-            value: 'NUpath Interpreting Culture',
-            count: 50,
-          },
-        ],
-      });
+    it('leaves aggregations unchanged if no filters applied', async () => {
+      const aggResults = (await prodSearch('fundies', '202110', 0, 10)).data.filterOptions;
+      expect(Object.keys(aggResults).length).not.toEqual(0);
+      expect((await prodSearch('fundies', '2020110', 0, 10)).data.filterOptions).toEqual(unfilteredAggregations);
     });
 
-    it('gives an AND count for aggregations of multiple filters', async () => {
-      const filters = {
-      };
-
-      expect((await prodSearch('science', '202110', 0, 10, filters))).toEqual({
-        // these guys should be ANDed together
-        sectionsAvailable: {
-          value: true,
-          count: 50,
-        },
-        online: {
-          value: true,
-          count: 30,
-        },
-      });
+    it('does not provide aggregations for selected filters', async () => {
+      const filters = { nupath: ['Interpreting Culture'], subject: ['CS'] };
+      const aggResults = (await prodSearch('fundies', '202110', 0, 1, filters)).data.filterOptions;
+      expect(aggResults.nupath.every(({ value }) => value.indexOf('Interpreting Culture') < 0)).toBeTruthy();
+      expect(aggResults.subject.every(({ value }) => value.indexOf('CS') < 0)).toBeTruthy();
     });
+
+    it('does not affect aggregation counts if filter of same type applied', async () => {
+
+    });
+    
+    it('ANDs the aggregation arithmetic when filters of different types applied', async () => {
+      const filters = { nupath: ['Interpreting Culture'], subject: ['CS'] };
+      const aggResults = (await prodSearch('fundies', '202110', 0, 1, filters)).data.filterOptions;
+
+      // expect each 
+    });
+
+    it('ORs the aggregation arithmetic when filters of same type applied', async () => {
+    });
+
+    it('removes aggregations for those values that have a count of zero', async () => {
+    });
+
+
   });
 });
 
-/*
-describe('searcher', () => {
-  describe('filter aggregations', () => {
-    it('gives an OR count for aggregations with multiple filters of the same kind', async () => {
-      const filters = {
-        sectionsAvailable: true,
-        classType: ['Lab', 'Lecture'],
-      };
-
-      expect((await searcher.search('science', '202110', 0, 10, filters))).toEqual({
-        // these guys should be ANDed together
-        sectionsAvailable: {
-          value: true,
-          count: 50,
-        },
-        classType: [
-          {
-            value: 'Lab',
-            count: 100,
-          },
-          {
-            value: 'Lecture',
-            count: 30,
-          },
-        ],
-      });
-    });
-  });
-
-
-  TODO Tests with no home :(
-
-
-    it('filter for class type of seminar', async () => {
-      const classTypeFilter = { classType: ['Seminar'] };
-      const allResults = (await prodSearch('2500', '202110', 0, 20, classTypeFilter)).data.results;
-      expect(allResults.length > 0).toBe(true);
-      allResults.forEach((result) => {
-        console.log(result.class);
-        expect(result.class.classType).toBe(classTypeFilter.classType)
-      });
-    });
-});
-*/
