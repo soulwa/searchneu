@@ -151,41 +151,58 @@ describe('search', () => {
 
   describe('filter aggregations', () => {
     let unfilteredAggregations;
+    let unfilteredAggCounts;
+
     beforeEach(async () => {
-      unfilteredAggregations = (await prodSearch('', '2020110', 0, 1)).data.filterOptions;
+      unfilteredAggregations = (await prodSearch('', '202110', 0, 1)).data.filterOptions;
+      unfilteredAggCounts = unfilteredAggregations.nupath.reduce((pathToCount, { value, count }) => {
+        return {
+          ...pathToCount,
+          [value]: count,
+        };
+      }, {});
     });
 
     it('leaves aggregations unchanged if no filters applied', async () => {
-      const aggResults = (await prodSearch('fundies', '202110', 0, 10)).data.filterOptions;
+      const aggResults = (await prodSearch('', '202110', 0, 10)).data.filterOptions;
       expect(Object.keys(aggResults).length).not.toEqual(0);
-      expect((await prodSearch('fundies', '2020110', 0, 10)).data.filterOptions).toEqual(unfilteredAggregations);
+      expect(aggResults).toEqual(unfilteredAggregations);
     });
 
     it('does not provide aggregations for selected filters', async () => {
       const filters = { nupath: ['Interpreting Culture'], subject: ['CS'] };
-      const aggResults = (await prodSearch('fundies', '202110', 0, 1, filters)).data.filterOptions;
+      const aggResults = (await prodSearch('', '202110', 0, 1, filters)).data.filterOptions;
       expect(aggResults.nupath.every(({ value }) => value.indexOf('Interpreting Culture') < 0)).toBeTruthy();
       expect(aggResults.subject.every(({ value }) => value.indexOf('CS') < 0)).toBeTruthy();
     });
 
-    it('does not affect aggregation counts if filter of same type applied', async () => {
+    it('does not affect aggregation counts of filters of the type of the selected', async () => {
+      const filters = { nupath: ['Interpreting Culture'] };
+      const aggResults = (await prodSearch('', '202110', 0, 1, filters)).data.filterOptions;
 
+      aggResults.nupath.forEach(({ value, count }) => expect(unfilteredAggCounts[value]).toEqual(count));
     });
-    
+
     it('ANDs the aggregation arithmetic when filters of different types applied', async () => {
       const filters = { nupath: ['Interpreting Culture'], subject: ['CS'] };
-      const aggResults = (await prodSearch('fundies', '202110', 0, 1, filters)).data.filterOptions;
+      const aggResults = (await prodSearch('', '202110', 0, 1, filters)).data.filterOptions;
 
-      // expect each 
+      aggResults.nupath.forEach(({ value, count }) => expect(count).toBeLessThan(unfilteredAggCounts[value]));
     });
 
     it('ORs the aggregation arithmetic when filters of same type applied', async () => {
+      const filters = { nupath: ['Interpreting Culture', 'Writing Intensive'] };
+      const aggResults = (await prodSearch('', '202110', 0, 1, filters)).data.filterOptions;
+
+      aggResults.nupath.forEach(({ value, count }) => expect(unfilteredAggCounts[value]).toEqual(count));
     });
 
     it('removes aggregations for those values that have a count of zero', async () => {
+      const filters = { online: true, classType: ['Seminar'] };
+      const aggResults = (await prodSearch('', '202110', 0, 1, filters)).data.filterOptions;
+
+      expect(aggResults.nupath.every(({ count }) => count !== 0)).toBeTruthy();
     });
-
-
   });
 });
 
