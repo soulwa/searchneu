@@ -4,11 +4,8 @@ One of the big beliefs with adding new features, designs, and functionality to S
 
 # The stack
 
-React is used for the Frontend and Node.js is used on the backend. The site itself runs on Amazon Web Services. The scrapers run as a daily cron job on Travis-CI and scrape a lot of data from many different parts of Northeastern's website. The data is first stored as static files on Travis ([Build History](https://travis-ci.org/ryanhugh/searchneu/builds)). After the scrapers run, the files are uploaded to the AWS instance and the production server is updated. The production server itself is lightweight, and only does two things: serve static files (build frontend code and the data files) and process search queries. The server itself is sitting behind CloudFlare which provides free https and helps with caching. The frontend is built with React and Webpack, and follow the standard React development patterns. Redux isn't used yet but may be added in the future. 
+React is used for the Frontend and Node.js is used on the backend. The site itself runs on Amazon Web Services on ECS. A scheduled task is set to trigger the scrapers every night. An updater to get seat data and send notifications to subscribed users runs in an ECS service as well. The server itself is sitting behind CloudFlare which provides free https and helps with caching. The frontend is built with React and Webpack, and follow the standard React development patterns. Redux isn't used yet but may be added in the future. 
 
 # Git branches and deploying to production
 
-The master branch is the main branch for all the development. When you push master, or any other branch, travis will build the code for production, run the unit tests, and send you an email if anything fails. When making a PR, request to merge it into the master branch. 
-
-When changes are pushed to the `prod` branch, Travis will also deploy the code to the production server and update the searchneu npm package [here](https://www.npmjs.com/package/searchneu). 
-
+The master branch is the main branch for all the development. Merging into master deploys to staging.searchneu.com. Releasing to searchneu.com must be done by running the reploy script, which catches prod up to staging. When making a PR, request to merge it into the master branch. 
