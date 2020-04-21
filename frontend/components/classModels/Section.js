@@ -218,6 +218,10 @@ class Section {
 
     return 0;
   }
+
+  isOnline() {
+    return this.campus === 'Online';
+  }
 }
 
 

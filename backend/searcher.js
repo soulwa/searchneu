@@ -45,7 +45,6 @@ class Searcher {
       return { exists: { field: 'sections' } };
     };
 
-    // TODO just use the terms query!!!!!!! wtfff
     const getNUpathFilter = (selectedNUpaths) => {
       return { terms: { 'class.nupath.keyword': selectedNUpaths } };
     };
@@ -54,10 +53,9 @@ class Searcher {
       return { terms: { 'class.subject.keyword': selectedSubjects } };
     };
 
-    // note that { online: false } is never in filters
-    const getOnlineFilter = (selectedOnlineOption) => {
-      return { term: { 'sections.online': selectedOnlineOption } };
-    };
+    const getCampusFilter = (selectedCampuses) => {
+      return { terms: { 'sections.campus.keyword': selectedCampuses } };
+    }
 
     const getClassTypeFilter = (selectedClassTypes) => {
       return { terms: { 'sections.classType.keyword': selectedClassTypes } };
@@ -71,19 +69,14 @@ class Searcher {
       return { range: { 'class.classId': { gte: selectedRange.min, lte: selectedRange.max } } };
     };
 
-    const getCampusFilter = (selectedCampuses) => {
-      return { terms: { 'class.campus.keyword': selectedCampuses } };
-    }
-
     return {
       nupath: { validate: isStringArray, create: getNUpathFilter, agg: 'class.nupath.keyword' },
       subject: { validate: isStringArray, create: getSubjectFilter, agg: 'class.subject.keyword' },
-      online: { validate: isTrue, create: getOnlineFilter, agg: false },
+      campus: { validate: isStringArray, create: getCampusFilter, agg: 'sections.campus.keyword' },
       classType: { validate: isStringArray, create: getClassTypeFilter, agg: 'sections.classType.keyword' },
       sectionsAvailable: { validate: isTrue, create: getSectionsAvailableFilter, agg: false },
       classIdRange: { validate: isRange, create: getRangeFilter, agg: false },
       termId: { validate: isString, create: getTermIdFilter, agg: false },
-      campus: { validate: isStringArray, create: getCampusFilter, agg: 'class.campus.keyword' },
     };
   }
 

@@ -11,7 +11,7 @@ import PropTypes from 'prop-types';
 
 function WeekdayBoxes(props) {
   // Don't render anything if the class is online.
-  if (props.section.online) {
+  if (props.section.isOnline()) {
     return null;
   }
 
