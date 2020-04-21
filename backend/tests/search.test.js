@@ -41,44 +41,12 @@ describe('searcher', () => {
 
     it('keeps all valid filters', () => {
       const validFilters = {
-        NUpath: ['NU Core/NUpath Adv Writ Dscpl', 'NUpath Interpreting Culture'],
-        college: ['UG Col Socl Sci & Humanities', 'GS Col of Arts', 'Computer&Info Sci'],
+        nupath: ['NU Core/NUpath Adv Writ Dscpl', 'NUpath Interpreting Culture'],
         subject: ['ENGW', 'ARTG', 'CS'],
         online: true,
-        classType: 'Lecture',
+        classType: ['Lecture'],
       };
       expect(searcher.validateFilters(validFilters)).toMatchObject(validFilters);
-    });
-  });
-
-  describe('getClassFilterQuery', () => {
-    it('converts filters to es class filters', () => {
-      const termId = '202110';
-      const filters = {
-        NUpath: ['NU Core/NUpath Adv Writ Dscpl', 'NUpath Interpreting Culture'],
-        college: ['UG Col Socl Sci & Humanities', 'GS Col of Arts', 'Computer&Info Sci'],
-        subject: ['ENGW', 'ARTG', 'CS'],
-        online: true,
-        classType: 'Lecture',
-      };
-      const esFilters = searcher.getClassFilterQuery(termId, filters);
-      const expectedEsFilters = [{ exists: { field: 'sections' } }, { term: { 'class.termId': '202110' } },
-        {
-          bool: {
-            should: [{ match_phrase: { 'class.classAttributes': 'NU Core/NUpath Adv Writ Dscpl' } },
-              { match_phrase: { 'class.classAttributes': 'NUpath Interpreting Culture' } }],
-          },
-        },
-        {
-          bool: {
-            should: [{ match_phrase: { 'class.classAttributes': 'UG Col Socl Sci & Humanities' } },
-              { match_phrase: { 'class.classAttributes': 'GS Col of Arts' } },
-              { match_phrase: { 'class.classAttributes': 'Computer&Info Sci' } }],
-          },
-        },
-        { bool: { should: [{ match: { 'class.subject': 'ENGW' } }, { match: { 'class.subject': 'ARTG' } }, { match: { 'class.subject': 'CS' } }] } },
-        { term: { 'sections.online': true } }, { match: { 'class.scheduleType': 'Lecture' } }];
-      expect(esFilters).toMatchObject({ bool:{ must: expectedEsFilters } });
     });
   });
 });
