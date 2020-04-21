@@ -101,71 +101,6 @@ afterAll(async () => {
   await sequelize.close();
 });
 
-describe('bulkJSON', () => {
-  it('generates proper JSON for a class', async () => {
-    const course = await Course.findByPk('neu.edu/202030/CS/2500');
-    const results = await Course.bulkJSON([course]);
-    expect(results).toMatchSnapshot();
-  });
-
-  it('includes prerequisites and corequisites if they exist', async () => {
-    // obviously...
-    const prereqs = {
-      type: 'and',
-      values: [
-        {
-          subject: 'CS',
-          classId: '2510',
-        },
-      ],
-    };
-
-    const coreqs = {
-      type: 'and',
-      values: [
-        {
-          subject: 'CS',
-          classId: '2501',
-        },
-      ],
-    };
-
-    const prereqsFor = {
-      values: [
-        {
-          subject: 'CS',
-          classId: '2510',
-        },
-        {
-          subject: 'CS',
-          classId: '2800',
-        },
-      ],
-    };
-
-    const optPrereqsFor = {
-      values: [
-        {
-          subject: 'CS',
-          classId: '3200',
-        },
-      ],
-    };
-
-    await Course.update({
-      prereqs: prereqs,
-      coreqs: coreqs,
-      prereqsFor: prereqsFor,
-      optPrereqsFor: optPrereqsFor,
-    }, { where: { id: 'neu.edu/202030/CS/2500' }, hooks: false });
-
-    const course = await Course.findByPk('neu.edu/202030/CS/2500');
-    const results = await Course.bulkJSON([course]);
-
-    expect(results).toMatchSnapshot();
-  });
-});
-
 describe('bulkUpsertES', () => {
   it('upserts to ES', async () => {
     const course = await Course.findByPk('neu.edu/202030/CS/2500');
@@ -175,36 +110,9 @@ describe('bulkUpsertES', () => {
   });
 });
 
-describe('afterBulkCreate', () => {
-  it('updates ES', async () => {
-    await Course.bulkCreate([{ name: 'Fundies 1', id: 'neu.edu/202030/CS/2500' }], { where: { id: 'neu.edu/202030/CS/2500' }, updateOnDuplicate: ['name'] });
-    expect(elastic.bulkIndexFromMap.mock.calls[0]).toMatchSnapshot();
-  });
-});
-
 describe('afterBulkUpdate', () => {
   it('updates ES', async () => {
     await Course.update({ name: 'Fundies 1' }, { where: { id: 'neu.edu/202030/CS/2500' } });
     expect(elastic.bulkIndexFromMap.mock.calls[0]).toMatchSnapshot();
-  });
-});
-
-describe('toJSON', () => {
-  it('generates the correct object', async () => {
-    const course = await Course.findByPk('neu.edu/202030/CS/2500');
-    expect(course.toJSON()).toEqual({
-      classAttributes: ['hebloo'],
-      maxCredits: 4,
-      minCredits: 4,
-      desc: 'a good class',
-      classId: '2500',
-      prettyUrl: 'https://foo.com',
-      url: 'https://foo.com',
-      name: 'Fundamentals of Computer Science 1',
-      lastUpdateTime: 123456789,
-      termId: '202030',
-      host: 'neu.edu',
-      subject: 'CS',
-    });
   });
 });

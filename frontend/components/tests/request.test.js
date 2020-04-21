@@ -34,9 +34,9 @@ it('should work', async (done) => {
 
 it('should error or something', async (done) => {
   // Retry times must be 1, because async.js doesn't play well with Jest
-  const promise = request.get({ url: '/request', retryTimes: 1 });
+  const promise = request.get({ url: '/request', retryTimes: 0 });
 
-  MockXMLHttpRequest.instance.respondToRequest(404, JSON.stringify('this is a 404'));
+  MockXMLHttpRequest.instance.respondToRequest(404, JSON.stringify('this is a 404'))
 
   try {
     await promise;

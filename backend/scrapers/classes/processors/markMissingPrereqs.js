@@ -4,9 +4,9 @@
  */
 
 import macros from '../../../macros';
-import ellucianRequisitesParser from '../parsers/ellucianRequisitesParser';
 import BaseProcessor from './baseProcessor';
 import Keys from '../../../../common/Keys';
+import simplifyRequirements from './simplifyPrereqs';
 
 // This file process the prereqs on each class and ensures that they point to other, valid classes.
 // If they point to a class that does not exist, they are marked as missing.
@@ -55,12 +55,12 @@ class MarkMissingPrereqs extends BaseProcessor.BaseProcessor {
         const prereqs = this.updatePrereqs(aClass.prereqs, aClass.host, aClass.termId, keyToRows);
 
         // And simplify tree again
-        aClass.prereqs = ellucianRequisitesParser.simplifyRequirements(prereqs);
+        aClass.prereqs = simplifyRequirements(prereqs);
       }
 
       if (aClass.coreqs) {
         const coreqs = this.updatePrereqs(aClass.coreqs, aClass.host, aClass.termId, keyToRows);
-        aClass.coreqs = ellucianRequisitesParser.simplifyRequirements(coreqs);
+        aClass.coreqs = simplifyRequirements(coreqs);
 
 
         // Remove honors coreqs from classes that are not honors

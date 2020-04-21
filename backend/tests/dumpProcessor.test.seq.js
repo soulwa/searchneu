@@ -5,6 +5,9 @@
 
 import dumpProcessor from '../dumpProcessor';
 import db from '../database/models/index';
+import elastic from '../elastic';
+
+jest.spyOn(elastic, 'bulkIndexFromMap').mockResolvedValue(true);
 
 const Professor = db.Professor;
 const Course = db.Course;
@@ -21,6 +24,7 @@ beforeEach(async () => {
 });
 
 afterAll(async () => {
+  jest.restoreAllMocks();
   await db.sequelize.close();
 });
 

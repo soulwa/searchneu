@@ -9,3 +9,5 @@ coverage
 .DS_Store
 .idea
 kibana.yml
+data/*
+!data/major.json

@@ -37,42 +37,17 @@ class Elastic {
    * @param  {Object} mapping   The new elasticsearch index mapping(schema)
    */
   async resetIndex(indexName, mapping) {
-    // Clear out the index.
-    await client.indices.delete({ index: indexName }).catch(() => {});
+    const exists = (await client.indices.exists({ index: indexName })).statusCode === 200;
+    if (exists) {
+      // Clear out the index.
+      macros.log('deleting index', indexName);
+      await client.indices.delete({ index: indexName });
+    }
     // Put in the new classes mapping (elasticsearch doesn't let you change mapping of existing index)
+    macros.log('inserting mapping for index', indexName);
     await client.indices.create({
       index: indexName,
       body: mapping,
-    });
-  }
-
-  /**
-   * Ensures that an index exists. Creates it (with the given mapping) if it doesn't exist.
-   * @param  {string} indexName The index to insert into
-   * @param  {Object} mapping   The new elasticsearch index mapping(schema)
-   */
-  async ensureIndexExists(indexName, mapping) {
-    const results = await client.indices.exists({ index: indexName });
-
-    // If the index doesn't exist, create it.
-    if (results.statusCode !== 200) {
-      await client.indices.create({
-        index: indexName,
-        body: mapping,
-      });
-    }
-  }
-
-  /**
-   * Inserts a singular doc into an index.
-   * @param  {string} indexName The index to insert into
-   * @param  {Object} doc   The new doc to insert into the index.
-   * TODO: I guess this is necessary? same as below
-   */
-  insertDoc(indexName, doc) {
-    return client.index({
-      index: indexName,
-      body: doc,
     });
   }
 
@@ -84,14 +59,15 @@ class Elastic {
    */
   async bulkIndexFromMap(indexName, map) {
     const chunks = _.chunk(Object.keys(map), BULKSIZE);
-    return pMap(chunks, (chunk, chunkNum) => {
-      macros.log(`indexed ${chunkNum * BULKSIZE} docs into ${indexName}`);
+    return pMap(chunks, async (chunk, chunkNum) => {
       const bulk = [];
       for (const id of chunk) {
         bulk.push({ index: { _id: id } });
         bulk.push(map[id]);
       }
-      return client.bulk({ index: indexName, refresh: 'wait_for', body: bulk });
+      const res = await client.bulk({ index: indexName, body: bulk });
+      macros.log(`indexed ${chunkNum * BULKSIZE + chunk.length} docs into ${indexName}`);
+      return res;
     },
     { concurrency: 1 });
   }

@@ -38,7 +38,7 @@ class DumpProcessor {
       const processedChunk = classChunk.map((aClass) => { return this.processClass(aClass, coveredTerms); });
       return Course.bulkCreate(processedChunk, { updateOnDuplicate: courseAttributes });
     });
-    await Promise.all(classPromises);
+    const courseInstances = (await Promise.all(classPromises)).flat();
 
     const secPromises = _.chunk(termDump.sections, this.CHUNK_SIZE).map(async (secChunk) => {
       const processedChunk = secChunk.map((section) => { return this.processSection(section); });
@@ -55,6 +55,8 @@ class DumpProcessor {
         },
       });
     }
+    // Upsert ES
+    await Course.bulkUpsertES(courseInstances);
     sequelize.options.logging = true;
   }
 

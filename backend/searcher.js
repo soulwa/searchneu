@@ -174,7 +174,6 @@ class Searcher {
     const classFilters = _(filters).pick(Object.keys(this.filters)).toPairs().map(([key, val]) => this.filters[key].create(val))
       .value();
 
-    macros.log(classFilters);
     // very likely this doesn't work
     const aggQuery = !aggregation ? undefined : {
       [aggregation]: {
@@ -219,8 +218,6 @@ class Searcher {
   async getSearchResults(query, termId, min, max, filters) {
     const queries = this.generateMQuery(query, termId, min, max, filters);
     const results = await elastic.mquery(`${elastic.CLASS_INDEX},${elastic.EMPLOYEE_INDEX}`, queries);
-    macros.log('es results')
-    macros.log(JSON.stringify(results, null, 2));
     return this.parseResults(results.body.responses, Object.keys(this.aggFilters));
   }
 
@@ -244,15 +241,21 @@ class Searcher {
    */
   async search(query, termId, min, max, filters = {}) {
     await this.initializeSubjects();
+    const start = Date.now();
     const {
       output, resultCount, took, aggregations,
     } = await this.getSearchResults(query, termId, min, max, filters);
+    const startHydrate = Date.now();
     const results = await (new HydrateSerializer(Section)).bulkSerialize(output);
 
     return {
       searchContent: results,
       resultCount,
-      took,
+      took: {
+        total: Date.now() - start,
+        hydrate: Date.now() - startHydrate,
+        es: took,
+      },
       aggregations,
     };
   }

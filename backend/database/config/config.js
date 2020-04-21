@@ -18,6 +18,7 @@ module.exports = {
     database: 'searchneu_test',
     host: '127.0.0.1',
     dialect: 'postgres',
+    logging: false,
   },
   prod: {
     username: process.env.dbUsername,

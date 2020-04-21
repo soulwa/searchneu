@@ -1,0 +1,44 @@
+name: Tests
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: install node v12
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12
+    - run: yarn install
+    - run: yarn test
+  seqtest:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:11.5
+        env:
+          POSTGRES_DB: searchneu_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD:
+        # needed because the postgres container does not provide a healthcheck
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+        ports:
+          - 5432:5432
+      elasticsearch:
+        image: elasticsearch:7.1.0
+        env:
+          discovery.type: single-node
+        ports:
+          - 9200:9200
+        options: --health-cmd "curl localhost:9200/_cluster/health" --health-interval 10s --health-timeout 5s --health-retries 5
+    steps:
+    - uses: actions/checkout@v1
+    - name: install node v12
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12
+    - run: yarn install
+    - run: yarn test:migrate
+    - run: yarn seqtest
