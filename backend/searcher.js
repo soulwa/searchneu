@@ -71,6 +71,10 @@ class Searcher {
       return { range: { 'class.classId': { gte: selectedRange.min, lte: selectedRange.max } } };
     };
 
+    const getCampusFilter = (selectedCampuses) => {
+      return { terms: { 'class.campus.keyword': selectedCampuses } };
+    }
+
     return {
       nupath: { validate: isStringArray, create: getNUpathFilter, agg: 'class.nupath.keyword' },
       subject: { validate: isStringArray, create: getSubjectFilter, agg: 'class.subject.keyword' },
@@ -79,6 +83,7 @@ class Searcher {
       sectionsAvailable: { validate: isTrue, create: getSectionsAvailableFilter, agg: false },
       classIdRange: { validate: isRange, create: getRangeFilter, agg: false },
       termId: { validate: isString, create: getTermIdFilter, agg: false },
+      campus: { validate: isStringArray, create: getCampusFilter, agg: 'class.campus.keyword' },
     };
   }
 
