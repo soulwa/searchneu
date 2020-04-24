@@ -52,7 +52,7 @@ export default class DesktopClassPanel extends BaseClassPanel {
     const aClass = this.props.aClass;
 
     // If the class does not have a waitlist, don't show the waitlist
-    if (!aClass.getHasWaitList()) {
+    if (!aClass.hasWaitList()) {
       return false;
     }
 
@@ -100,7 +100,7 @@ export default class DesktopClassPanel extends BaseClassPanel {
       // Add the Online sections head if there are any sections that are online
       const showWaitList = this.shouldShowWaitlist();
 
-      const showHonorsColumn = aClass.getHasHonorsSections();
+      const showHonorsColumn = aClass.hasHonorsSections();
 
       sectionTable = (
         <table className='ui celled striped table resultsTable'>

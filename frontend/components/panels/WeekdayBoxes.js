@@ -15,9 +15,8 @@ function WeekdayBoxes(props) {
     return null;
   }
 
-
   // Calculate the "Meets on Tuesday, Friday" or "No Meetings found" string that hovers over the weekday boxes
-  const meetingDays = props.section.getWeekDaysAsStringArray();
+  const meetingDays = props.section.getDaysOfWeekAsBooleans();
   let meetingString;
   if (meetingDays.length === 0) {
     meetingString = 'No Meetings found';
@@ -26,7 +25,7 @@ function WeekdayBoxes(props) {
   }
 
   // Calculate the weekday boxes eg [][x][][][x] for Tuesday Friday
-  let booleans = props.section.getWeekDaysAsBooleans();
+  let booleans = props.section.getDaysOfWeekAsBooleans();
   if (!props.section.meetsOnWeekends()) {
     booleans = booleans.slice(1, 6);
   }

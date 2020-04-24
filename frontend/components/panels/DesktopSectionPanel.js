@@ -108,7 +108,7 @@ export default class DesktopSectionPanel extends React.Component {
           tdElements = tdElements.concat([
             <td key='exam1'> {examTimeString} </td>,
             <td key='exam3'> {sectionExamMeeting.endDate.format('MMM Do')} </td>,
-            <td key='exam4'> <LocationLinks locations={ [sectionExamMeeting.where] } /> </td>,
+            <td key='exam4'> <LocationLinks locations={ [sectionExamMeeting.location] } /> </td>,
           ]);
         } else {
           tdElements = tdElements.concat([

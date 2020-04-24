@@ -48,27 +48,53 @@ beforeEach(() => {
   exam = new Meeting(serverDataForExam);
 });
 
-it('Testing basic getters on meeting', () => {
-  expect(meeting.getBuilding()).toBe('Robinson Hall');
-  expect(meeting.getHoursPerWeek()).toBe(3.3);
-  expect(meeting.isExam()).toBe(false);
-  expect(meeting.getIsHidden()).toBe(false);
-  expect(meeting.getMeetsOnWeekends()).toBe(false);
-  expect(meeting.getWeekdayStrings()).toStrictEqual(['Tuesday', 'Friday']);
+describe('Testing basic getters on meeting', () => {
+  it('gets location', () => {
+    expect(meeting.getLocation()).toBe('Robinson Hall');
+  });
+
+  it('gets hours per week', () => {
+    expect(meeting.getHoursPerWeek()).toBe(3.3);
+  });
+
+  it('is exam?', () => {
+    expect(meeting.isExam()).toBe(false);
+  });
+
+  it('meets on weekends', () => {
+    expect(meeting.meetsOnWeekends()).toBe(false);
+  });
+
+  it('getWeekdayStrings', () => {
+    expect(meeting.getWeekdayStrings()).toStrictEqual(['Tuesday', 'Friday']);
+  });
 });
 
 it('Testing getMeetsOnDay', () => {
-  expect(meeting.getMeetsOnDay(DayOfWeek.TUESDAY)).toBe(true);
-  expect(meeting.getMeetsOnDay(DayOfWeek.WEDNESDAY)).toBe(false);
-  expect(exam.getMeetsOnDay(DayOfWeek.SUNDAY)).toBe(false);
-  expect(exam.getMeetsOnDay(DayOfWeek.THURSDAY)).toBe(true);
+  expect(meeting.meetsOnDay(DayOfWeek.TUESDAY)).toBe(true);
+  expect(meeting.meetsOnDay(DayOfWeek.WEDNESDAY)).toBe(false);
+  expect(exam.meetsOnDay(DayOfWeek.SUNDAY)).toBe(false);
+  expect(exam.meetsOnDay(DayOfWeek.THURSDAY)).toBe(true);
 });
 
 it('Testing basic getters on exam', () => {
-  expect(exam.getBuilding()).toBe('Mugar Life Science Building');
-  expect(exam.getHoursPerWeek()).toBe(2);
-  expect(exam.isExam()).toBe(true);
-  expect(exam.getIsHidden()).toBe(false);
-  expect(exam.getMeetsOnWeekends()).toBe(false);
-  expect(exam.getWeekdayStrings()).toStrictEqual(['Thursday']);
+  it('get location', () => {
+    expect(exam.getLocation()).toBe('Mugar Life Science Building');
+  });
+
+  it('gets hours per week', () => {
+    expect(exam.getHoursPerWeek()).toBe(2);
+  });
+
+  it('is exam?', () => {
+    expect(exam.isExam()).toBe(true);
+  });
+
+  it('meets on weekends?', () => {
+    expect(exam.meetsOnWeekends()).toBe(false);
+  });
+
+  it('weekday strings', () => {
+    expect(exam.getWeekdayStrings()).toStrictEqual(['Thursday']);
+  });
 });

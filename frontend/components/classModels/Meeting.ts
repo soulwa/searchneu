@@ -35,25 +35,25 @@ type TimeToMoment = {
 }
 
 class Meeting {
-  where: string;
+  location: string;
 
   startDate: Moment;
 
   endDate: Moment;
 
-  times: MomentTuple[][];
+  times: MomentTuple[];
 
   constructor(serverData : ServerData) {
     if (!serverData) {
       return null;
     }
 
-    this.where = serverData.where;
+    this.location = serverData.where;
 
     // if without spaces and case insensitive is tba, make it TBA
     // TODO: I don't think this code actually triggers
-    if (this.where.replace(/\s/gi, '').toUpperCase() === 'TBA') {
-      this.where = 'TBA';
+    if (this.location.replace(/\s/gi, '').toUpperCase() === 'TBA') {
+      this.location = 'TBA';
     }
 
     //beginning of the day that the class starts/ends
@@ -91,7 +91,6 @@ class Meeting {
       }
     }
 
-
     // returns objects like this: {3540000041400000: Array[3]}
     // if has three meetings per week that meet at the same times
     const groupedByTimeOfDay : TimeToMoment = _.groupBy(timeMoments, (event) => {
@@ -108,18 +107,18 @@ class Meeting {
       return meetingsInAday[0].start.diff(zero);
     });
 
-    this.times = valuesGroupedByTimeOfDay;
+    this.times = _.flatten(valuesGroupedByTimeOfDay);
   }
 
-  getBuilding() : string {
+  getLocation() : string {
     // regex off the room number
-    return this.where.replace(/\d+\s*$/i, '').trim();
+    return this.location.replace(/\d+\s*$/i, '').trim();
   }
 
   getHoursPerWeek() : number {
     let retVal = 0;
 
-    _.flatten(this.times).forEach((time) => {
+    this.times.forEach((time) => {
       // moment#diff returns ms, need hr
       retVal += time.end.diff(time.start) / (1000 * 60 * 60);
     });
@@ -132,13 +131,13 @@ class Meeting {
   getWeekdayStrings() : string[] {
     const retVal = [];
 
-    const flatTimes = _.flatten(this.times);
+    const copyOfTimes = this.times.slice(0);
 
-    flatTimes.sort((a, b) => {
-      return a.start.unix() - b.start.unix()
+    copyOfTimes.sort((a, b) => {
+      return a.start.unix() - b.start.unix();
     });
 
-    flatTimes.forEach((time) => {
+    copyOfTimes.forEach((time) => {
       const weekdayString = time.start.format('dddd');
       if (!retVal.includes(weekdayString)) {
         retVal.push(weekdayString);
@@ -148,23 +147,18 @@ class Meeting {
     return retVal;
   }
 
-  getIsHidden() : boolean {
-    return this.getHoursPerWeek() === 0;
-  }
-
   isExam() : boolean {
     // this could be improved by scraping more data...
     return this.startDate.unix() === this.endDate.unix();
   }
 
-  getMeetsOnDay(dayIndex : DayOfWeek) : boolean {
-    const flatTimes = _.flatten(this.times);
-    return flatTimes.some((time) => { return time.start.day() === dayIndex; });
+  meetsOnDay(dayIndex : DayOfWeek) : boolean {
+    return this.times.some((time) => { return time.start.day() === dayIndex; });
   }
 
-  getMeetsOnWeekends() : boolean {
+  meetsOnWeekends() : boolean {
     return !this.isExam()
-        && this.getMeetsOnDay(DayOfWeek.SUNDAY) || this.getMeetsOnDay(DayOfWeek.SATURDAY);
+        && this.meetsOnDay(DayOfWeek.SUNDAY) || this.meetsOnDay(DayOfWeek.SATURDAY);
   }
 }
 

@@ -12,7 +12,7 @@ import Meeting, { MomentTuple } from './Meeting';
 class Section {
   static requiredPath : string[] = ['host', 'termId', 'subject', 'classId'];
 
-  static optionalPath : string[]= ['crn'];
+  static optionalPath : string[] = ['crn'];
 
   static API_ENDPOINT : string = '/listSections';
 
@@ -63,7 +63,7 @@ class Section {
   }
 
   meetsOnWeekends() : boolean {
-    return this.meetings.some((meeting) => { return meeting.getMeetsOnWeekends(); });
+    return this.meetings.some((meeting) => { return meeting.meetsOnWeekends(); });
   }
 
   getAllMeetingMoments(ignoreExams = true) : MomentTuple[] {
@@ -73,7 +73,7 @@ class Section {
         return;
       }
 
-      retVal = retVal.concat(_.flatten(meeting.times));
+      retVal = retVal.concat(meeting.times);
     });
 
     retVal.sort((a, b) => {
@@ -84,7 +84,7 @@ class Section {
   }
 
   //returns [false,true,false,true,false,true,false] if meeting mon, wed, fri
-  getWeekDaysAsBooleans() : boolean[] {
+  getDaysOfWeekAsBooleans() : boolean[] {
     const retVal = [false, false, false, false, false, false, false];
 
     this.getAllMeetingMoments().forEach((time) => {
@@ -95,11 +95,9 @@ class Section {
   }
 
   getWeekDaysAsStringArray() : string[] {
-    const weekdaySet = new Set<string>();
-    this.getAllMeetingMoments().forEach((time) => {
-      weekdaySet.add(time.start.format('dddd'));
+    return this.getAllMeetingMoments().map((time) => {
+      return time.start.format('dddd');
     });
-    return Array.from(weekdaySet);
   }
 
   //returns true if has exam, else false
@@ -111,7 +109,7 @@ class Section {
   //else returns null
   getExamMeeting() : Meeting {
     return this.meetings.find((meeting) => {
-      return meeting.isExam() && meeting.times.length > 0
+      return meeting.isExam() && meeting.times.length > 0;
     });
   }
 
@@ -124,7 +122,7 @@ class Section {
     const meetingLocations = [];
     this.meetings.forEach((meeting) => {
       if (!(ignoreExams && meeting.isExam())) {
-        meetingLocations.push(meeting.where);
+        meetingLocations.push(meeting.location);
       }
     });
     const retVal = _.uniq(meetingLocations);
@@ -158,6 +156,8 @@ class Section {
 
       this.meetings = newMeetings;
     }
+
+    macros.log('eeee', this.wasHasWaitLisTNeedsBetterName);
   }
 
   //TODO : there has to be a way to make this *so much better*, but there are sooo many special cases omo
@@ -215,10 +215,10 @@ class Section {
     if (other.meetings[0].times.length === 0) {
       return -1;
     }
-    if (this.meetings[0].times[0][0].start.unix() < other.meetings[0].times[0][0].start.unix()) {
+    if (this.meetings[0].times[0].start.unix() < other.meetings[0].times[0].start.unix()) {
       return -1;
     }
-    if (this.meetings[0].times[0][0].start.unix() > other.meetings[0].times[0][0].start.unix()) {
+    if (this.meetings[0].times[0].start.unix() > other.meetings[0].times[0].start.unix()) {
       return 1;
     }
 

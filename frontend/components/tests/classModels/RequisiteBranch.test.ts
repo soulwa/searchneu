@@ -1,15 +1,15 @@
 import RequisiteBranch from '../../classModels/RequisiteBranch';
 import mockData from '../../panels/tests/mockData'
 
-let swdEnglishReqOr : RequisiteBranch;
+let ReqBranchWithOr : RequisiteBranch;
 
 beforeEach(() => {
-  swdEnglishReqOr = new RequisiteBranch(mockData.swdEnglishReqOr);
+  ReqBranchWithOr = new RequisiteBranch(mockData.swdEnglishReqOr);
 });
 
 it('constructor tests...', () => {
-  expect(swdEnglishReqOr.coreqs).toStrictEqual({ type: 'or', values: [] });
-  expect(swdEnglishReqOr.prereqs).toStrictEqual({
+  expect(ReqBranchWithOr.coreqs).toStrictEqual({ type: 'or', values: [] });
+  expect(ReqBranchWithOr.prereqs).toStrictEqual({
     type: 'or',
     values: [
       {

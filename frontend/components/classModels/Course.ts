@@ -154,9 +154,7 @@ class Course {
       if (!data.termId) {
         data.termId = this.termId;
       }
-
-      // TODO: oh no
-      retVal = (this.constructor as typeof Course).create(data);
+      retVal = Course.create(data);
     }
 
     if (!retVal) {
@@ -223,10 +221,6 @@ class Course {
 
   // called once
   updateWithData(config) {
-    if (config instanceof Course) {
-      macros.error('wtf', config);
-    }
-
     if (config.title || config.allParents || config.missing || config.updateWithData) {
       macros.error();
     }
@@ -412,19 +406,19 @@ class Course {
     });
   }
 
-  getHasWaitList() : boolean {
+  hasWaitlist() : boolean {
     return this.sections.some((e) => {
       return e.hasWaitList();
     });
   }
 
-  getHasOnlineSections() : boolean {
+  hasOnlineSections() : boolean {
     return this.sections.some((e) => {
       return e.online;
     });
   }
 
-  getHasHonorsSections() : boolean {
+  hasHonorsSections() : boolean {
     return this.sections.some((e) => {
       return e.honors;
     });

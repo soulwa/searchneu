@@ -3,7 +3,7 @@
  * See the license file in the root folder for details.
  */
 import macros from '../macros';
-import Course from "./Course";
+import Course from './Course';
 
 export enum ReqTypeType {
   AND = 'and',
@@ -36,7 +36,6 @@ class RequisiteBranch {
       }
     });
 
-    macros.log('values, values', values);
     this.prereqs = {
       type: data.type,
       values: values,
