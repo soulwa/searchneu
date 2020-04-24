@@ -17,20 +17,27 @@
   }
 
   &__clear {
+    cursor: pointer;
+    color: #d41b2c;
     padding: 0 10px;
+    line-height: 30px;
+  }
+
+  &__clear:hover {
+    text-decoration: underline;
   }
 }
 
-/* any class that ends with __clear will have these rules: */
-div [class$="__clear"] {
-  padding: 0 5px;
-  display: inline;
+/* for clearing filters when there are no results */
+.no-results__clear {
   cursor: pointer;
   color: #d41b2c;
+  padding: 0 5px;
+  display: inline;
   line-height: 30px;
 }
 
-div [class$="__clear"]:hover {
+.no-results__clear:hover {
   text-decoration: underline;
 }
 

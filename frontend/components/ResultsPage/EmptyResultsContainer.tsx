@@ -26,7 +26,7 @@ export default function EmptyResultsContainer({ query, filtersAreSet, setFilters
         ? (
           <div className='Results_EmptyBottomLine'> Try
             <div
-              className='no-result__clear'
+              className='no-results__clear'
               role='button'
               tabIndex={ 0 }
               onClick={ () => setFilters(DEFAULT_FILTER_SELECTION) }
