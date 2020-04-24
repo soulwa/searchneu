@@ -19,6 +19,7 @@ import useSearch from '../ResultsPage/useSearch';
 import FilterPanel from '../ResultsPage/FilterPanel';
 import FilterPills from '../ResultsPage/FilterPills';
 import FeedbackHeader from '../ResultsPage/FeedbackHeader';
+import FeedbackModal from '../ResultsPage/FeedbackModal';
 import EmptyResultsContainer from '../ResultsPage/EmptyResultsContainer';
 import MobileSearchOverlay from '../ResultsPage/MobileSearchOverlay';
 import useAtTop from '../ResultsPage/useAtTop';
@@ -114,6 +115,7 @@ export default function Results() {
         />
       </div>
       {isReady && results.length > 0 && <FeedbackHeader searchQuery={ query } selectedFilters={ filters } searchResults={ results } />}
+      {!macros.isMobile && <FeedbackModal />}
       <div className='Results_Container'>
         {!macros.isMobile && (
           <>
