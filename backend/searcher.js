@@ -15,6 +15,7 @@ class Searcher {
     this.subjects = null;
     this.filters = Searcher.generateFilters();
     this.aggFilters = _.pickBy(this.filters, (f) => !!f.agg);
+    this.AGG_RES_SIZE = 1000;
   }
 
   static generateFilters() {
@@ -176,7 +177,7 @@ class Searcher {
     // very likely this doesn't work
     const aggQuery = !aggregation ? undefined : {
       [aggregation]: {
-        terms: { field: this.filters[aggregation].agg },
+        terms: { field: this.filters[aggregation].agg, size: this.AGG_RES_SIZE },
       },
     };
 
@@ -246,8 +247,6 @@ class Searcher {
     } = await this.getSearchResults(query, termId, min, max, filters);
     const startHydrate = Date.now();
     const results = await (new HydrateSerializer(Section)).bulkSerialize(output);
-
-    console.log(aggregations);
 
     return {
       searchContent: results,
