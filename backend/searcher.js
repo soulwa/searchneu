@@ -247,6 +247,8 @@ class Searcher {
     const startHydrate = Date.now();
     const results = await (new HydrateSerializer(Section)).bulkSerialize(output);
 
+    console.log(aggregations);
+
     return {
       searchContent: results,
       resultCount,
