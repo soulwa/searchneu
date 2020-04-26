@@ -84,7 +84,7 @@ class Searcher {
 
   async initializeSubjects() {
     if (!this.subjects) {
-      this.subjects = new Set((await Course.aggregate('subject', 'distinct', { plain: false })).map((hash) => hash.distinct));
+      this.subjects = new Set((await Course.aggregate('subject', 'distinct', { plain: false })).map((hash) => hash.distinct.toUpperCase()));
     }
   }
 

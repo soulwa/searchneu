@@ -98,21 +98,6 @@ describe('search', () => {
     expect(Keys.getClassHash(firstResult)).toBe('neu.edu/202110/CS/2500');
   });
 
-  it('returns correct number of nupath aggregations', async () => {
-    const aggs = (await prodSearch('', '202110', 0, 10)).data.filterOptions;
-    expect(aggs.nupath.length).toEqual(13);
-  });
-
-  it('returns correct number of subject aggregations', async () => {
-    const aggs = (await prodSearch('', '202110', 0, 10)).data.filterOptions;
-    expect(aggs.subject.length).toEqual(145);
-  });
-
-  it('returns correct number of classType aggregations', async () => {
-    const aggs = (await prodSearch('', '202110', 0, 10)).data.filterOptions;
-    expect(aggs.classType.length).toEqual(8);
-  });
-
   describe('filter queries', () => {
     it('filters by one NUpath', async () => {
       const nupath = 'Writing Intensive';
@@ -216,6 +201,23 @@ describe('search', () => {
       const aggResults = (await prodSearch('', '202110', 0, 1, filters)).data.filterOptions;
 
       expect(aggResults.nupath.every(({ count }) => count !== 0)).toBeTruthy();
+    });
+  });
+
+  describe('aggregation counts', () => {
+    it('returns correct number of nupath aggregations', async () => {
+      const aggs = (await prodSearch('', '202110', 0, 10)).data.filterOptions;
+      expect(aggs.nupath.length).toEqual(13);
+    });
+
+    it('returns correct number of subject aggregations', async () => {
+      const aggs = (await prodSearch('', '202110', 0, 10)).data.filterOptions;
+      expect(aggs.subject.length).toEqual(145);
+    });
+
+    it('returns correct number of classType aggregations', async () => {
+      const aggs = (await prodSearch('', '202110', 0, 10)).data.filterOptions;
+      expect(aggs.classType.length).toEqual(8);
     });
   });
 });
