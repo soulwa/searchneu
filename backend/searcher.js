@@ -127,7 +127,7 @@ class Searcher {
       'class.subject^4',
       'class.classId^3',
       'sections.profs',
-      'class.crns',
+      'sections.crn',
       'employee.name^2',
       'employee.emails',
       'employee.phone',
@@ -154,7 +154,6 @@ class Searcher {
         multi_match: {
           query: query,
           type: 'most_fields', // More fields match => higher score
-          fuzziness: 'AUTO',
           fields: fields,
         },
       }

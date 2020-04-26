@@ -94,8 +94,7 @@ describe('search', () => {
   });
 
   it('fetches correct result if query is a crn', async () => {
-    const results = await prodSearch('10460', '202110', 0, 1);
-    const firstResult = getFirstClassResult(results);
+    const firstResult = getFirstClassResult(await prodSearch('10415', '202030', 0, 1));
     expect(Keys.getClassHash(firstResult)).toBe('neu.edu/202110/CS/2500');
   });
 
