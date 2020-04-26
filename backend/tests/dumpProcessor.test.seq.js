@@ -28,7 +28,7 @@ afterAll(async () => {
   await db.sequelize.close();
 });
 
-it('does not create records if dump is empty', async () => {
+it.only('does not create records if dump is empty', async () => {
   const prevCounts = Promise.all([Professor.count(), Course.count(), Section.count()]);
   await dumpProcessor.main({ termDump: { classes: [], sections: [] } });
   expect(Promise.all([Professor.count(), Course.count(), Section.count()])).toEqual(prevCounts);

@@ -38,7 +38,9 @@ class DumpProcessor {
       const processedChunk = classChunk.map((aClass) => { return this.processClass(aClass, coveredTerms); });
       return Course.bulkCreate(processedChunk, { updateOnDuplicate: courseAttributes });
     });
-    const courseInstances = (await Promise.all(classPromises)).flat();
+    const stuff = await Promise.all(classPromises);
+    console.log(stuff);
+    const courseInstances = stuff.flat();
 
     const secPromises = _.chunk(termDump.sections, this.CHUNK_SIZE).map(async (secChunk) => {
       const processedChunk = secChunk.map((section) => { return this.processSection(section); });
