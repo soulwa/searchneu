@@ -69,6 +69,7 @@ Array [
       "nupath": Object {
         "terms": Object {
           "field": "class.nupath.keyword",
+          "size": 1000,
         },
       },
     },
@@ -137,6 +138,7 @@ Array [
       "subject": Object {
         "terms": Object {
           "field": "class.subject.keyword",
+          "size": 1000,
         },
       },
     },
@@ -205,6 +207,7 @@ Array [
       "classType": Object {
         "terms": Object {
           "field": "sections.classType.keyword",
+          "size": 1000,
         },
       },
     },
@@ -340,6 +343,7 @@ Array [
       "nupath": Object {
         "terms": Object {
           "field": "class.nupath.keyword",
+          "size": 1000,
         },
       },
     },
@@ -408,6 +412,7 @@ Array [
       "subject": Object {
         "terms": Object {
           "field": "class.subject.keyword",
+          "size": 1000,
         },
       },
     },
@@ -476,6 +481,7 @@ Array [
       "classType": Object {
         "terms": Object {
           "field": "sections.classType.keyword",
+          "size": 1000,
         },
       },
     },
@@ -548,6 +554,7 @@ Object {
     "nupath": Object {
       "terms": Object {
         "field": "class.nupath.keyword",
+        "size": 1000,
       },
     },
   },
