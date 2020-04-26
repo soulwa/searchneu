@@ -16,11 +16,13 @@ Array [
       "sections": Array [
         Object {
           "classType": null,
+          "crn": "19350",
           "online": false,
           "profs": null,
         },
         Object {
           "classType": null,
+          "crn": "19360",
           "online": false,
           "profs": null,
         },
@@ -47,11 +49,13 @@ Array [
       "sections": Array [
         Object {
           "classType": null,
+          "crn": "19350",
           "online": false,
           "profs": null,
         },
         Object {
           "classType": null,
+          "crn": "19360",
           "online": false,
           "profs": null,
         },
