@@ -4,19 +4,20 @@
  */
 import macros from '../macros';
 import Course from './Course';
+import { CourseReq } from '../../../backend/types';
 
-export enum ReqTypeType {
+export enum ReqKind {
   AND = 'and',
   OR = 'or'
 }
 
 export interface ReqType {
-  type: ReqTypeType,
+  type: ReqKind,
   values: Course[]
 }
 
 export interface ReqFor {
-  values : any[]
+  values : CourseReq[]
 }
 
 // This class holds a branch in the prerequisite or corequisite graph. For instance, if
@@ -43,7 +44,7 @@ class RequisiteBranch {
 
 
     this.coreqs = {
-      type: ReqTypeType.OR,
+      type: ReqKind.OR,
       values: [],
     };
   }

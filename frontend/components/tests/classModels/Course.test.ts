@@ -18,12 +18,8 @@ describe('tests basic getters', () => {
     expect(course.hasHonorsSections()).toBe(false);
   });
 
-  it('has online sections', () => {
-    expect(course.hasOnlineSections()).toBe(false);
-  });
-
   it('has wait list', () => {
-    expect(course.hasWaitlist()).toBe(false);
+    expect(course.hasWaitList()).toBe(false);
   });
 
   it('highest professor count', () => {

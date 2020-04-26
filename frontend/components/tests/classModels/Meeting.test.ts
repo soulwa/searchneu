@@ -77,7 +77,7 @@ it('Testing getMeetsOnDay', () => {
   expect(exam.meetsOnDay(DayOfWeek.THURSDAY)).toBe(true);
 });
 
-it('Testing basic getters on exam', () => {
+describe('Testing basic getters on exam', () => {
   it('get location', () => {
     expect(exam.getLocation()).toBe('Mugar Life Science Building');
   });

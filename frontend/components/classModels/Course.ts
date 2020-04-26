@@ -10,7 +10,7 @@ import moment from 'moment';
 import Keys from '../../../common/Keys';
 import macros from '../macros';
 import Section from './Section';
-import RequisiteBranch, { ReqFor, ReqType, ReqTypeType } from './RequisiteBranch';
+import RequisiteBranch, { ReqFor, ReqType, ReqKind } from './RequisiteBranch';
 
 
 // This file used to have an equals method as part of coursepro, but then it was removed.
@@ -47,31 +47,28 @@ class Course {
 
   lastUpdateTime : number;
 
-  hasWaitList : boolean;
-
   prereqsFor : ReqFor;
 
   optPrereqsFor : ReqFor;
-
 
   constructor() {
     //true, if for instance "AP placement exam, etc"
     this.isString = false;
 
-    // A class that is listed as a prereq for another class on the site, but this class dosen't actually exist
+    // A class that is listed as a prereq for another class on the site, but this class doesn't actually exist
     // Currently, missing prereqs are not even added as prereqs for classes because I can't think of any reason to list classes
-    // that don't exist anywhere on the site. Could be changed in future, the fitlter is in this file.
+    // that don't exist anywhere on the site. Could be changed in future, the filter is in this file.
     // this.missing = false;
 
     this.sections = [];
 
     this.prereqs = {
-      type: ReqTypeType.OR,
+      type: ReqKind.OR,
       values: [],
     };
 
     this.coreqs = {
-      type: ReqTypeType.OR,
+      type: ReqKind.OR,
       values: [],
     };
 
@@ -230,6 +227,7 @@ class Course {
       //dont copy over some attr
       //these are copied below and processed a bit
       if (_(['coreqs', 'prereqs', 'download']).includes(attrName) || config[attrName] === undefined) {
+        continue;
       } else {
         this[attrName] = config[attrName];
       }
@@ -387,34 +385,14 @@ class Course {
       this.sections.push(section);
     }
 
-    this.finishLoadingSections();
-  }
-
-  // This runs when just after the sections are done loading. This would be at the bottom of this.loadSections*, but was moved to a separate function
-  // so code is not duplicated.
-  finishLoadingSections() : void {
-    let hasWaitList = 0;
-    this.sections.forEach((section) => {
-      hasWaitList += section.wasHasWaitLisTNeedsBetterName;
-    });
-
-    this.hasWaitList = hasWaitList > this.sections.length / 2;
-
-    //sort sections
     this.sections.sort((a, b) => {
       return a.compareTo(b);
     });
   }
 
-  hasWaitlist() : boolean {
+  hasWaitList() : boolean {
     return this.sections.some((e) => {
       return e.hasWaitList();
-    });
-  }
-
-  hasOnlineSections() : boolean {
-    return this.sections.some((e) => {
-      return e.online;
     });
   }
 
