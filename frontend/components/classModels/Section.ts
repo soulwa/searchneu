@@ -155,7 +155,6 @@ class Section {
 
       this.meetings = newMeetings;
     }
-
   }
 
   //TODO : there has to be a way to make this *so much better*, but there are sooo many special cases omo

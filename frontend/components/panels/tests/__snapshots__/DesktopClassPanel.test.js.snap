@@ -181,7 +181,6 @@ exports[`should render some stuff 1`] = `
                   "url": "https://wl11gp.neu.edu/udcprod8/bwckschd.p_disp_detail_sched?term_in=201810&crn_in=13502",
                   "waitCapacity": 0,
                   "waitRemaining": 0,
-                  "wasHasWaitLisTNeedsBetterName": undefined,
                 },
                 Section {
                   "classId": "1210",
@@ -214,7 +213,6 @@ exports[`should render some stuff 1`] = `
                   "url": "https://wl11gp.neu.edu/udcprod8/bwckschd.p_disp_detail_sched?term_in=201810&crn_in=14404",
                   "waitCapacity": 0,
                   "waitRemaining": 0,
-                  "wasHasWaitLisTNeedsBetterName": undefined,
                 },
                 Section {
                   "classId": "1210",
@@ -247,7 +245,6 @@ exports[`should render some stuff 1`] = `
                   "url": "https://wl11gp.neu.edu/udcprod8/bwckschd.p_disp_detail_sched?term_in=201810&crn_in=14404",
                   "waitCapacity": 0,
                   "waitRemaining": 0,
-                  "wasHasWaitLisTNeedsBetterName": undefined,
                 },
                 Section {
                   "classId": "1210",
@@ -280,7 +277,6 @@ exports[`should render some stuff 1`] = `
                   "url": "https://wl11gp.neu.edu/udcprod8/bwckschd.p_disp_detail_sched?term_in=201810&crn_in=13503",
                   "waitCapacity": 0,
                   "waitRemaining": 0,
-                  "wasHasWaitLisTNeedsBetterName": undefined,
                 },
                 Section {
                   "classId": "1210",
@@ -313,7 +309,6 @@ exports[`should render some stuff 1`] = `
                   "url": "https://wl11gp.neu.edu/udcprod8/bwckschd.p_disp_detail_sched?term_in=201810&crn_in=14386",
                   "waitCapacity": 0,
                   "waitRemaining": 0,
-                  "wasHasWaitLisTNeedsBetterName": undefined,
                 },
               ],
               "subject": "CS",
@@ -424,7 +419,6 @@ exports[`should render some stuff 1`] = `
             "url": "https://wl11gp.neu.edu/udcprod8/bwckschd.p_disp_detail_sched?term_in=201810&crn_in=13502",
             "waitCapacity": 0,
             "waitRemaining": 0,
-            "wasHasWaitLisTNeedsBetterName": undefined,
           }
         }
         shouldShowExamColumns={false}
@@ -466,7 +460,6 @@ exports[`should render some stuff 1`] = `
             "url": "https://wl11gp.neu.edu/udcprod8/bwckschd.p_disp_detail_sched?term_in=201810&crn_in=14404",
             "waitCapacity": 0,
             "waitRemaining": 0,
-            "wasHasWaitLisTNeedsBetterName": undefined,
           }
         }
         shouldShowExamColumns={false}
@@ -508,7 +501,6 @@ exports[`should render some stuff 1`] = `
             "url": "https://wl11gp.neu.edu/udcprod8/bwckschd.p_disp_detail_sched?term_in=201810&crn_in=14404",
             "waitCapacity": 0,
             "waitRemaining": 0,
-            "wasHasWaitLisTNeedsBetterName": undefined,
           }
         }
         shouldShowExamColumns={false}
