@@ -34,8 +34,6 @@ class Section {
 
   seatsCapacity : number;
 
-  wasHasWaitLisTNeedsBetterName : number; // TODO
-
   honors : boolean;
 
   constructor(config) {
@@ -157,7 +155,6 @@ class Section {
       this.meetings = newMeetings;
     }
 
-    macros.log('eeee', this.wasHasWaitLisTNeedsBetterName);
   }
 
   //TODO : there has to be a way to make this *so much better*, but there are sooo many special cases omo
