@@ -9,7 +9,6 @@ beforeEach(() => {
 });
 
 describe('tests basic getters', () => {
-
   it('hashing', () => {
     expect(course.getHash()).toBe('neu.edu/202110/CS/2500');
   });
