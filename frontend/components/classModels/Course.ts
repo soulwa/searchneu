@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 /*
  * This file is part of Search NEU and licensed under AGPL3.
  * See the license file in the root folder for details.
@@ -226,9 +227,7 @@ class Course {
     for (const attrName in config) {
       //dont copy over some attr
       //these are copied below and processed a bit
-      if (_(['coreqs', 'prereqs', 'download']).includes(attrName) || config[attrName] === undefined) {
-        continue;
-      } else {
+      if (!_(['coreqs', 'prereqs', 'download']).includes(attrName) && config[attrName] !== undefined) {
         this[attrName] = config[attrName];
       }
     }
