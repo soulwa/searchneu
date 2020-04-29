@@ -114,23 +114,20 @@ exports[`should render a section 1`] = `
                 "classId": "1210",
                 "crn": "13502",
                 "dataStatus": undefined,
-                "hasWaitList": undefined,
                 "honors": undefined,
                 "host": "neu.edu",
                 "lastUpdateTime": 1511131914029,
                 "meetings": Array [
                   Meeting {
                     "endDate": "2017-12-07T00:00:00.000Z",
+                    "location": "Snell Engineering Center 108",
                     "startDate": "2017-09-07T00:00:00.000Z",
                     "times": Array [
-                      Array [
-                        Object {
-                          "end": "1970-01-06T11:30:00.000Z",
-                          "start": "1970-01-06T09:50:00.000Z",
-                        },
-                      ],
+                      Object {
+                        "end": "1970-01-06T11:30:00.000Z",
+                        "start": "1970-01-06T09:50:00.000Z",
+                      },
                     ],
-                    "where": "Snell Engineering Center 108",
                   },
                 ],
                 "online": false,
@@ -144,6 +141,7 @@ exports[`should render a section 1`] = `
                 "url": "https://wl11gp.neu.edu/udcprod8/bwckschd.p_disp_detail_sched?term_in=201810&crn_in=13502",
                 "waitCapacity": 0,
                 "waitRemaining": 0,
+                "wasHasWaitLisTNeedsBetterName": undefined,
               }
             }
           />
@@ -191,23 +189,20 @@ exports[`should render a section 1`] = `
                 "classId": "1210",
                 "crn": "13502",
                 "dataStatus": undefined,
-                "hasWaitList": undefined,
                 "honors": undefined,
                 "host": "neu.edu",
                 "lastUpdateTime": 1511131914029,
                 "meetings": Array [
                   Meeting {
                     "endDate": "2017-12-07T00:00:00.000Z",
+                    "location": "Snell Engineering Center 108",
                     "startDate": "2017-09-07T00:00:00.000Z",
                     "times": Array [
-                      Array [
-                        Object {
-                          "end": "1970-01-06T11:30:00.000Z",
-                          "start": "1970-01-06T09:50:00.000Z",
-                        },
-                      ],
+                      Object {
+                        "end": "1970-01-06T11:30:00.000Z",
+                        "start": "1970-01-06T09:50:00.000Z",
+                      },
                     ],
-                    "where": "Snell Engineering Center 108",
                   },
                 ],
                 "online": false,
@@ -221,6 +216,7 @@ exports[`should render a section 1`] = `
                 "url": "https://wl11gp.neu.edu/udcprod8/bwckschd.p_disp_detail_sched?term_in=201810&crn_in=13502",
                 "waitCapacity": 0,
                 "waitRemaining": 0,
+                "wasHasWaitLisTNeedsBetterName": undefined,
               }
             }
           />
@@ -345,23 +341,20 @@ exports[`should render another section w/ checkboxes 1`] = `
                 "classId": "1210",
                 "crn": "14404",
                 "dataStatus": undefined,
-                "hasWaitList": undefined,
                 "honors": undefined,
                 "host": "neu.edu",
                 "lastUpdateTime": 1511131914065,
                 "meetings": Array [
                   Meeting {
                     "endDate": "2017-12-07T00:00:00.000Z",
+                    "location": "Ryder Hall 431",
                     "startDate": "2017-09-07T00:00:00.000Z",
                     "times": Array [
-                      Array [
-                        Object {
-                          "end": "1970-01-06T13:25:00.000Z",
-                          "start": "1970-01-06T11:45:00.000Z",
-                        },
-                      ],
+                      Object {
+                        "end": "1970-01-06T13:25:00.000Z",
+                        "start": "1970-01-06T11:45:00.000Z",
+                      },
                     ],
-                    "where": "Ryder Hall 431",
                   },
                 ],
                 "online": false,
@@ -375,6 +368,7 @@ exports[`should render another section w/ checkboxes 1`] = `
                 "url": "https://wl11gp.neu.edu/udcprod8/bwckschd.p_disp_detail_sched?term_in=201810&crn_in=14404",
                 "waitCapacity": 0,
                 "waitRemaining": 0,
+                "wasHasWaitLisTNeedsBetterName": undefined,
               }
             }
           />
@@ -422,23 +416,20 @@ exports[`should render another section w/ checkboxes 1`] = `
                 "classId": "1210",
                 "crn": "14404",
                 "dataStatus": undefined,
-                "hasWaitList": undefined,
                 "honors": undefined,
                 "host": "neu.edu",
                 "lastUpdateTime": 1511131914065,
                 "meetings": Array [
                   Meeting {
                     "endDate": "2017-12-07T00:00:00.000Z",
+                    "location": "Ryder Hall 431",
                     "startDate": "2017-09-07T00:00:00.000Z",
                     "times": Array [
-                      Array [
-                        Object {
-                          "end": "1970-01-06T13:25:00.000Z",
-                          "start": "1970-01-06T11:45:00.000Z",
-                        },
-                      ],
+                      Object {
+                        "end": "1970-01-06T13:25:00.000Z",
+                        "start": "1970-01-06T11:45:00.000Z",
+                      },
                     ],
-                    "where": "Ryder Hall 431",
                   },
                 ],
                 "online": false,
@@ -452,6 +443,7 @@ exports[`should render another section w/ checkboxes 1`] = `
                 "url": "https://wl11gp.neu.edu/udcprod8/bwckschd.p_disp_detail_sched?term_in=201810&crn_in=14404",
                 "waitCapacity": 0,
                 "waitRemaining": 0,
+                "wasHasWaitLisTNeedsBetterName": undefined,
               }
             }
           />
