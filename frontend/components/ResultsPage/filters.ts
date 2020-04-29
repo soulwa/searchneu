@@ -59,8 +59,8 @@ const CLASSTYPE_SPEC: FilterSpec<'Checkboxes'> = {
 const CLASSIDRANGE_SPEC: FilterSpec<'Range'> = {
   category: FilterCategories.Range, default: { min:'', max:'' }, display: 'Course Number', order: 5,
 }
-const CAMPUS_SPEC: FilterSpec<'Checkboxes'> = {
-  category: FilterCategories.Checkboxes, default: [], display: 'Campus', order: 6,
+const CAMPUS_SPEC: FilterSpec<'Dropdown'> = {
+  category: FilterCategories.Dropdown, default: [], display: 'Campus', order: 6,
 }
 
 export const FILTER_SPECS = {
