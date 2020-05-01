@@ -294,7 +294,6 @@ class Course {
     }
   }
 
-
   //this is used for panels i think and for class list (settings)
   //sort by classId, if it exists, and then subject
   compareTo(otherClass) {
@@ -342,17 +341,6 @@ class Course {
     return 0;
   }
 
-
-  getHeighestProfCount() : number {
-    return Math.max(...this.sections.map((section) => {
-      return section.profs.length;
-    }));
-  }
-
-  getPrettyClassId() {
-    return this.classId ? parseInt(this.classId, 10).toString() : null;
-  }
-
   getLastUpdateString() : string {
     return this.lastUpdateTime ? moment(this.lastUpdateTime).fromNow() : null;
   }
@@ -362,7 +350,7 @@ class Course {
     return this.sections.some((section) => { return section.getHasExam(); });
   }
 
-  isAtLeastOneSectionFull() : boolean {
+  hasAtLeastOneSectionFull() : boolean {
     return this.sections.some((e) => {
       return e.seatsRemaining <= 0 && e.seatsCapacity > 0
     });

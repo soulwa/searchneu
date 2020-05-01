@@ -116,38 +116,6 @@ class Meeting {
     return this.location.replace(/\d+\s*$/i, '').trim();
   }
 
-  getHoursPerWeek() : number {
-    let retVal = 0;
-
-    this.times.forEach((time) => {
-      // moment#diff returns ms, need hr
-      retVal += time.end.diff(time.start) / (1000 * 60 * 60);
-    });
-
-    return Math.round(10 * retVal) / 10;
-  }
-
-  // returns sorted list of weekday strings, eg
-  //["Monday","Friday"]
-  getWeekdayStrings() : string[] {
-    const retVal = [];
-
-    const copyOfTimes = this.times.slice(0);
-
-    copyOfTimes.sort((a, b) => {
-      return a.start.unix() - b.start.unix();
-    });
-
-    copyOfTimes.forEach((time) => {
-      const weekdayString = time.start.format('dddd');
-      if (!retVal.includes(weekdayString)) {
-        retVal.push(weekdayString);
-      }
-    });
-
-    return retVal;
-  }
-
   isExam() : boolean {
     // this could be improved by scraping more data...
     return this.startDate.unix() === this.endDate.unix();

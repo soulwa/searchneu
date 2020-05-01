@@ -53,20 +53,12 @@ describe('Testing basic getters on meeting', () => {
     expect(meeting.getLocation()).toBe('Robinson Hall');
   });
 
-  it('gets hours per week', () => {
-    expect(meeting.getHoursPerWeek()).toBe(3.3);
-  });
-
   it('is exam?', () => {
     expect(meeting.isExam()).toBe(false);
   });
 
   it('meets on weekends', () => {
     expect(meeting.meetsOnWeekends()).toBe(false);
-  });
-
-  it('getWeekdayStrings', () => {
-    expect(meeting.getWeekdayStrings()).toStrictEqual(['Tuesday', 'Friday']);
   });
 });
 
@@ -82,19 +74,11 @@ describe('Testing basic getters on exam', () => {
     expect(exam.getLocation()).toBe('Mugar Life Science Building');
   });
 
-  it('gets hours per week', () => {
-    expect(exam.getHoursPerWeek()).toBe(2);
-  });
-
   it('is exam?', () => {
     expect(exam.isExam()).toBe(true);
   });
 
   it('meets on weekends?', () => {
     expect(exam.meetsOnWeekends()).toBe(false);
-  });
-
-  it('weekday strings', () => {
-    expect(exam.getWeekdayStrings()).toStrictEqual(['Thursday']);
   });
 });

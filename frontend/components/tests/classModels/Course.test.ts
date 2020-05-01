@@ -21,16 +21,8 @@ describe('tests basic getters', () => {
     expect(course.hasWaitList()).toBe(false);
   });
 
-  it('highest professor count', () => {
-    expect(course.getHeighestProfCount()).toBe(2);
-  });
-
-  it('pretty class id', () => {
-    expect(course.getPrettyClassId()).toBe('2500');
-  });
-
   it('is at least one section full', () => {
-    expect(course.isAtLeastOneSectionFull()).toBe(true);
+    expect(course.hasAtLeastOneSectionFull()).toBe(true);
   });
 
   it('sections have exam', () => {
