@@ -86,7 +86,26 @@ export default function FeedbackModal() {
     setOpen(false);
   }
   console.log('yes', yes);
-  const renderFeedback = (step) => {
+
+  const handleSubmit = () => {
+    switch (step) {
+      case 'initial':
+        if (yes) {
+          macros.logAmplitudeEvent('Feedback modal initial submit', {lookingForFound: yes});
+
+        } else {
+          macros.logAmplitudeEvent('Feedback modal initial submit', {lookingForFound: yes});
+          setStep('checkbox');
+
+        }
+      case 'checkbox':
+          macros.logAmplitudeEvent('Feedback modal checkbox submit', { lookingFor: selectedFeedback }); };
+
+        
+  }
+
+
+  const renderFeedback = () => {
     switch (step) {
       case 'initial':
         return <FeedbackModalInitial yes={ yes } setYes={ setYes } />;
@@ -116,8 +135,8 @@ export default function FeedbackModal() {
         <div className='FeedbackModal__popoutHeader'>
           <p>SearchNEU Feedback</p>
         </div>
-        { renderFeedback(step)}
-        <div className={ !submitted ? 'FeedbackModal__submit' : 'FeedbackModal__submit--submitted' } role='button' tabIndex={ 0 } onClick={ () => { setSubmitted(true); setFinished(); macros.logAmplitudeEvent('Feedback modal submit', { lookingFor: selectedFeedback }); } }>
+        { renderFeedback()}
+        <div className={ !submitted ? 'FeedbackModal__submit' : 'FeedbackModal__submit--submitted' } role='button' tabIndex={ 0 } onClick={ handleSubmit }>
           <p>{!submitted ? 'SEND FEEDBACK' : 'THANK YOU!' }</p>
         </div>
       </div>

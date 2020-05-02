@@ -82,6 +82,12 @@
     user-select: none;
   }
 
+  &__initial {
+    display: flex;
+    flex-direction: column;
+
+  }
+
   &__checkBoxes {
     width: 200px;
     margin-left: 12px;
