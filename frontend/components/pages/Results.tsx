@@ -69,6 +69,8 @@ export default function Results() {
 
   const searchParams: SearchParams = { termId, query, filters };
 
+  const filtersAreSet: Boolean = areFiltersSet(filters);
+
   const us = useSearch(searchParams, BLANK_SEARCH_RESULT(), fetchResults);
   const {
     isReady, loadMore, doSearch,
@@ -130,10 +132,10 @@ export default function Results() {
           </>
         )}
         <div className='Results_Main'>
-          { areFiltersSet(filters)
+          { filtersAreSet
           && <FilterPills filters={ filters } setFilters={ setQParams } />}
           {!isReady && <div style={{ visibility: 'hidden' }} />}
-          {isReady && results.length === 0 && <EmptyResultsContainer query={ query } />}
+          {isReady && results.length === 0 && <EmptyResultsContainer query={ query } filtersAreSet={ filtersAreSet } setFilters={ setQParams } /> }
           {isReady && results.length > 0
             && (
               <ResultsLoader
