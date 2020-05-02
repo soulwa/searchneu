@@ -19,7 +19,7 @@ import useSearch from '../ResultsPage/useSearch';
 import FilterPanel from '../ResultsPage/FilterPanel';
 import FilterPills from '../ResultsPage/FilterPills';
 import FeedbackHeader from '../ResultsPage/FeedbackHeader';
-import FeedbackModal from '../ResultsPage/FeedbackModal';
+import FeedbackModal from '../ResultsPage/FeedbackModal/FeedbackModal';
 import EmptyResultsContainer from '../ResultsPage/EmptyResultsContainer';
 import MobileSearchOverlay from '../ResultsPage/MobileSearchOverlay';
 import useAtTop from '../ResultsPage/useAtTop';
