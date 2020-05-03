@@ -77,7 +77,7 @@
     color: black;
     margin-left: 14px;
     width: 180px;
-    font-size: 16px;
+    font-size: 14px;
     line-height: 23px;
     user-select: none;
   }
@@ -231,6 +231,87 @@
   &__checkboxText > input:checked + .FeedbackModal__checkboxBox::after {
     display: block;
   }
+
+  &__freeSelector {
+    margin: 12px 10px;
+  }
+
+
+  &__freeSelector > input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    height: 16px;
+    width: 16px;
+  }
+
+  &__freeSelector > input:checked + .FeedbackModal__freeSelectorLeft, &__freeSelector > input:checked + .FeedbackModal__freeSelectorCenter,
+  &__freeSelector > input:checked + .FeedbackModal__freeSelectorRight {
+    border: 1px solid #489FFF;
+    color: #489FFF;
+  }
+
+  &__freeSelectorLeft {
+    display: inline-block;
+    width: 68px;
+    height: 28px;
+    text-align: center;
+    padding-top: 2px;
+    font-size: 11px;
+    background: #fff;
+    border: 1px solid #DEDEDF;
+    border-radius: 3px 0 0 3px;
+    cursor: pointer
+  }
+  
+  &__freeSelectorCenter {
+    display: inline-block;
+    width: 68px;
+    height: 28px;
+    text-align: center;
+    padding-top: 2px;
+    font-size: 11px;
+    background: #fff;
+    border: 1px solid #DEDEDF;
+    cursor: pointer
+  }
+
+  &__freeSelectorRight {
+    display: inline-block;
+    width: 68px;
+    height: 28px;
+    text-align: center;
+    padding-top: 2px;
+    font-size: 11px;
+    background: #fff;
+    border: 1px solid #DEDEDF;
+    border-radius: 0 3px 3px 0;
+    cursor: pointer
+  }
+
+  &__freeQuery {
+    margin: 0 10px;
+    width: 204px;
+    height: 90px;
+    border: 1px solid #DEDEDF;
+    border-radius: 3px;
+    resize: none;
+    font-size: 12px;
+    line-height: 14px;
+    padding: 10px;
+    
+    &:focus {
+      outline: none;
+    }
+  }
+
+
+
+
+
+
+  
+
 
   &__submit {
     background: #338ef1;

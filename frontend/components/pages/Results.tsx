@@ -18,7 +18,6 @@ import Footer from '../Footer';
 import useSearch from '../ResultsPage/useSearch';
 import FilterPanel from '../ResultsPage/FilterPanel';
 import FilterPills from '../ResultsPage/FilterPills';
-import FeedbackHeader from '../ResultsPage/FeedbackHeader';
 import FeedbackModal from '../ResultsPage/FeedbackModal/FeedbackModal';
 import EmptyResultsContainer from '../ResultsPage/EmptyResultsContainer';
 import MobileSearchOverlay from '../ResultsPage/MobileSearchOverlay';
@@ -114,7 +113,6 @@ export default function Results() {
           onChange={ setTerm }
         />
       </div>
-      {isReady && results.length > 0 && <FeedbackHeader searchQuery={ query } selectedFilters={ filters } searchResults={ results } />}
       {!macros.isMobile && <FeedbackModal />}
       <div className='Results_Container'>
         {!macros.isMobile && (
