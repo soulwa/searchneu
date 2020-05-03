@@ -85,8 +85,8 @@
   &__initial {
     display: flex;
     flex-direction: column;
-
   }
+
   &__initialText {
     margin-top: 10px;
     padding-left: 32px;
@@ -97,11 +97,10 @@
     font-size: 12px;
     position: relative;
     width: 200px;
-    
+
     &:hover {
       background: #eaeaea;
     }
-   
   }
 
   &__initialText > input {
@@ -112,9 +111,20 @@
     width: 16px;
   }
 
+  &__initialRadio::after {
+    content: "";
+    position: absolute;
+    display: none;
+    top: 2px;
+    left: 2px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #338ef1;
+  }
+
   &__initialText > input:checked + .FeedbackModal__initialRadio::after {
     display: block;
-
   }
 
   &__initialRadio {
@@ -130,18 +140,6 @@
     &:hover {
       cursor: pointer;
     }
-  }
-
-  &__initialRadio:after {
-    content: "";
-    position: absolute;
-    display: none;
-    top: 2px;
-    left: 2px;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #338ef1;
   }
 
   &__checkBoxes {
@@ -236,19 +234,12 @@
     margin: 12px 10px;
   }
 
-
   &__freeSelector > input {
     position: absolute;
     opacity: 0;
     pointer-events: none;
     height: 16px;
     width: 16px;
-  }
-
-  &__freeSelector > input:checked + .FeedbackModal__freeSelectorLeft, &__freeSelector > input:checked + .FeedbackModal__freeSelectorCenter,
-  &__freeSelector > input:checked + .FeedbackModal__freeSelectorRight {
-    border: 1px solid #489FFF;
-    color: #489FFF;
   }
 
   &__freeSelectorLeft {
@@ -259,11 +250,11 @@
     padding-top: 2px;
     font-size: 11px;
     background: #fff;
-    border: 1px solid #DEDEDF;
+    border: 1px solid #dededf;
     border-radius: 3px 0 0 3px;
-    cursor: pointer
+    cursor: pointer;
   }
-  
+
   &__freeSelectorCenter {
     display: inline-block;
     width: 68px;
@@ -272,8 +263,8 @@
     padding-top: 2px;
     font-size: 11px;
     background: #fff;
-    border: 1px solid #DEDEDF;
-    cursor: pointer
+    border: 1px solid #dededf;
+    cursor: pointer;
   }
 
   &__freeSelectorRight {
@@ -284,34 +275,33 @@
     padding-top: 2px;
     font-size: 11px;
     background: #fff;
-    border: 1px solid #DEDEDF;
+    border: 1px solid #dededf;
     border-radius: 0 3px 3px 0;
-    cursor: pointer
+    cursor: pointer;
+  }
+
+  &__freeSelector > input:checked + .FeedbackModal__freeSelectorLeft,
+  &__freeSelector > input:checked + .FeedbackModal__freeSelectorCenter,
+  &__freeSelector > input:checked + .FeedbackModal__freeSelectorRight {
+    border: 1px solid #489fff;
+    color: #489fff;
   }
 
   &__freeQuery {
     margin: 0 10px;
     width: 204px;
     height: 90px;
-    border: 1px solid #DEDEDF;
+    border: 1px solid #dededf;
     border-radius: 3px;
     resize: none;
     font-size: 12px;
     line-height: 14px;
     padding: 10px;
-    
+
     &:focus {
       outline: none;
     }
   }
-
-
-
-
-
-
-  
-
 
   &__submit {
     background: #338ef1;

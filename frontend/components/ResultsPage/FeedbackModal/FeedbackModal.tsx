@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import LogoInput from '../../images/LogoInput';
 import FeedbackModalInitial from './FeedbackModalInitial';
 import FeedbackModalCheckboxes from './FeedbackModalCheckboxes';
 import FeedbackModalFree from './FeedbackModalFree';
 import macros from '../../macros';
 import useFeedbackSchedule from '../useFeedbackSchedule';
+import useClickOutside from '../useClickOutside';
 
 
 export default function FeedbackModal() {
@@ -17,19 +18,12 @@ export default function FeedbackModal() {
   const [step, setStep] = useState('initial');
 
   const modalRef = useRef(null);
+  useClickOutside(modalRef, open, setOpen);
 
   const keyString = 'MODAL'
   const [show, setFinished] = useFeedbackSchedule(keyString, 86400000);
 
   const feedbackOptions = ['Class time', 'Professor', 'Prereqs', 'Something else'];
-
-  const handleClickOutside = (e) => {
-    if (modalRef.current.contains(e.target)) {
-      return;
-    }
-    setOpen(false);
-  }
-
 
   function handleSubmit() {
     switch (step) {
@@ -78,18 +72,6 @@ export default function FeedbackModal() {
         return null;
     }
   }
-
-  useEffect(() => {
-    if (open) {
-      document.addEventListener('mousedown', handleClickOutside);
-    } else {
-      document.removeEventListener('mousedown', handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [open]);
-
 
   return (
     show
