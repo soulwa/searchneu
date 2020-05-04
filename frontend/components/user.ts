@@ -9,40 +9,41 @@ import _ from 'lodash';
 import request from './request';
 import macros from './macros';
 import Keys from '../../common/Keys';
-
+import { user } from '../../common/types';
+import UserError from './UserError';
 
 // Manages user data in the frontend
 // Downloads the data from the server when the page first starts
 
 class User {
+  // Keep track of the user object.
+  user: user;
+
+  // Promise to keep track of user data downloading status.
+  userDataPromise: Promise<void>;
+
+  // Allow other classes to listen to changes in the user object.
+  // Any time the user object is called, these handlers are called.
+  userStateChangedHandlers: ((user: user) => void)[];
+
   constructor() {
-    // Keep track of the user object.
-    this.user = null;
-
-    // Promise to keep track of user data downloading status.
-    this.userDataPromise = null;
-
     // Download the user data as soon as the page loads
     this.downloadUserData();
-
-    // Allow other classes to listen to changes in the user object.
-    // Any time the user object is called, these handlers are called.
     this.userStateChangedHandlers = [];
   }
 
   // Register a handler for user updates.
-  registerUserChangeHandler(handler) {
+  registerUserChangeHandler(handler : ((user: user) => void)) : void {
     this.userStateChangedHandlers.push(handler);
   }
 
   // Unregister a handler for user updates.
-  unregisterUserChangeHandler(handler) {
+  unregisterUserChangeHandler(handler : ((user: user) => void)) : void{
     _.pull(this.userStateChangedHandlers, handler);
   }
 
   // Calls all the userStateChangedHandlers.
-  // Internal only.
-  callUserChangeHandlers() {
+  private callUserChangeHandlers() {
     for (const handler of this.userStateChangedHandlers) {
       handler(this.user);
     }
@@ -59,6 +60,7 @@ class User {
 
     const body = {
       loginKey: this.getLoginKey(),
+      senderId: undefined,
     };
 
     // If we have sender id, send that up too
@@ -123,43 +125,28 @@ class User {
 
   // gets a user's (as in browser) loginKey, or generates one if it doesn't exist yet
   getLoginKey() {
-    let loginKey = window.localStorage.loginKey;
-
     // Init the loginKey if it dosen't exist
-    if (!loginKey) {
-      loginKey = randomstring.generate(100);
-      window.localStorage.loginKey = loginKey;
+    if (!window.localStorage.loginKey) {
+      window.localStorage.loginKey = randomstring.generate(100);
     }
-
-    return loginKey;
+    return window.localStorage.loginKey;
   }
 
   // checks if the user already has the section in it
-  isWatchingSection(sectionHash) {
-    if (this.user && this.user.watchingSections) {
-      return this.user.watchingSections.includes(sectionHash);
-    }
-    return false;
+  isWatchingSection(sectionHash : string) : boolean {
+    return this.user && this.user.watchingSections && this.user.watchingSections.includes(sectionHash);
   }
 
   // checks if the user already has the class in it
-  isWatchingClass(classHash) {
-    if (this.user && this.user.watchingClasses) {
-      return this.user.watchingClasses.includes(classHash);
-    }
-    return false;
+  isWatchingClass(classHash : string) : boolean {
+    return this.user && this.user.watchingClasses && this.user.watchingClasses.includes(classHash);
   }
 
   // removes a section from a user, as well as the class if no more sections are tracked
   // in that class
   async removeSection(section) {
     // Make sure the user state is settled.
-    await this.userDataPromise;
-
-    if (!this.user || !this.hasLoggedInBefore()) {
-      macros.error('Remove section called with no valid user.', this.user, this.hasLoggedInBefore());
-      return;
-    }
+    await this.ensureClassSettled('Remove section');
 
     const sectionHash = Keys.getSectionHash(section);
 
@@ -201,12 +188,7 @@ class User {
     }
 
     // Make sure the user state is settled.
-    await this.userDataPromise;
-
-    if (!this.user || !this.hasLoggedInBefore()) {
-      macros.error('Add section called with no valid user.', this.user, this.hasLoggedInBefore());
-      return;
-    }
+    await this.ensureClassSettled('Add section');
 
     const sectionHash = Keys.getSectionHash(section);
 
@@ -256,14 +238,7 @@ class User {
   // enable updateBackend to update the backend along with updating the state here.
   // this is used when another piece of code updates the backend some way, and we don't want to send two requests to the backend here.
   async addClass(aClass) {
-    // Make sure the user state is settled.
-    await this.userDataPromise;
-
-    if (!this.user || !this.hasLoggedInBefore()) {
-      macros.error('Add class called with no valid user.', this.user, this.hasLoggedInBefore());
-      return;
-    }
-
+    await this.ensureClassSettled('Add class');
     const classHash = Keys.getClassHash(aClass);
 
     if (this.user.watchingClasses.includes(classHash)) {
@@ -284,7 +259,7 @@ class User {
     };
 
     await request.post({
-      url:'/addClass',
+      url: '/addClass',
       body: body,
     });
 
@@ -292,7 +267,15 @@ class User {
 
     macros.log('class registered', this.user);
   }
-}
 
+  async ensureClassSettled(operation : string) {
+    // Make sure the user state is settled.
+    await this.userDataPromise;
+
+    if (!this.user || !this.hasLoggedInBefore()) {
+      throw new UserError(`${operation} called with no valid user.`, [this.user, this.hasLoggedInBefore()]);
+    }
+  }
+}
 
 export default new User();

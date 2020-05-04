@@ -79,9 +79,9 @@ export default class NotifCheckBox extends React.Component {
     }
 
     return (
-      <div data-tip='Sign up for notifications for this section' className='inlineBlock'>
-        <Checkbox toggle checked={ this.state.checked } onChange={ this.onCheckboxClick } />
-      </div>
+        <div data-tip='Sign up for notifications for this section' className='inlineBlock'>
+          <Checkbox toggle checked={ this.state.checked } onChange={ this.onCheckboxClick } />
+        </div>
     );
   }
 }

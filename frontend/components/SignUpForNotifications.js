@@ -121,7 +121,7 @@ class SignUpForNotifications extends React.Component {
 
       const aClass = this.props.aClass;
 
-      user.addClass(aClass);
+      user.addCourse(aClass);
 
       // If this class only has 1 section, sign the user for it automatically.
       if (aClass.sections && aClass.sections.length === 1 && aClass.sections[0].seatsRemaining <= 0) {
