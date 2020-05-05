@@ -9,9 +9,9 @@ import { Course, Section } from './database/models/index';
 import HydrateSerializer from './database/serializers/hydrateSerializer';
 import macros from './macros';
 import { 
-  EsQuery, QueryNode, FilterStruct, AggFilterStruct, ValidFilterInput,
+  EsQuery, QueryNode, FilterStruct, AggFilterStruct, ValidFilterInput, PartialResults,
   ExistsQuery, TermsQuery, TermQuery, LeafQuery, MATCH_ALL_QUERY, SortStruct,
-  FilterInput, FilterPrelude, EsResultBody, Range, RangeQuery, AggFilterPrelude
+  FilterInput, FilterPrelude, EsResultBody, Range, RangeQuery, AggFilterPrelude, EsMultiResult, SearchResults
 } from './types';
 
 class Searcher {
@@ -223,30 +223,26 @@ class Searcher {
     const queries: EsQuery[] = [this.generateQuery(query, termId, validFilters, min, max)];
 
     for (const fKey of Object.keys(this.aggFilters)) {
-      // shouldn't this be from validFilters?
       const everyOtherFilter: FilterInput = _.omit(filters, fKey);
       queries.push((this.generateQuery(query, termId, everyOtherFilter, 0, 0, fKey)));
     }
     return queries;
   }
 
-  async getSearchResults(query, termId, min, max, filters) {
+  async getSearchResults(query: string, termId: string, min: number, max: number, filters: FilterInput): Promise<PartialResults> {
     const queries = this.generateMQuery(query, termId, min, max, filters);
-    const results = await elastic.mquery(`${elastic.CLASS_INDEX},${elastic.EMPLOYEE_INDEX}`, queries);
+    const results: EsMultiResult = await elastic.mquery(`${elastic.CLASS_INDEX},${elastic.EMPLOYEE_INDEX}`, queries);
     return this.parseResults(results.body.responses, Object.keys(this.aggFilters));
   }
-
-  async interpretResults(results: EsResultBody[], filters: string[]): Promise<any> {
-    const searchContent: any = await (new HydrateSerializer(Section)).bulkSerialize(results[0].hits.hits);
-    const aggregations: any = _.fromPairs(filters.map((filter, idx) => {
-      return [filter, results[idx + 1].aggregations[filter].buckets.map((aggVal) => { return { value: aggVal.key, count: aggVal.doc_count } })];
-    }));
-
+  
+  parseResults(results: EsResultBody[], filters: string[]): PartialResults {
     return {
-      searchContent,
-      aggregations,
+      output: results[0].hits.hits,
       resultCount: results[0].hits.total.value,
       took: results[0].took,
+      aggregations: _.fromPairs(filters.map((filter, idx) => {
+        return [filter, results[idx + 1].aggregations[filter].buckets.map((aggVal) => { return { value: aggVal.key, count: aggVal.doc_count } })];
+      })),
     };
   }
 
@@ -257,7 +253,7 @@ class Searcher {
    * @param  {integer} min    The index of first document to retreive
    * @param  {integer} max    The index of last document to retreive
    */
-  async search(query: string, termId: string, min: number, max: number, filters: FilterInput = {}): Promise<any> {
+  async search(query: string, termId: string, min: number, max: number, filters: FilterInput = {}): Promise<SearchResults> {
     await this.initializeSubjects();
     const start = Date.now();
     // this can be re-written in a way that's less bad
