@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { FilterSelection } from './filters';
 import { SearchItem } from '../types';
 import macros from '../macros';
+import useFeedbackSchedule from './useFeedbackSchedule';
 
 
 interface FeedbackHeaderProps {
@@ -15,32 +16,12 @@ export default function FeedbackHeader({ searchQuery, selectedFilters, searchRes
   const [yes, setYes] = useState(false);
   const [no, setNo] = useState(false);
   const [feedbackQuery, setFeedbackQuery] = useState('');
+  const keyString = 'FEEDBACK';
+  const [show, setFinished] = useFeedbackSchedule(keyString, 86400000);
 
-  // When feedback finished (yes or query entered), set seen in local storage to automatically close header and start timing for showing once a day
-  useEffect(() => {
-    if (yes) {
-      setTimeout(() => { localStorage.setItem('SEEN', 'true') }, 3000);
-    }
-  }, [yes]);
-
-  if (localStorage.getItem('SEEN')) {
-    if (!localStorage.getItem('SEEN_TODAY')) {
-      const today = new Date();
-      localStorage.setItem('SEEN_TODAY', today.toString());
-    } else {
-      const current = new Date();
-      if (current.getTime() >= Date.parse(localStorage.getItem('SEEN_TODAY')) + 86400000) {
-        localStorage.removeItem('SEEN_TODAY');
-        localStorage.removeItem('SEEN');
-        setYes(false);
-        setNo(false);
-        setClose(false);
-      }
-    }
-  }
 
   return (
-    !close && !localStorage.getItem('SEEN_TODAY') && (
+    show && !close && (
       <>
         <div className='FeedbackHeader'>
           { !yes && !no
@@ -58,6 +39,7 @@ export default function FeedbackHeader({ searchQuery, selectedFilters, searchRes
                     macros.logAmplitudeEvent('Feedback header click', {
                       isYes: true, searchQuery: searchQuery, selectedFilters: selectedFilters, searchResults: searchResults.slice(0, 3),
                     });
+                    setFinished();
                   } }
                 >
                   {macros.isMobile ? 'Y' : 'Yes'}
@@ -94,6 +76,7 @@ export default function FeedbackHeader({ searchQuery, selectedFilters, searchRes
                     if (event.key === 'Enter') {
                       setYes(true);
                       setNo(false);
+                      setFinished();
                       macros.logAmplitudeEvent('Feedback header user enter input', {
                         feedbackQuery: feedbackQuery, searchQuery: searchQuery, selectedFilters: selectedFilters, searchResults: searchResults.slice(0, 3),
                       })

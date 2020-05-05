@@ -15,6 +15,7 @@ class Searcher {
     this.subjects = null;
     this.filters = Searcher.generateFilters();
     this.aggFilters = _.pickBy(this.filters, (f) => !!f.agg);
+    this.AGG_RES_SIZE = 1000;
   }
 
   static generateFilters() {
@@ -83,7 +84,7 @@ class Searcher {
 
   async initializeSubjects() {
     if (!this.subjects) {
-      this.subjects = new Set((await Course.aggregate('subject', 'distinct', { plain: false })).map((hash) => hash.distinct));
+      this.subjects = new Set((await Course.aggregate('subject', 'distinct', { plain: false })).map((hash) => hash.distinct.toUpperCase()));
     }
   }
 
@@ -127,14 +128,14 @@ class Searcher {
       'class.subject^4',
       'class.classId^3',
       'sections.profs',
-      'class.crns',
+      'sections.crn',
       'employee.name^2',
       'employee.emails',
       'employee.phone',
     ];
 
     const patternResults = query.match(courseCodePattern);
-    if (patternResults && (this.getSubjects()).has(patternResults[1].toLowerCase())) {
+    if (patternResults && (this.getSubjects()).has(patternResults[1].toUpperCase())) {
       // after the first result, all of the following results should be of the same subject, e.g. it's weird to get ENGL2500 as the second or third result for CS2500
       fields = ['class.subject^10', 'class.classId'];
     }
@@ -154,7 +155,6 @@ class Searcher {
         multi_match: {
           query: query,
           type: 'most_fields', // More fields match => higher score
-          fuzziness: 'AUTO',
           fields: fields,
         },
       }
@@ -177,7 +177,7 @@ class Searcher {
     // very likely this doesn't work
     const aggQuery = !aggregation ? undefined : {
       [aggregation]: {
-        terms: { field: this.filters[aggregation].agg },
+        terms: { field: this.filters[aggregation].agg, size: this.AGG_RES_SIZE },
       },
     };
 

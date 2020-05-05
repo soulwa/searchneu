@@ -19,6 +19,7 @@ import useSearch from '../ResultsPage/useSearch';
 import FilterPanel from '../ResultsPage/FilterPanel';
 import FilterPills from '../ResultsPage/FilterPills';
 import FeedbackHeader from '../ResultsPage/FeedbackHeader';
+import FeedbackModal from '../ResultsPage/FeedbackModal';
 import EmptyResultsContainer from '../ResultsPage/EmptyResultsContainer';
 import MobileSearchOverlay from '../ResultsPage/MobileSearchOverlay';
 import useAtTop from '../ResultsPage/useAtTop';
@@ -68,6 +69,8 @@ export default function Results() {
 
   const searchParams: SearchParams = { termId, query, filters };
 
+  const filtersAreSet: Boolean = areFiltersSet(filters);
+
   const us = useSearch(searchParams, BLANK_SEARCH_RESULT(), fetchResults);
   const {
     isReady, loadMore, doSearch,
@@ -114,6 +117,7 @@ export default function Results() {
         />
       </div>
       {isReady && results.length > 0 && <FeedbackHeader searchQuery={ query } selectedFilters={ filters } searchResults={ results } />}
+      {!macros.isMobile && <FeedbackModal />}
       <div className='Results_Container'>
         {!macros.isMobile && (
           <>
@@ -128,10 +132,10 @@ export default function Results() {
           </>
         )}
         <div className='Results_Main'>
-          { areFiltersSet(filters)
+          { filtersAreSet
           && <FilterPills filters={ filters } setFilters={ setQParams } />}
           {!isReady && <div style={{ visibility: 'hidden' }} />}
-          {isReady && results.length === 0 && <EmptyResultsContainer query={ query } />}
+          {isReady && results.length === 0 && <EmptyResultsContainer query={ query } filtersAreSet={ filtersAreSet } setFilters={ setQParams } /> }
           {isReady && results.length > 0
             && (
               <ResultsLoader

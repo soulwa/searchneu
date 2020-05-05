@@ -29,6 +29,7 @@ exports[`should render a section 1`] = `
       termId="202030"
     />
   </div>
+  <FeedbackModal />
   <div
     className="Results_Container"
   >
