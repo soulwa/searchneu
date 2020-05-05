@@ -8,18 +8,12 @@ import _ from 'lodash';
 import moment, { Moment } from 'moment';
 import macros from '../macros';
 import { DayOfWeek } from '../types';
-
-export interface ServerData {
-  startDate : number;
-  endDate : number;
-  where : string;
-  type : string;
-  times: DayOfWeekToTime;
-}
+import { BackendMeeting } from '../../../common/types';
 
 type DayOfWeekToTime = {
   [key in DayOfWeek]? : TimeTuple[];
 };
+
 
 type TimeTuple = {
   start : number;
@@ -44,7 +38,7 @@ class Meeting {
 
   times: MomentTuple[];
 
-  constructor(serverData : ServerData) {
+  constructor(serverData : BackendMeeting) {
     if (!serverData) {
       return null;
     }
