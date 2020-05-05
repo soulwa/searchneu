@@ -94,7 +94,8 @@ export interface MeetingTime {
  */
 
 export type EsMapping = Record<string, any>;
-export type EsBulkData = any;
+// TODO value is a Document--something we insert into ES
+export type EsBulkData = Record<string, any>;
 
 // ======== Results ==========
 export type EsResult = any; // is this one even necessary?
@@ -125,7 +126,6 @@ export interface AggResults {
 }
 
 // ======== Queries ==========
-
 export interface EsQuery {
   from: number,
   size: number,
@@ -160,6 +160,7 @@ export type LeafQuery = TermQuery
                       | TermsQuery 
                       | ExistsQuery 
                       | MultiMatchQuery 
+                      | RangeQuery
                       | typeof MATCH_ALL_QUERY;
 
 export interface TermQuery {
@@ -174,8 +175,18 @@ export interface MultiMatchQuery {
   multi_match: {
     query: string,
     type: string,
-    fuzziness: string,
     fields: string[]
+  }
+}
+
+export interface RangeQuery {
+  range: {
+    [fieldName: string]: {
+      gte?: number;
+      gt?:  number;
+      lte?: number;
+      lt?:  number;
+    }
   }
 }
 
@@ -202,7 +213,10 @@ export interface SortStruct {
 
 export interface QueryAgg {
   [aggName: string]: {
-    terms: { field: string }
+    terms: {
+      field: string,
+      size?: number,
+    }
   }
 }
 
@@ -214,13 +228,25 @@ export type FilterInput = {
   [filterName: string]: ValidFilterInput
 }
 
+export type AggProp = false | string; 
+
 export interface FilterStruct<Input> {
   validate: (input: Input) => boolean,
   create: (input: Input) => LeafQuery,
-  agg: false | string,
-};
+  agg: AggProp;
+}
 
+export interface AggFilterStruct<Input> extends FilterStruct<Input> {
+  agg: string;
+}
 
-type ValidFilterInput = string | string[] | boolean;
+export interface Range {
+  min: number;
+  max: number;
+}
+
+export type ValidFilterInput = string | string[] | boolean | Range;
 
 export type FilterPrelude = Record<string, FilterStruct<ValidFilterInput>>;
+
+export type AggFilterPrelude = Record<string, AggFilterStruct<ValidFilterInput>>;

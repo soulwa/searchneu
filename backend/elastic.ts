@@ -59,7 +59,6 @@ export class Elastic {
    * @param  {Object} map       A map of document ids to document sources to create
    */
   async bulkIndexFromMap(indexName: string, map: EsBulkData): Promise<any> {
-    // TODO not sure what the type is here
     const chunks = _.chunk(Object.keys(map), BULKSIZE);
     return pMap(chunks, async (chunk, chunkNum) => {
       const bulk = [];
@@ -72,22 +71,6 @@ export class Elastic {
       return res;
     },
     { concurrency: 1 });
-  }
-
-  /**
-   * Bulk update a collection of documents using ids fromhashmap
-   * @param  {string} indexName The index to update into
-   * @param  {Object} map       A map of document ids to document sources to update
-   * TODO: does this need the Elastic serializer? why does this exist?
-   */
-  async bulkUpdateFromMap(indexName: string, map: EsBulkData): Promise<void> {
-    // TODO not sure what the type is here
-    const bulk = [];
-    for (const id of Object.keys(map)) {
-      bulk.push({ update: { _id: id } });
-      bulk.push({ doc: map[id] });
-    }
-    await client.bulk({ index: indexName, body: bulk });
   }
 
   async query(index: string, from: number, size: number, body: EsQuery): Promise<EsResult> {
