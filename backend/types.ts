@@ -1,3 +1,9 @@
+/*
+ * This file is part of Search NEU and licensed under AGPL3.
+ * See the license file in the root folder for details.
+ */
+// ONLY PUT COMMONLY USED TYPES HERE
+
 // An NU employee
 export interface Employee {
   name: string,
@@ -46,9 +52,11 @@ export interface CourseReq {
   subject: string;
   missing?: true;
 }
+
 export function isBooleanReq(req: Requisite): req is BooleanReq {
   return (req as BooleanReq).type !== undefined;
 }
+
 export function isCourseReq(req: Requisite): req is CourseReq {
   return (req as CourseReq).classId !== undefined;
 }
@@ -86,19 +94,14 @@ export interface MeetingTime {
   end: number,
 }
 
-/*
- * This file is part of Search NEU and licensed under AGPL3.
- * See the license file in the root folder for details.
- *
- * ONLY PUT COMMONLY USED TYPES HERE
- */
 
 export type EsMapping = Record<string, any>;
 // TODO value is a Document--something we insert into ES
 export type EsBulkData = Record<string, any>;
 
 // ======== Results ==========
-export type EsResult = any; // is this one even necessary?
+// TODO blocked a bit by new ORM, trying to avoid duplication
+export type EsResult = any;
 
 export type EsMultiResult = {
   body: {
@@ -110,20 +113,56 @@ export interface EsResultBody {
   took: number,
   hits: {
     total: { value: number },
-    hits: {
-      // TODO blah
-      // EsSerializer types
-    },
+    hits: EsResult[],
     value: number,
   }
-  aggregations: AggResults
+  aggregations: EsAggResults
 }
 
-export interface AggResults {
+export interface EsAggResults {
   [aggName: string]: {
     buckets: Array<{ key: string, doc_count: number }>
   }
 }
+
+export interface SearchResults {
+  searchContent: SearchResult[],
+  resultCount: number,
+  took: {
+    total: number,
+    hydrate: number,
+    es: number,
+  },
+  aggregations: AggResults
+}
+
+export interface PartialResults {
+  output: EsResult[],
+  resultCount: number,
+  took: number,
+  aggregations: AggResults
+}
+
+export interface AggCount {
+  value: string;
+  count: number;
+}
+
+export interface AggResults {
+  [filterName: string]: AggCount[];
+}
+
+
+// WARNING there should be a `type` property of type `string` here, but Typescript doesn't like it (because `type`, the property name, is a string, which conflicts with the `resultId` field)
+export interface SearchResult {
+  [resultId: string]: ResultDoc
+}
+
+export interface CourseDoc {
+  class: Course;
+  sections: Section[];
+}
+export type ResultDoc = Employee | CourseDoc;
 
 // ======== Queries ==========
 export interface EsQuery {
@@ -250,3 +289,4 @@ export type ValidFilterInput = string | string[] | boolean | Range;
 export type FilterPrelude = Record<string, FilterStruct<ValidFilterInput>>;
 
 export type AggFilterPrelude = Record<string, AggFilterStruct<ValidFilterInput>>;
+
