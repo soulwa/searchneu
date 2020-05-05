@@ -9,22 +9,24 @@ import { Course, Section } from './database/models/index';
 import HydrateSerializer from './database/serializers/hydrateSerializer';
 import macros from './macros';
 import { 
-  EsQuery, QueryNode, QueryAgg, 
+  EsQuery, QueryNode, FilterStruct, AggFilterStruct, ValidFilterInput,
   ExistsQuery, TermsQuery, TermQuery, LeafQuery, MATCH_ALL_QUERY, SortStruct,
-  FilterInput, FilterPrelude, EsResultBody, EsMultiResult,
+  FilterInput, FilterPrelude, EsResultBody, Range, RangeQuery, AggFilterPrelude
 } from './types';
 
 class Searcher {
   elastic: Elastic;
   subjects: Set<string>;
   filters: FilterPrelude;
-  aggFilters: FilterPrelude;
+  aggFilters: AggFilterPrelude;
+  AGG_RES_SIZE: number;
 
   constructor() {
     this.elastic = elastic;
     this.subjects = null;
     this.filters = Searcher.generateFilters();
-    this.aggFilters = _.pickBy(this.filters, (f) => !!f.agg);
+    this.aggFilters = _.pickBy<FilterStruct<ValidFilterInput>, AggFilterStruct<ValidFilterInput>>(this.filters, 
+                                                                                                  (f): f is AggFilterStruct<ValidFilterInput> => f.agg !== false);
     this.AGG_RES_SIZE = 1000;
   }
 
@@ -76,7 +78,7 @@ class Searcher {
       return { term: { 'class.termId': selectedTermId } };
     };
 
-    const getRangeFilter = (selectedRange) => {
+    const getRangeFilter = (selectedRange: Range): RangeQuery => {
       return { range: { 'class.classId': { gte: selectedRange.min, lte: selectedRange.max } } };
     };
 
@@ -93,8 +95,7 @@ class Searcher {
 
   async initializeSubjects(): Promise<void> {
     if (!this.subjects) {
-      this.subjects = new Set((await Course.aggregate('subject', 'distinct', { plain: false })).map((hash) => hash.distinct.toUpperCase()));
-    }
+      this.subjects = new Set((await Course.aggregate('subject', 'distinct', { plain: false })).map((hash) => hash.distinct.toUpperCase()));    }
   }
 
   /**
@@ -161,6 +162,7 @@ class Searcher {
    */
   // TODO: GET RID OF THE ANY
   generateQuery(query: string, termId: string, userFilters: FilterInput, min: number, max: number, aggregation: string = ''): EsQuery {
+    const fields: string[] = this.getFields(query);
     // text query from the main search box
     // I hate this this is garbage
     const matchTextQuery: LeafQuery = query.length > 0
@@ -177,7 +179,7 @@ class Searcher {
     const sortByClassId: SortStruct = { 'class.classId.keyword': { order: 'asc', unmapped_type: 'keyword' } };
 
     // filter by type employee
-    const isEmployee: TermQuery = { term: { type: 'employee' } };
+    const isEmployee: LeafQuery = { term: { type: 'employee' } };
     const areFiltersApplied: boolean = Object.keys(userFilters).length > 0;
     const requiredFilters: FilterInput = { termId: termId, sectionsAvailable: true };
     const filters: FilterInput = { ...requiredFilters, ...userFilters };
@@ -189,7 +191,7 @@ class Searcher {
     // very likely this doesn't work
     const aggQuery = !aggregation ? undefined : {
       [aggregation]: {
-        terms: { field: this.filters[aggregation].agg, size: this.AGG_RES_SIZE },
+        terms: { field: this.aggFilters[aggregation].agg, size: this.AGG_RES_SIZE },
       },
     };
 
