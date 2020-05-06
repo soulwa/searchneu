@@ -80,7 +80,12 @@ export interface BoolQuery {
 
 export type BoolType = MustQuery | ShouldQuery | FilterQuery;
 
-// THESE ARE THE SAME. The only difference is what string shows up first.
+/**
+ * The below three Query types have the same structure.
+ * The only difference is what string shows up first.
+ * But, they need to be separate types, because they mean very different things.
+ * Not sure how to solve.
+ */
 export interface MustQuery {
   must: OneOrMany<QueryNode>;
 }
