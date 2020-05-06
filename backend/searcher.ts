@@ -164,11 +164,9 @@ class Searcher {
   /**
    * Get elasticsearch query
    */
-  // TODO: GET RID OF THE ANY
   generateQuery(query: string, termId: string, userFilters: FilterInput, min: number, max: number, aggregation: string = ''): EsQuery {
     const fields: string[] = this.getFields(query);
     // text query from the main search box
-    // I hate this this is garbage
     const matchTextQuery: LeafQuery = query.length > 0
       ? {
         multi_match: {
@@ -188,11 +186,9 @@ class Searcher {
     const requiredFilters: FilterInput = { termId: termId, sectionsAvailable: true };
     const filters: FilterInput = { ...requiredFilters, ...userFilters };
 
-    // should I get rid of the OneOrMany
     const classFilters: QueryNode[] = _(filters).pick(Object.keys(this.filters)).toPairs().map(([key, val]) => this.filters[key].create(val))
       .value();
 
-    // very likely this doesn't work
     const aggQuery = !aggregation ? undefined : {
       [aggregation]: {
         terms: { field: this.aggFilters[aggregation].agg, size: this.AGG_RES_SIZE },
