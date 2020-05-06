@@ -8,7 +8,7 @@ import { Client } from '@elastic/elasticsearch';
 import _ from 'lodash';
 import pMap from 'p-map';
 import macros from './macros';
-import { EsBulkData, EsQuery, EsMapping, EsMultiResult, EsResult } from './types';
+import { EsBulkData, EsQuery, EsMapping, EsMultiResult, EsResult } from './search_types';
 
 const URL: string = macros.getEnvVariable('elasticURL') || 'http://localhost:9200';
 const client = new Client({ node: URL });
@@ -34,10 +34,7 @@ export class Elastic {
     return true;
   }
 
-  /**
-   * @param  {string} indexName The index to insert into
-   * @param  {Object} mapping   The new elasticsearch index mapping(schema)
-   */
+  // replace an index with a fresh one with a specified mapping
   async resetIndex(indexName: string, mapping: EsMapping): Promise<any> {
     const exists = (await client.indices.exists({ index: indexName })).statusCode === 200;
     if (exists) {
@@ -53,11 +50,7 @@ export class Elastic {
     });
   }
 
-  /**
-   * Bulk index a collection of documents using ids from hashmap
-   * @param  {string} indexName The index to insert into
-   * @param  {Object} map       A map of document ids to document sources to create
-   */
+  // Bulk index a collection of documents using ids from hashmap
   async bulkIndexFromMap(indexName: string, map: EsBulkData): Promise<any> {
     const chunks = _.chunk(Object.keys(map), BULKSIZE);
     return pMap(chunks, async (chunk, chunkNum) => {
@@ -73,12 +66,14 @@ export class Elastic {
     { concurrency: 1 });
   }
 
+  // Send a query to elasticsearch
   async query(index: string, from: number, size: number, body: EsQuery): Promise<EsResult> {
     return client.search({
       index: index, from: from, size: size, body: body,
     });
   }
 
+  // Send a MultiQuery to elasticsearch
   async mquery(index: string, queries: EsQuery[]): Promise<EsMultiResult> {
     const multiQuery = [];
     for (const query of queries) {

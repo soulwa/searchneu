@@ -9,10 +9,10 @@ import { Course, Section } from './database/models/index';
 import HydrateSerializer from './database/serializers/hydrateSerializer';
 import macros from './macros';
 import { 
-  EsQuery, QueryNode, FilterStruct, AggFilterStruct, ValidFilterInput, PartialResults,
-  ExistsQuery, TermsQuery, TermQuery, LeafQuery, MATCH_ALL_QUERY, SortStruct,
-  FilterInput, FilterPrelude, EsResultBody, Range, RangeQuery, AggFilterPrelude, EsMultiResult, SearchResults
-} from './types';
+  EsQuery, QueryNode, ExistsQuery, TermsQuery, TermQuery, LeafQuery, MATCH_ALL_QUERY, RangeQuery,
+  EsFilterStruct, EsAggFilterStruct, FilterInput, FilterPrelude, AggFilterPrelude, SortInfo, Range,
+  SearchResults, PartialResults, EsResultBody, EsMultiResult,
+} from './search_types';
 
 class Searcher {
   elastic: Elastic;
@@ -25,30 +25,29 @@ class Searcher {
     this.elastic = elastic;
     this.subjects = null;
     this.filters = Searcher.generateFilters();
-    this.aggFilters = _.pickBy<FilterStruct<ValidFilterInput>, AggFilterStruct<ValidFilterInput>>(this.filters, 
-                                                                                                  (f): f is AggFilterStruct<ValidFilterInput> => f.agg !== false);
+    this.aggFilters = _.pickBy<EsFilterStruct, EsAggFilterStruct>(this.filters, (f): f is EsAggFilterStruct => f.agg !== false);
     this.AGG_RES_SIZE = 1000;
   }
 
   static generateFilters(): FilterPrelude {
     // type validating functions
-    const isString = (arg: any): boolean => {
+    const isString = (arg: any): arg is string => {
       return typeof arg === 'string';
     };
 
-    const isStringArray = (arg: any): boolean => {
+    const isStringArray = (arg: any): arg is string[] => {
       return Array.isArray(arg) && arg.every((elem) => isString(elem));
     };
 
-    const isTrue = (arg: any): boolean => {
+    const isTrue = (arg: any): arg is true => {
       return typeof arg === 'boolean' && arg;
     };
 
-    const isNum = (arg) => {
+    const isNum = (arg: any): arg is number => {
       return typeof arg === 'number';
     };
 
-    const isRange = (arg) => {
+    const isRange = (arg: any): arg is Range => {
       return _.difference(Object.keys(arg), ['min', 'max']).length === 0 && isNum(arg.min) && isNum(arg.max);
     };
 
@@ -176,7 +175,7 @@ class Searcher {
       : MATCH_ALL_QUERY;
 
     // use lower classId has tiebreaker after relevance
-    const sortByClassId: SortStruct = { 'class.classId.keyword': { order: 'asc', unmapped_type: 'keyword' } };
+    const sortByClassId: SortInfo = { 'class.classId.keyword': { order: 'asc', unmapped_type: 'keyword' } };
 
     // filter by type employee
     const isEmployee: LeafQuery = { term: { type: 'employee' } };

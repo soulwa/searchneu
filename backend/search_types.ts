@@ -17,7 +17,7 @@ export interface EsQuery {
   aggregations?: QueryAgg;
 };
 
-type EsValues = string | string[] | boolean | Range;
+type EsValue = string | string[] | boolean | Range;
 
 export interface Range {
   min: number;
@@ -71,7 +71,7 @@ export interface ExistsQuery {
 }
 
 export interface FieldQuery {
-  [fieldName: string]: EsValues;
+  [fieldName: string]: EsValue;
 }
 // ====== Bool Queries =======
 export interface BoolQuery {
@@ -94,9 +94,8 @@ export interface FilterQuery {
 };
 
 // ====== Misc. Queries ======
-
-// TODO what does the string represent?
-export type EsSort = [string, SortInfo];
+export type EsSort = [SortType, SortInfo];
+type SortType = string;
 
 export interface SortInfo {
   [fieldName: string]: {
@@ -116,25 +115,29 @@ export interface QueryAgg {
 
 // ========= Filters =========
 export type FilterInput = {
-  [filterName: string]: EsValues;
+  [filterName: string]: EsValue;
 }
 
-export interface FilterStruct<Input> {
+interface FilterStruct<Input> {
   validate: (input: Input) => boolean;
   create: (input: Input) => LeafQuery;
   agg: AggProp;
 }
 
-export type FilterPrelude = Record<string, FilterStruct<EsValues>>;
+export type EsFilterStruct = FilterStruct<EsValue>;
+
+export type FilterPrelude = Record<string, EsFilterStruct>;
 
 // ======= Agg Filters =======
 export type AggProp = false | string; 
 
-export interface AggFilterStruct<Input> extends FilterStruct<Input> {
+interface AggFilterStruct<Input> extends FilterStruct<Input> {
   agg: string;
 }
 
-export type AggFilterPrelude = Record<string, AggFilterStruct<EsValues>>;
+export type EsAggFilterStruct = AggFilterStruct<EsValue>;
+
+export type AggFilterPrelude = Record<string, EsAggFilterStruct>;
 
 /*************** ES RESULTS ****************/
 // TODO blocked a bit by new ORM, trying to avoid duplication
@@ -142,44 +145,44 @@ export type EsResult = any;
 
 export type EsMultiResult = {
   body: {
-    responses: EsResultBody[]
+    responses: EsResultBody[];
   }
 };
 
 export interface EsResultBody {
   took: number,
   hits: {
-    total: { value: number },
-    hits: EsResult[],
-    value: number,
+    total: { value: number };
+    hits: EsResult[];
+    value: number;
   }
-  aggregations: EsAggResults
+  aggregations: EsAggResults;
 }
 
 export interface EsAggResults {
   [aggName: string]: {
-    buckets: Array<{ key: string, doc_count: number }>
+    buckets: Array<{ key: string, doc_count: number }>;
   }
 }
 
 
 /************* SEARCH RESULTS **************/
 export interface SearchResults {
-  searchContent: SearchResult[],
-  resultCount: number,
+  searchContent: SearchResult[];
+  resultCount: number;
   took: {
-    total: number,
-    hydrate: number,
-    es: number,
+    total: number;
+    hydrate: number;
+    es: number;
   },
-  aggregations: AggResults
+  aggregations: AggResults;
 }
 
 export interface PartialResults {
-  output: EsResult[],
-  resultCount: number,
-  took: number,
-  aggregations: AggResults
+  output: EsResult[];
+  resultCount: number;
+  took: number;
+  aggregations: AggResults;
 }
 
 export interface AggCount {
@@ -198,7 +201,7 @@ export interface AggResults {
  * the `resultId` field, which captures all string property names, but has a value other than `string`.
  */
 export interface SearchResult {
-  [resultId: string]: ResultDoc
+  [resultId: string]: ResultDoc;
 }
 
 export interface CourseDoc {
