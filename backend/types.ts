@@ -93,4 +93,3 @@ export interface MeetingTime {
   start: number,
   end: number,
 }
-

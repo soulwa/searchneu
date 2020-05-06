@@ -8,7 +8,9 @@ import { Client } from '@elastic/elasticsearch';
 import _ from 'lodash';
 import pMap from 'p-map';
 import macros from './macros';
-import { EsBulkData, EsQuery, EsMapping, EsMultiResult, EsResult } from './search_types';
+import {
+  EsBulkData, EsQuery, EsMapping, EsMultiResult, EsResult,
+} from './search_types';
 
 const URL: string = macros.getEnvVariable('elasticURL') || 'http://localhost:9200';
 const client = new Client({ node: URL });
@@ -17,6 +19,7 @@ const BULKSIZE = 5000;
 
 export class Elastic {
   CLASS_INDEX: string;
+
   EMPLOYEE_INDEX: string;
 
   constructor() {
