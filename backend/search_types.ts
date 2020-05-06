@@ -15,7 +15,7 @@ export interface EsQuery {
   sort: EsSort;
   query: QueryNode;
   aggregations?: QueryAgg;
-};
+}
 
 type EsValue = string | string[] | boolean | Range;
 
@@ -29,12 +29,12 @@ export interface Range {
 export type QueryNode = LeafQuery | BoolQuery;
 
 // ====== Leaf Queries =======
-export type LeafQuery = TermQuery 
-                      | TermsQuery 
-                      | ExistsQuery 
-                      | MultiMatchQuery 
-                      | RangeQuery
-                      | MatchAllQuery;
+export type LeafQuery = TermQuery
+| TermsQuery
+| ExistsQuery
+| MultiMatchQuery
+| RangeQuery
+| MatchAllQuery;
 
 export interface TermQuery {
   term: FieldQuery;
@@ -56,9 +56,9 @@ export interface RangeQuery {
   range: {
     [fieldName: string]: {
       gte?: number;
-      gt?:  number;
+      gt?: number;
       lte?: number;
-      lt?:  number;
+      lt?: number;
     }
   }
 }
@@ -76,22 +76,22 @@ export interface FieldQuery {
 // ====== Bool Queries =======
 export interface BoolQuery {
   bool: BoolType;
-};
+}
 
 export type BoolType = MustQuery | ShouldQuery | FilterQuery;
 
 // THESE ARE THE SAME. The only difference is what string shows up first.
 export interface MustQuery {
   must: OneOrMany<QueryNode>;
-};
+}
 
 export interface ShouldQuery {
   should: OneOrMany<QueryNode>;
-};
+}
 
 export interface FilterQuery {
   filter: OneOrMany<QueryNode>;
-};
+}
 
 // ====== Misc. Queries ======
 export type EsSort = [SortType, SortInfo];
@@ -129,7 +129,7 @@ export type EsFilterStruct = FilterStruct<EsValue>;
 export type FilterPrelude = Record<string, EsFilterStruct>;
 
 // ======= Agg Filters =======
-export type AggProp = false | string; 
+export type AggProp = false | string;
 
 interface AggFilterStruct<Input> extends FilterStruct<Input> {
   agg: string;
@@ -215,4 +215,3 @@ export type EsMapping = Record<string, any>;
 
 // TODO value is a Document--something we insert into ES
 export type EsBulkData = Record<string, any>;
-

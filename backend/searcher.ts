@@ -8,7 +8,7 @@ import elastic, { Elastic } from './elastic';
 import { Course, Section } from './database/models/index';
 import HydrateSerializer from './database/serializers/hydrateSerializer';
 import macros from './macros';
-import { 
+import {
   EsQuery, QueryNode, ExistsQuery, TermsQuery, TermQuery, LeafQuery, MATCH_ALL_QUERY, RangeQuery,
   EsFilterStruct, EsAggFilterStruct, FilterInput, FilterPrelude, AggFilterPrelude, SortInfo, Range,
   SearchResults, PartialResults, EsResultBody, EsMultiResult,
@@ -16,9 +16,13 @@ import {
 
 class Searcher {
   elastic: Elastic;
+
   subjects: Set<string>;
+
   filters: FilterPrelude;
+
   aggFilters: AggFilterPrelude;
+
   AGG_RES_SIZE: number;
 
   constructor() {
@@ -94,7 +98,8 @@ class Searcher {
 
   async initializeSubjects(): Promise<void> {
     if (!this.subjects) {
-      this.subjects = new Set((await Course.aggregate('subject', 'distinct', { plain: false })).map((hash) => hash.distinct.toUpperCase()));    }
+      this.subjects = new Set((await Course.aggregate('subject', 'distinct', { plain: false })).map((hash) => hash.distinct.toUpperCase()));
+    }
   }
 
   /**
@@ -233,7 +238,7 @@ class Searcher {
     const results: EsMultiResult = await elastic.mquery(`${elastic.CLASS_INDEX},${elastic.EMPLOYEE_INDEX}`, queries);
     return this.parseResults(results.body.responses, Object.keys(this.aggFilters));
   }
-  
+
   parseResults(results: EsResultBody[], filters: string[]): PartialResults {
     return {
       output: results[0].hits.hits,
