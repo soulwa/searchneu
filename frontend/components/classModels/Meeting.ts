@@ -14,7 +14,6 @@ type DayOfWeekToTime = {
   [key in DayOfWeek]? : TimeTuple[];
 };
 
-
 type TimeTuple = {
   start : number;
   end : number;
@@ -29,6 +28,11 @@ type TimeToMoment = {
   [key: number] : MomentTuple[];
 }
 
+const DAY_IN_MILLISECONDS = 24 * 60 * 60 * 1000;
+
+/**
+ * Represents a meeting's location and times, e.g. labs and lecture.
+ */
 class Meeting {
   location: string;
 
@@ -52,8 +56,8 @@ class Meeting {
     }
 
     //beginning of the day that the class starts/ends
-    this.startDate = moment((serverData.startDate + 1) * 24 * 60 * 60 * 1000);
-    this.endDate = moment((serverData.endDate + 1) * 24 * 60 * 60 * 1000);
+    this.startDate = moment((serverData.startDate + 1) * DAY_IN_MILLISECONDS);
+    this.endDate = moment((serverData.endDate + 1) * DAY_IN_MILLISECONDS);
 
     //grouped by start+end time on each day.
     // eg, if have class that meets tue, wed, thu, at same time each day,

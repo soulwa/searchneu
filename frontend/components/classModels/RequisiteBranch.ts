@@ -21,9 +21,9 @@ export interface ReqFor {
   values : CourseReq[]
 }
 
-// This class holds a branch in the prerequisite or corequisite graph. For instance, if
-// a clas's prereqs are ((a or b) and (c or d)), then
-
+/**
+ * RequisiteBranch is a branch in the prerequisite or coreqs graph.
+ */
 class RequisiteBranch {
   prereqs: ReqType;
 
@@ -34,7 +34,7 @@ class RequisiteBranch {
       try {
         return a.compareTo(b);
       } catch (e) {
-        return 0; // todo: temporary, anyone have ideas?
+        return 0; // todo: temporary, anyone have ideas? (sometimes, for some reason, a & b aren't courses :/
       }
     });
 
@@ -42,7 +42,6 @@ class RequisiteBranch {
       type: data.type,
       values: values,
     };
-
 
     this.coreqs = {
       type: ReqKind.OR,

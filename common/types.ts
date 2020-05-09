@@ -5,7 +5,7 @@ export interface BackendMeeting {
   endDate: number,
   where: string,
   type: string,
-  times: Record<'0' | '1' | '2' | '3' | '4' | '5' | '6', MeetingTime>
+  times: Partial<Record<'0' | '1' | '2' | '3' | '4' | '5' | '6', MeetingTime[]>>
 }
 
 // A single meeting time, ex: "9:50-11:30am"

@@ -10,6 +10,9 @@ import Keys from '../../../common/Keys';
 import macros from '../macros';
 import Meeting, { MomentTuple } from './Meeting';
 
+/**
+ * Represents all of the data a Section of a {@link Course} holds.
+ */
 class Section {
   static requiredPath : string[] = ['host', 'termId', 'subject', 'classId'];
 
@@ -45,9 +48,6 @@ class Section {
       this.dataStatus = macros.DATASTATUS_DONE;
     }
 
-    //seperate reasons to meet: eg Lecture or Lab.
-    //each of these then has times, and days
-    //instances of Meeting
     this.meetings = [];
   }
 

@@ -13,10 +13,9 @@ import macros from '../macros';
 import Section from './Section';
 import RequisiteBranch, { ReqFor, ReqType, ReqKind } from './RequisiteBranch';
 
-
-// This file used to have an equals method as part of coursepro, but then it was removed.
-// It might still be in the git history, or you can just ask Ryan if you ever find that you need an equals method.
-
+/**
+ * Course represents a Course. Contains sections, its id, its name, crn, prereqs/coreqs, etc.
+ */
 class Course {
   static requiredPath : string[] = ['host', 'termId', 'subject'];
 
@@ -55,11 +54,6 @@ class Course {
   constructor() {
     //true, if for instance "AP placement exam, etc"
     this.isString = false;
-
-    // A class that is listed as a prereq for another class on the site, but this class doesn't actually exist
-    // Currently, missing prereqs are not even added as prereqs for classes because I can't think of any reason to list classes
-    // that don't exist anywhere on the site. Could be changed in future, the filter is in this file.
-    // this.missing = false;
 
     this.sections = [];
 

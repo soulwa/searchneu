@@ -2,14 +2,15 @@
  * This file is part of Search NEU and licensed under AGPL3.
  * See the license file in the root folder for details.
  */
-import Meeting, { ServerData } from '../../classModels/Meeting';
+import Meeting from '../../classModels/Meeting';
 import { DayOfWeek } from '../../types';
+import { BackendMeeting } from '../../../../common/types';
 
 let meeting : Meeting;
 let exam : Meeting;
 
 beforeEach(() => {
-  const serverDataForMeeting : ServerData = {
+  const serverDataForMeeting : BackendMeeting = {
     startDate: 18267,
     endDate: 18366,
     where: 'Robinson Hall 411',
@@ -31,7 +32,7 @@ beforeEach(() => {
   };
   meeting = new Meeting(serverDataForMeeting);
 
-  const serverDataForExam : ServerData = {
+  const serverDataForExam : BackendMeeting = {
     startDate: 18375,
     endDate: 18375,
     where: 'Mugar Life Science Building 201',
