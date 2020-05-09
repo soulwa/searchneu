@@ -7,6 +7,11 @@ import macros from '../../macros';
 import useFeedbackSchedule from '../useFeedbackSchedule';
 import useClickOutside from '../useClickOutside';
 
+enum FeedbackStep {
+  initial,
+  checkbox,
+  free
+}
 
 export default function FeedbackModal() {
   const [open, setOpen] = useState(false);
@@ -15,7 +20,7 @@ export default function FeedbackModal() {
   const [feedbackQuery, setFeedbackQuery] = useState('');
   const [feedbackType, setFeedbackType] = useState('filter');
   const [submitted, setSubmitted] = useState(false);
-  const [step, setStep] = useState('initial');
+  const [step, setStep] = useState(FeedbackStep.initial);
 
   const modalRef = useRef(null);
   useClickOutside(modalRef, open, setOpen);
@@ -27,21 +32,21 @@ export default function FeedbackModal() {
 
   function handleSubmit() {
     switch (step) {
-      case 'initial':
+      case FeedbackStep.initial:
         if (yes) {
           macros.logAmplitudeEvent('Feedback modal initial submit', { lookingForFound: yes });
           setSubmitted(true);
           setFinished();
         } else {
           macros.logAmplitudeEvent('Feedback modal initial submit', { lookingForFound: yes });
-          setStep('checkbox');
+          setStep(FeedbackStep.checkbox);
         }
         break;
-      case 'checkbox':
+      case FeedbackStep.checkbox:
         macros.logAmplitudeEvent('Feedback modal checkbox submit', { lookingFor: selectedFeedback });
-        setStep('free');
+        setStep(FeedbackStep.free);
         break;
-      case 'free':
+      case FeedbackStep.free:
         macros.logAmplitudeEvent('Feedback modal free submit', { feedbackType: feedbackType, feedbackQuery: feedbackQuery });
         setSubmitted(true);
         setFinished();
@@ -62,11 +67,11 @@ export default function FeedbackModal() {
 
   function renderFeedback() {
     switch (step) {
-      case 'initial':
+      case FeedbackStep.initial:
         return <FeedbackModalInitial setYes={ setYes } />;
-      case 'checkbox':
+      case FeedbackStep.checkbox:
         return <FeedbackModalCheckboxes feedbackOptions={ feedbackOptions } selectedFeedback={ selectedFeedback } setSelectedFeedback={ setSelectedFeedback } />;
-      case 'free':
+      case FeedbackStep.free:
         return <FeedbackModalFree feedbackQuery={ feedbackQuery } setFeedbackQuery={ setFeedbackQuery } setFeedbackType={ setFeedbackType } />;
       default:
         return null;
