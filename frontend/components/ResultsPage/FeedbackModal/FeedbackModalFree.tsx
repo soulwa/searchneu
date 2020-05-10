@@ -6,6 +6,10 @@ interface FreeResponseProps {
   setFeedbackType: (s: string) => void;
 }
 
+/**
+ * Open-ended response in feedback modal
+ */
+
 export default function FeedbackModalFree({
   feedbackQuery, setFeedbackQuery, setFeedbackType,
 } : FreeResponseProps) {

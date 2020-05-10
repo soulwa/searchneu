@@ -6,6 +6,9 @@ interface CheckboxProps {
   selectedFeedback: string[];
   setSelectedFeedback: (a:string[]) => void;
 }
+/**
+ * Checkbox selection form for feedback modal
+ */
 
 export default function FeedbackModalCheckboxes({ feedbackOptions, selectedFeedback, setSelectedFeedback } : CheckboxProps) {
   return (

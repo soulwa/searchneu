@@ -3,6 +3,9 @@ import React from 'react';
 interface InitialStepProps {
   setYes: (b:boolean) => void;
 }
+/**
+ *  Initial form for feedback modal, yes or no radio buttons
+ */
 
 export default function FeedbackModalInitial({ setYes } : InitialStepProps) {
   return (
