@@ -5,6 +5,9 @@
 // ONLY PUT COMMONLY USED TYPES HERE
 
 // An NU employee
+
+import { BackendMeeting } from '../common/types';
+
 export interface Employee {
   name: string,
   firstName: string,
@@ -76,20 +79,5 @@ export interface Section {
   honors: boolean,
   url: string,
   profs: string[],
-  meetings: Meeting[],
-}
-
-// A block of meetings, ex: "Tuesdays+Fridays, 9:50-11:30am"
-export interface Meeting {
-  startDate: number,
-  endDate: number,
-  where: string,
-  type: string,
-  times: Record<'0'|'1'|'2'|'3'|'4'|'5'|'6', MeetingTime>
-}
-
-// A single meeting time, ex: "9:50-11:30am"
-export interface MeetingTime {
-  start: number,
-  end: number,
+  meetings: BackendMeeting[],
 }

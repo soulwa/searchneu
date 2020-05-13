@@ -27,7 +27,7 @@ export default class MobileSectionPanel extends React.Component {
   // This is different than the one in ClassPanel.js because this can show and hide the waitlist based on a per-section basis
   // and ClassPanel.js is show it for all sections or none.
   shouldShowWaitlist() {
-    return this.props.section.getHasWaitList()
+    return this.props.section.hasWaitList()
       && this.props.section.seatsRemaining < 10;
   }
 
@@ -68,7 +68,7 @@ export default class MobileSectionPanel extends React.Component {
         const examDayMoment = examMeeting.endDate;
         const examTimeMoment = examMeeting.times[0][0].start;
 
-        let examLocation = examMeeting.where;
+        let examLocation = examMeeting.location;
 
         if (examLocation === 'TBA') {
           examLocation = 'Location TBA';

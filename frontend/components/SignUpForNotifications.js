@@ -226,7 +226,7 @@ class SignUpForNotifications extends React.Component {
       }
     } else if (this.props.aClass.sections.length === 0) {
       content = <Button basic onClick={ this.onSubscribeToggleChange } content='Get notified when sections are added!' className='notificationButton' />;
-    } else if (this.props.aClass.isAtLeastOneSectionFull()) {
+    } else if (this.props.aClass.hasAtLeastOneSectionFull()) {
       content = <Button basic onClick={ this.onSubscribeToggleChange } content='Get notified when seats open up!' className='notificationButton' />;
     } else {
       // Show a button that says there are currently seats available.

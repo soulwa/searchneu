@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 /*
  * This file is part of Search NEU and licensed under AGPL3.
  * See the license file in the root folder for details.
@@ -7,9 +8,38 @@ import _ from 'lodash';
 
 import Keys from '../../../common/Keys';
 import macros from '../macros';
-import Meeting from './Meeting';
+import Meeting, { MomentTuple } from './Meeting';
 
+/**
+ * Represents all of the data a Section of a {@link Course} holds.
+ */
 class Section {
+  static requiredPath : string[] = ['host', 'termId', 'subject', 'classId'];
+
+  static optionalPath : string[] = ['crn'];
+
+  static API_ENDPOINT : string = '/listSections';
+
+  dataStatus : string;
+
+  lastUpdateTime : number;
+
+  meetings: Meeting[];
+
+  profs : string[];
+
+  waitCapacity : number;
+
+  waitRemaining : 0;
+
+  online : boolean;
+
+  seatsRemaining: number;
+
+  seatsCapacity : number;
+
+  honors : boolean;
+
   constructor(config) {
     //loading status is done if any sign that has data
     if (config.dataStatus !== undefined) {
@@ -18,54 +48,43 @@ class Section {
       this.dataStatus = macros.DATASTATUS_DONE;
     }
 
-    //seperate reasons to meet: eg Lecture or Lab.
-    //each of these then has times, and days
-    //instances of Meeting
     this.meetings = [];
   }
 
-  static create(config) {
+  static create(config) : Section {
     const instance = new this(config);
     instance.updateWithData(config);
     return instance;
   }
 
-  getHash() {
+  getHash() : string {
     return Keys.getSectionHash(this);
   }
 
-  meetsOnWeekends() {
-    return this.meetings.some((meeting) => { return meeting.getMeetsOnWeekends(); });
+  meetsOnWeekends() : boolean {
+    return this.meetings.some((meeting) => { return meeting.meetsOnWeekends(); });
   }
 
-  getAllMeetingMoments(ignoreExams = true) {
+  getAllMeetingMoments(ignoreExams = true) : MomentTuple[] {
     let retVal = [];
     this.meetings.forEach((meeting) => {
-      if (ignoreExams && meeting.getIsExam()) {
+      if (ignoreExams && meeting.isExam()) {
         return;
       }
 
-      retVal = retVal.concat(_.flatten(meeting.times));
+      retVal = retVal.concat(meeting.times);
     });
 
     retVal.sort((a, b) => {
-      if (a.start.unix() > b.start.unix()) {
-        return 1;
-      }
-      if (a.start.unix() < b.start.unix()) {
-        return -1;
-      }
-
-      return 0;
+      return a.start.unix() - b.start.unix();
     });
 
     return retVal;
   }
 
   //returns [false,true,false,true,false,true,false] if meeting mon, wed, fri
-  getWeekDaysAsBooleans() {
+  getDaysOfWeekAsBooleans() : boolean[] {
     const retVal = [false, false, false, false, false, false, false];
-
 
     this.getAllMeetingMoments().forEach((time) => {
       retVal[time.start.day()] = true;
@@ -74,67 +93,51 @@ class Section {
     return retVal;
   }
 
-  getWeekDaysAsStringArray() {
-    const weekdaySet = new Set();
-    this.getAllMeetingMoments().forEach((time) => {
-      weekdaySet.add(time.start.format('dddd'));
+  getWeekDaysAsStringArray() : string[] {
+    return this.getAllMeetingMoments().map((time) => {
+      return time.start.format('dddd');
     });
-
-    return Array.from(weekdaySet);
   }
 
   //returns true if has exam, else false
-  getHasExam() {
-    return this.meetings.some((meeting) => { return meeting.getIsExam(); });
+  getHasExam() : boolean {
+    return this.meetings.some((meeting) => { return meeting.isExam(); });
   }
 
   //returns the {start:end:} moment object of the first exam found
   //else returns null
-  getExamMeeting() {
-    for (let i = 0; i < this.meetings.length; i++) {
-      const meeting = this.meetings[i];
-      if (meeting.getIsExam()) {
-        if (meeting.times.length > 0) {
-          return meeting;
-        }
-      }
-    }
-    return null;
+  getExamMeeting() : Meeting {
+    return this.meetings.find((meeting) => {
+      return meeting.isExam() && meeting.times.length > 0;
+    });
   }
 
   // Unique list of all professors in all meetings, sorted alphabetically
-  getProfs() {
+  getProfs() : string[] {
     return this.profs.length > 0 ? Array.from(this.profs).sort() : ['TBA'];
   }
 
-  getLocations(ignoreExams = true) {
-    const retVal = [];
+  getLocations(ignoreExams = true) : string[] {
+    const meetingLocations = [];
     this.meetings.forEach((meeting) => {
-      if (ignoreExams && meeting.getIsExam()) {
-        return;
-      }
-
-      const where = meeting.where;
-      if (!retVal.includes(where)) {
-        retVal.push(where);
+      if (!(ignoreExams && meeting.isExam())) {
+        meetingLocations.push(meeting.location);
       }
     });
+    const retVal = _.uniq(meetingLocations);
 
     // If it is at least 1 long with TBAs remove, return the array without any TBAs
     // Eg ["TBA", "Richards Hall 201" ] -> ["Richards Hall 201"]
     const noTBAs = _.pull(retVal.slice(0), 'TBA');
-    if (noTBAs.length > 0) {
-      return noTBAs;
-    }
 
-    return retVal;
+    return (noTBAs || retVal);
   }
 
-  getHasWaitList() {
+  hasWaitList() : boolean {
     return this.waitCapacity > 0 || this.waitRemaining > 0;
   }
 
-  updateWithData(data) {
+  updateWithData(data) : void {
     for (const attrName of Object.keys(data)) {
       if ((typeof data[attrName]) === 'function') {
         macros.error('given fn??', data, this, this.constructor.name);
@@ -154,8 +157,8 @@ class Section {
     }
   }
 
-
-  compareTo(other) {
+  //TODO : there has to be a way to make this *so much better*, but there are sooo many special cases omo
+  compareTo(other) : number {
     if (this.online && !other.online) {
       return 1;
     }
@@ -209,21 +212,15 @@ class Section {
     if (other.meetings[0].times.length === 0) {
       return -1;
     }
-    if (this.meetings[0].times[0][0].start.unix() < other.meetings[0].times[0][0].start.unix()) {
+    if (this.meetings[0].times[0].start.unix() < other.meetings[0].times[0].start.unix()) {
       return -1;
     }
-    if (this.meetings[0].times[0][0].start.unix() > other.meetings[0].times[0][0].start.unix()) {
+    if (this.meetings[0].times[0].start.unix() > other.meetings[0].times[0].start.unix()) {
       return 1;
     }
 
     return 0;
   }
 }
-
-
-Section.requiredPath = ['host', 'termId', 'subject', 'classId'];
-Section.optionalPath = ['crn'];
-Section.API_ENDPOINT = '/listSections';
-
 
 export default Section;
