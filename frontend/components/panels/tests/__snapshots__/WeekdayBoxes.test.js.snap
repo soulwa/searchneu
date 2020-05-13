@@ -53,5 +53,13 @@ exports[`should render another section 1`] = `
     className="weekday-box"
     key="4"
   />
+  <div
+    className="weekday-box"
+    key="5"
+  />
+  <div
+    className="weekday-box"
+    key="6"
+  />
 </div>
 `;

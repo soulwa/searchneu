@@ -30,7 +30,7 @@ export default class DesktopSectionPanel extends React.Component {
   // Create the 4:35 - 5:40 pm string.
   // This was copied from mobile section panel.js
   // TODO: deduplicate
-  getTimeStingFromMeetings(meetingMoments) {
+  getTimeStringFromMeetings(meetingMoments) {
     const times = [];
     meetingMoments.forEach((time) => {
       const startString = time.start.format('h:mm');
@@ -72,13 +72,13 @@ export default class DesktopSectionPanel extends React.Component {
     // Have individual cells for the different columns
     } else {
       const meetingMoments = this.props.section.getAllMeetingMoments();
-      const meetingStrings = this.getTimeStingFromMeetings(meetingMoments);
+      const meetingStrings = this.getTimeStringFromMeetings(meetingMoments);
 
       const examMeeting = this.props.section.getExamMeeting();
 
       let examTimeString = null;
       if (examMeeting) {
-        examTimeString = this.getTimeStingFromMeetings(examMeeting.times[0]);
+        examTimeString = this.getTimeStringFromMeetings(examMeeting.times[0]);
       }
 
 
@@ -108,7 +108,7 @@ export default class DesktopSectionPanel extends React.Component {
           tdElements = tdElements.concat([
             <td key='exam1'> {examTimeString} </td>,
             <td key='exam3'> {sectionExamMeeting.endDate.format('MMM Do')} </td>,
-            <td key='exam4'> <LocationLinks locations={ [sectionExamMeeting.where] } /> </td>,
+            <td key='exam4'> <LocationLinks locations={ [sectionExamMeeting.location] } /> </td>,
           ]);
         } else {
           tdElements = tdElements.concat([
