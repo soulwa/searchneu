@@ -5,6 +5,7 @@ import macros from '../macros';
 import EmployeePanel from '../panels/EmployeePanel';
 import DesktopClassPanel from '../panels/DesktopClassPanel';
 import MobileClassPanel from '../panels/MobileClassPanel';
+import SearchResult from './Results/SearchResult'
 
 import Course from '../classModels/Course';
 import Keys from '../../../common/Keys';
@@ -45,11 +46,11 @@ const ResultItemMemoized = React.memo(({ result }:{result:SearchItem}) => {
   if (result.type === 'class') {
     const aClass = Course.create(result.class);
     aClass.loadSectionsFromServerList(result.sections);
-    if (macros.isMobile) {
-      return <MobileClassPanel aClass={ aClass } history={ history } />;
-    }
+    // if (macros.isMobile) {
+    //   return <MobileClassPanel aClass={ aClass } history={ history } />;
+    // }
 
-    return <DesktopClassPanel aClass={ aClass } history={ history } />;
+    return <SearchResult aClass={ aClass } history={ history } />;
   }
 
   if (result.type === 'employee') {

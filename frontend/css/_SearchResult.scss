@@ -1,0 +1,58 @@
+.SearchResult {
+    background: #ffffff;
+    width: 100%;
+    margin: 16px 0;
+    border-radius: 5px;
+    box-shadow: 0 1px 2px 0 rgba(34,36,38,.15);
+    border: 1px solid rgba(34,36,38,.15);
+
+    &__header {
+        background: #fafafa;
+        padding: 12px 16px 4px 16px;
+
+        &--classTitle {
+          margin-bottom: 4px;
+          font-family: Lato;
+          font-style: normal;
+          font-weight: 800;
+          font-size: 17px;
+          line-height: 2px;
+          border-radius: 5px 5px 0 0;
+        }
+
+        &--creditString {
+          font-family: Lato;
+          font-style: normal;
+          font-weight: 800;
+          font-size: 15px;
+          color: #474747;
+          position: absolute;
+          right: 5%;
+          margin-top: 14px;
+
+
+        }
+
+        &--sub {
+          display: flex;
+          flex-direction: row;
+          align-items: flex-end;
+        }
+
+        &--sub > span {
+          font-family: Lato;
+          font-style: italic;
+          font-weight: normal;
+          font-size: 12px;
+          letter-spacing: 0.5px;
+          margin: 0 0 2px 6px;
+          color: #505050;
+        }
+        
+        &--sub > svg:hover {
+          cursor: pointer;
+        }
+
+      
+    }
+}

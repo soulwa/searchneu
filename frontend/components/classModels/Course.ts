@@ -51,6 +51,10 @@ class Course {
 
   optPrereqsFor : ReqFor;
 
+  minCredits: number;
+
+  maxCredits: number;
+
   constructor() {
     //true, if for instance "AP placement exam, etc"
     this.isString = false;
