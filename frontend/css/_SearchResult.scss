@@ -27,7 +27,7 @@
           font-size: 15px;
           color: #474747;
           position: absolute;
-          right: 5%;
+          right: 4.5%;
           margin-top: 14px;
 
 
@@ -52,7 +52,30 @@
         &--sub > svg:hover {
           cursor: pointer;
         }
+    }
+    
+    &__panel {
+      padding: 16px;
 
-      
+      &--left {
+        font-family: Lato;
+        font-style: normal;
+        font-weight: 600;
+        font-size: 13px;
+      }
+      &--left > span {
+        font-weight: normal;
+        letter-spacing: 0.25px;
+        
+      }
+      &--left > span.empty {
+        color: #969696;
+        
+      }
+    }
+
+    &__sectionTable {
+      width: 100%
+
     }
 }
