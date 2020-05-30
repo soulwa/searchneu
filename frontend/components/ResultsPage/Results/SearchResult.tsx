@@ -1,6 +1,7 @@
 import React from 'react'
 import { History } from 'history'
 import macros from '../../macros'
+import DesktopSectionPanel from './DesktopSectionPanel'
 import RequisiteBranch from '../../classModels/RequisiteBranch'
 import Course from '../../classModels/Course'
 import IconGlobe from '../../images/IconGlobe'
@@ -69,7 +70,6 @@ export default function SearchResult({ aClass, history } : SearchResultProps) {
               role='link'
               tabIndex={0}
               onClick={ (event) => { onReqClick(reqType, childBranch, event, hash); } }
-              className='reqClassLink'
             >
               {`${childBranch.subject} ${childBranch.classId}`}
             </a>
@@ -202,7 +202,7 @@ export default function SearchResult({ aClass, history } : SearchResultProps) {
           {feeString ? <span>  {feeString}</span> : <span className='empty'> None</span>}
         </div>
       </div>
-      <table className='SearchResult__sectionTable'>
+      <table className='ui celled striped table SearchResult__sectionTable'>
         <thead>
           <tr>
             <th>
@@ -211,12 +211,22 @@ export default function SearchResult({ aClass, history } : SearchResultProps) {
               </div>
             </th>
             <th> Professors </th>
-            <th> Weekdays </th>
-            <th> Time </th>
-            <th> Location </th>
+            <th> Meetings </th>
+            <th> Campus </th>
             <th> Seats </th>
           </tr>
         </thead>
+        <tbody>
+        {aClass.sections.map((section) => {
+              return (
+                <DesktopSectionPanel
+                  key={ section.crn }
+                  section={ section }
+                  showNotificationSwitches={ false }
+                />
+              );
+            })}
+        </tbody>
       </table>
     </div>
 

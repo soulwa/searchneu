@@ -40,6 +40,8 @@ class Section {
 
   honors : boolean;
 
+  crn: string;
+
   constructor(config) {
     //loading status is done if any sign that has data
     if (config.dataStatus !== undefined) {
