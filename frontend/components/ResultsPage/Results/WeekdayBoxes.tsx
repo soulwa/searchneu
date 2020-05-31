@@ -8,7 +8,7 @@ interface WeekdayBoxesProps {
 function WeekdayBoxes({section}: WeekdayBoxesProps) {
   const checked = section.getDaysOfWeekAsBooleans()
   const days = ['S','M','T','W','T','F','S']
-  console.log('checked', checked)
+
   return (
   <div className='WeekdayBoxes'>
     {

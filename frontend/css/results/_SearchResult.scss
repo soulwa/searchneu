@@ -25,7 +25,7 @@
           color: #474747;
           position: absolute;
           right: 4.5%;
-          margin-top: 14px;
+          margin-top: 8px;
 
 
         }
@@ -64,6 +64,9 @@
         &:hover {
           cursor: pointer;
         }
+        &:focus {
+          outline: none;
+        }
       }
 
       &--left > span {
@@ -79,12 +82,39 @@
 
     &__sectionTable {
       width: 100%;
+      border-spacing: 0;
 
 
     }
     &__sectionTable > thead > tr > th{ 
       text-align: left;
       padding-left: 32px;
+    }
+    &__sectionTable > tbody > tr:nth-child(odd) {
+      background:  #FAFAFB;
+    }
+    &__sectionTable > tbody > tr:nth-child(even) {
+      background: #FFFFFF;
+    }
 
+    &__sectionTable > tbody > tr > td {
+      
+      border: 1px solid #E9E9E9;
+      padding: 16px 32px;
+    }
+
+    &__showAll {
+      height: 42px;
+      background: #FAFAFB;
+      border: 1px solid #E9E9E9;
+      box-sizing: border-box;
+      border-radius: 0px 0px 5px 5px;
+      display: flex;
+      align-items: center;
+      font-weight: bold;
+      font-size: 14px;
+      line-height: 17px;
+      padding: 16px;
+      cursor: pointer;
     }
 }

@@ -2,6 +2,12 @@
   display: inline-flex;
   flex-direction: row;
   width: 126px;
+  font-family: Lato;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 10px;
+  line-height: 16px;
+  text-align: center;
   &__box {
     display: block;
     width: 18px;
@@ -9,26 +15,13 @@
     background: #FAFAFB;
     color: #979797;
     border: 0.5px solid #979797;
-    text-align: center;
-    line-height: 16px;
-    font-family: Lato;
-    font-style: normal;
-    font-weight: normal;
-    font-size: 10px;
     &--checked {
-      font-family: Lato;
-      font-style: normal;
-      font-weight: normal;
-      font-size: 10px;
       display:block;
       width: 18px;
       height: 18px;
       background: #A5C0DD;
       color: #000000;
       border: 0.5px solid #979797;
-      text-align: center;
-      line-height: 16px;
-    
     }
   }
 
