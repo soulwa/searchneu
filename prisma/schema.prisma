@@ -1,0 +1,130 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Courses {
+  classAttributes String[]
+  classId         String?
+  coreqs          Json?
+  createdAt       DateTime
+  desc            String?
+  feeAmount       Int?
+  feeDescription  String?
+  host            String?
+  id              String            @id
+  lastUpdateTime  DateTime?
+  maxCredits      Int?
+  minCredits      Int?
+  name            String?
+  nupath          String[]
+  optPrereqsFor   Json?
+  prereqs         Json?
+  prereqsFor      Json?
+  prettyUrl       String?
+  subject         String?
+  termId          String?
+  updatedAt       DateTime
+  url             String?
+  FollowedCourses FollowedCourses[]
+  Sections        Sections[]
+
+  @@index([classId, termId, subject], name: "courses_class_id_term_id_subject")
+}
+
+model FollowedCourses {
+  courseId  String
+  createdAt DateTime
+  updatedAt DateTime
+  userId    String
+  Courses   Courses  @relation(fields: [courseId], references: [id])
+  Users     Users    @relation(fields: [userId], references: [id])
+
+  @@id([userId, courseId])
+}
+
+model FollowedSections {
+  createdAt DateTime
+  sectionId String
+  updatedAt DateTime
+  userId    String
+  Sections  Sections @relation(fields: [sectionId], references: [id])
+  Users     Users    @relation(fields: [userId], references: [id])
+
+  @@id([userId, sectionId])
+}
+
+model MajorData {
+  catalogYear  Int?
+  createdAt    DateTime
+  id           Int      @default(autoincrement()) @id
+  majorId      String?
+  name         String?
+  plansOfStudy Json?
+  requirements Json?
+  updatedAt    DateTime
+}
+
+model Professors {
+  bigPictureUrl     String?
+  createdAt         DateTime
+  email             String?
+  emails            String[]
+  firstName         String?
+  googleScholarId   String?
+  id                String   @id
+  lastName          String?
+  link              String?
+  name              String?
+  officeRoom        String?
+  personalSite      String?
+  phone             String?
+  pic               Json?
+  primaryDepartment String?
+  primaryRole       String?
+  streetAddress     String?
+  updatedAt         DateTime
+  url               String?
+}
+
+model Sections {
+  campus           String?
+  classHash        String?
+  classType        String?
+  createdAt        DateTime
+  crn              String?
+  honors           Boolean?
+  id               String             @id
+  info             String?
+  meetings         Json?
+  online           Boolean?
+  profs            String[]
+  seatsCapacity    Int?
+  seatsRemaining   Int?
+  updatedAt        DateTime
+  url              String?
+  waitCapacity     Int?
+  waitRemaining    Int?
+  Courses          Courses?           @relation(fields: [classHash], references: [id])
+  FollowedSections FollowedSections[]
+}
+
+model SequelizeMeta {
+  name String @id
+}
+
+model Users {
+  createdAt        DateTime
+  facebookPageId   String?
+  firstName        String?
+  id               String             @id
+  lastName         String?
+  loginKeys        String[]
+  updatedAt        DateTime
+  FollowedCourses  FollowedCourses[]
+  FollowedSections FollowedSections[]
+}
