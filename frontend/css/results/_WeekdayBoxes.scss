@@ -1,6 +1,7 @@
 .WeekdayBoxes {
-  display: flex;
+  display: inline-flex;
   flex-direction: row;
+  width: 126px;
   &__box {
     display: block;
     width: 18px;

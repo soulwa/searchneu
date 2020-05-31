@@ -1,0 +1,39 @@
+.DesktopSectionPanel {
+  font-family: Lato;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 13px;
+    line-height: 16px;
+
+  &__meetings {
+    display: inline-flex;
+    margin-left: 16px;
+
+  }
+
+  & > td:nth-child(3) {
+    width: 35%;
+  }
+  &__times {
+    margin-left: 20px;
+    line-height: 20px;
+  }
+
+  & > td:nth-child(5) {
+    line-height: 20px;
+    & > .green {
+      color: #27AE34;
+    }
+    & > .yellow {
+      color: #FFBF3D;
+    }
+    & > .red {
+      color: #D41B2C;
+    }
+    & span:nth-of-type(2) {
+      font-style: italic;
+    }
+  }
+
+
+}
