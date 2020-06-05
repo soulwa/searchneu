@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import Section from '../../classModels/Section'
 import WeekdayBoxes from './WeekdayBoxes'
+import NotifCheckBox from '../../panels/NotifCheckBox'
 
 interface DesktopSectionPanelProps {
   section: Section
@@ -13,6 +14,7 @@ interface DesktopSectionPanelProps {
 
 
 function DesktopSectionPanel({section, showNotificationSwitches} : DesktopSectionPanelProps) {
+
   
   const renderTimes = () => {
     return section.meetings.map((meeting) => {
@@ -67,7 +69,7 @@ function DesktopSectionPanel({section, showNotificationSwitches} : DesktopSectio
             {`${section.waitRemaining}/${section.waitCapacity} Waitlist Seats`}
           </span>
         </td>
-
+        {showNotificationSwitches && <td><NotifCheckBox section={section}/></td>}
     </tr>
 
   )

@@ -1,10 +1,13 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { History } from 'history'
 import macros from '../../macros'
 import DesktopSectionPanel from './DesktopSectionPanel'
-import RequisiteBranch from '../../classModels/RequisiteBranch'
 import Course from '../../classModels/Course'
 import IconGlobe from '../../images/IconGlobe'
+import IconArrow from '../../images/IconArrow'
+import SignUpForNotifications from '../../SignUpForNotifications'
+import user from '../../user'
+import Keys from '../../../../common/Keys'
 import useResultRequisite from './useResultRequisite';
 
 interface SearchResultProps {
@@ -17,6 +20,15 @@ export default function SearchResult({ aClass, history } : SearchResultProps) {
 
   console.log('class', aClass)
 
+
+  const sectionsShownByDefault = aClass.sections.length < 3 ? aClass.sections.length : 3
+  const [renderedSections, setRenderedSections] = useState(aClass.sections.slice(0, sectionsShownByDefault))
+  const [hideShowAll, setHideShowAll] = useState(sectionsShownByDefault === aClass.sections.length)
+  const [userIsWatchingClass, setUserIsWatchingClass] = useState(false)
+
+  // useEffect(() => {
+  //   setUserIsWatchingClass(user.userIsWatchingClass(Keys.getClassHash(aClass)))
+  // }, [userIsWatchingClass]);
 
 
   return (
@@ -44,6 +56,7 @@ export default function SearchResult({ aClass, history } : SearchResultProps) {
         {aClass.desc}
         <br />
         <br />
+        <div className='SearchResult__panel--main'>
         <div className='SearchResult__panel--left'>
           NUPaths:
           {aClass.nupath.length > 0 ? <span> {aClass.nupath.join(', ')}</span> : <span className='empty'> None</span>}
@@ -55,6 +68,10 @@ export default function SearchResult({ aClass, history } : SearchResultProps) {
           Course fees:
           {feeString ? <span>  {feeString}</span> : <span className='empty'> None</span>}
         </div>
+        <div className='SearchResult__panel--right'>
+          <SignUpForNotifications aClass={ aClass } userIsWatchingClass={ userIsWatchingClass } />
+        </div>
+      </div>
       </div>
       <table className='SearchResult__sectionTable'>
         <thead>
@@ -71,19 +88,22 @@ export default function SearchResult({ aClass, history } : SearchResultProps) {
           </tr>
         </thead>
         <tbody>
-        {aClass.sections.map((section) => {
+        {renderedSections.map((section) => {
               return (
                 <DesktopSectionPanel
                   key={ section.crn }
                   section={ section }
-                  showNotificationSwitches={ false }
+                  showNotificationSwitches={ userIsWatchingClass }
                 />
               );
             })}
         </tbody>
       </table>
-      <div className='SearchResult__showAll'>Show all class information</div>
+      {!hideShowAll &&
+      <div className='SearchResult__showAll' onClick={() => {setRenderedSections(aClass.sections); setHideShowAll(true)}}>
+        Show all class information
+        <IconArrow/>
+      </div>}
     </div>
-
   )
 }
