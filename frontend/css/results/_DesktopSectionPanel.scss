@@ -7,12 +7,12 @@
 
   &__meetings {
     display: inline-flex;
-
   }
 
   & > td:nth-child(3) {
     width: 35%;
   }
+
   &__times {
     margin-left: 20px;
     line-height: 20px;
@@ -20,19 +20,21 @@
 
   & > td:nth-child(5) {
     line-height: 20px;
+
     & > .green {
-      color: #27AE34;
+      color: #27ae34;
     }
+
     & > .yellow {
-      color: #FFBF3D;
+      color: #ffbf3d;
     }
+
     & > .red {
-      color: #D41B2C;
+      color: #d41b2c;
     }
+
     & span:nth-of-type(2) {
       font-style: italic;
     }
   }
-
-
 }

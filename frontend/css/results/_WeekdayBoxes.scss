@@ -2,27 +2,28 @@
   display: inline-flex;
   flex-direction: row;
   width: 126px;
-  font-family: Lato;
+  font-family: Lato, sans-serif;
   font-style: normal;
   font-weight: normal;
   font-size: 10px;
   line-height: 16px;
   text-align: center;
+
   &__box {
     display: block;
     width: 18px;
     height: 18px;
-    background: #FAFAFB;
+    background: #fafafb;
     color: #979797;
     border: 0.5px solid #979797;
+
     &--checked {
-      display:block;
+      display: block;
       width: 18px;
       height: 18px;
-      background: #A5C0DD;
-      color: #000000;
+      background: #a5c0dd;
+      color: #000;
       border: 0.5px solid #979797;
     }
   }
-
 }

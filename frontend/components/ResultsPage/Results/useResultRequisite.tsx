@@ -5,9 +5,8 @@ import RequisiteBranch from '../../classModels/RequisiteBranch'
 import Course from '../../classModels/Course'
 
 export default function useResultRequisite(history: History) {
-  
   const optionalDisplay = (prereqType, aClass) => {
-    let data = getReqsString(prereqType, aClass);
+    const data = getReqsString(prereqType, aClass);
 
     return data;
   }
@@ -60,7 +59,7 @@ export default function useResultRequisite(history: History) {
           const element = (
             <a
               role='link'
-              tabIndex={0}
+              tabIndex={ 0 }
               onClick={ (event) => { onReqClick(reqType, childBranch, event, hash); } }
             >
               {`${childBranch.subject} ${childBranch.classId}`}
@@ -156,6 +155,4 @@ export default function useResultRequisite(history: History) {
   }
 
   return optionalDisplay
-
-  
 }

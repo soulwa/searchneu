@@ -57,21 +57,21 @@ export default function SearchResult({ aClass, history } : SearchResultProps) {
         <br />
         <br />
         <div className='SearchResult__panel--main'>
-        <div className='SearchResult__panel--left'>
-          NUPaths:
-          {aClass.nupath.length > 0 ? <span> {aClass.nupath.join(', ')}</span> : <span className='empty'> None</span>}
-          <br />
-          Prerequisites: {optionalDisplay(macros.prereqTypes.PREREQ, aClass)}
-          <br />
-          Corequisites: {optionalDisplay(macros.prereqTypes.COREQ, aClass)}
-          <br />
-          Course fees:
-          {feeString ? <span>  {feeString}</span> : <span className='empty'> None</span>}
+          <div className='SearchResult__panel--left'>
+            NUPaths:
+            {aClass.nupath.length > 0 ? <span> {aClass.nupath.join(', ')}</span> : <span className='empty'> None</span>}
+            <br />
+            Prerequisites: {optionalDisplay(macros.prereqTypes.PREREQ, aClass)}
+            <br />
+            Corequisites: {optionalDisplay(macros.prereqTypes.COREQ, aClass)}
+            <br />
+            Course fees:
+            {feeString ? <span>  {feeString}</span> : <span className='empty'> None</span>}
+          </div>
+          <div className='SearchResult__panel--right'>
+            <SignUpForNotifications aClass={ aClass } userIsWatchingClass={ userIsWatchingClass } />
+          </div>
         </div>
-        <div className='SearchResult__panel--right'>
-          <SignUpForNotifications aClass={ aClass } userIsWatchingClass={ userIsWatchingClass } />
-        </div>
-      </div>
       </div>
       <table className='SearchResult__sectionTable'>
         <thead>
@@ -85,25 +85,26 @@ export default function SearchResult({ aClass, history } : SearchResultProps) {
             <th> Meetings </th>
             <th> Campus </th>
             <th> Seats </th>
+            {userIsWatchingClass && <th> Notifications </th>}
           </tr>
         </thead>
         <tbody>
-        {renderedSections.map((section) => {
-              return (
-                <DesktopSectionPanel
-                  key={ section.crn }
-                  section={ section }
-                  showNotificationSwitches={ userIsWatchingClass }
-                />
-              );
-            })}
+          {renderedSections.map((section) => (
+              <DesktopSectionPanel
+                key={ section.crn }
+                section={ section }
+                showNotificationSwitches={ userIsWatchingClass }
+              />
+            ))}
         </tbody>
       </table>
-      {!hideShowAll &&
-      <div className='SearchResult__showAll' onClick={() => {setRenderedSections(aClass.sections); setHideShowAll(true)}}>
+      {!hideShowAll
+      && (
+      <div className='SearchResult__showAll' onClick={ () => { setRenderedSections(aClass.sections); setHideShowAll(true) } }>
         Show all class information
-        <IconArrow/>
-      </div>}
+        <IconArrow />
+      </div>
+      )}
     </div>
   )
 }

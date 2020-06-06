@@ -5,20 +5,22 @@ interface WeekdayBoxesProps {
   section: Section
 }
 
-function WeekdayBoxes({section}: WeekdayBoxesProps) {
+function WeekdayBoxes({ section }: WeekdayBoxesProps) {
   const checked = section.getDaysOfWeekAsBooleans()
-  const days = ['S','M','T','W','T','F','S']
+  const days = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
 
   return (
-  <div className='WeekdayBoxes'>
-    {
+    <div className='WeekdayBoxes'>
+      {
       checked.map((box, index) => {
-      return(  
-      <span className={`WeekdayBoxes__box${box ? '--checked' : ''}`}>
-        {days[index]}
-      </span>)
-    })}
-  </div>
+        return (
+          <span className={ `WeekdayBoxes__box${box ? '--checked' : ''}` }>
+            {days[index]}
+          </span>
+        )
+      })
+}
+    </div>
   )
 }
 
