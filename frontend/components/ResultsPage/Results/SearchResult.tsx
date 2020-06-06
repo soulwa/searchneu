@@ -8,7 +8,7 @@ import IconArrow from '../../images/IconArrow'
 import SignUpForNotifications from '../../SignUpForNotifications'
 import user from '../../user'
 import Keys from '../../../../common/Keys'
-import useResultRequisite from './useResultRequisite';
+import useResultRequisite from './useResultRequisite'
 
 interface SearchResultProps {
   aClass: Course,

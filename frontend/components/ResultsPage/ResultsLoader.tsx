@@ -6,6 +6,7 @@ import EmployeePanel from '../panels/EmployeePanel';
 import DesktopClassPanel from '../panels/DesktopClassPanel';
 import MobileClassPanel from '../panels/MobileClassPanel';
 import SearchResult from './Results/SearchResult'
+import MobileSearchResult from './Results/MobileSearchResult'
 
 import Course from '../classModels/Course';
 import Keys from '../../../common/Keys';
@@ -50,7 +51,7 @@ const ResultItemMemoized = React.memo(({ result }:{result:SearchItem}) => {
     //   return <MobileClassPanel aClass={ aClass } history={ history } />;
     // }
 
-    return <SearchResult aClass={ aClass } history={ history } />;
+    return macros.isMobile ? <MobileSearchResult aClass={ aClass } history={ history }/> : <SearchResult aClass={ aClass } history={ history } />;
   }
 
   if (result.type === 'employee') {

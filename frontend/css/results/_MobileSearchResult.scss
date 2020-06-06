@@ -1,0 +1,52 @@
+.MobileSearchResult {
+  margin: 16px 0;
+
+  &__header {
+    background: #FAFAFA;
+    border: 1px solid #DEDEDF;
+    box-sizing: border-box;
+    box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.25);
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    cursor: pointer;
+    &--expanded {
+      background: #FAFAFA;
+      border: 1px solid #DEDEDF;
+      box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.25);
+      border-radius: 8px 8px 0 0;
+      border-bottom: none;
+      padding: 16px;
+      display: flex;
+      
+    }
+    &--expanded > svg {
+      transform: rotate(90deg);
+      position: absolute;
+    }
+    & > svg {
+      position: absolute;
+      margin-top: 3px;
+    }
+    &--classTitle {
+      font-family: Lato;
+      font-style: normal;
+      font-weight: 800;
+      font-size: 20px;
+      line-height: 24px;
+      display: flex;
+      align-items: center;
+      color: #505050;
+      margin-left: 24px;
+    }
+  }
+  
+  &__panel {
+    background: green;
+    height: 200px;
+    width: 100%;
+    box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.25);
+    border-radius: 0 0 8px 8px;
+    border: 1px solid #DEDEDF;
+  }
+}

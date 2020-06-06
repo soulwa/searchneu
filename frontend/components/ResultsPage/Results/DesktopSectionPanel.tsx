@@ -10,9 +10,6 @@ interface DesktopSectionPanelProps {
 }
 
 
-
-
-
 function DesktopSectionPanel({section, showNotificationSwitches} : DesktopSectionPanelProps) {
 
   
