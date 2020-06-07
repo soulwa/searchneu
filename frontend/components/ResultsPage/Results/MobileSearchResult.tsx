@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { History } from 'history'
 import Course from '../../classModels/Course'
 import IconCollapseExpand from '../../images/IconCollapseExpand'
@@ -6,6 +6,7 @@ import IconArrow from '../../images/IconArrow'
 import useResultRequisite from './useResultRequisite'
 import macros from '../../macros'
 import MobileSectionPanel from './MobileSectionPanel'
+import { IncomingMessage } from 'http';
 
 
 interface MobileSearchResultProps {
@@ -20,7 +21,20 @@ function MobileSearchResult({ aClass, history } : MobileSearchResultProps) {
   const [showPrereq, setShowPrereq] = useState(false)
   const [showCoreq, setShowCoreq] = useState(false)
   const [userIsWatchingClass, setUserIsWatchingClass] = useState(false)
+  const [showAll, setShowAll] = useState(false)
+  
+  const sectionsShownByDefault = aClass.sections.length < 3 ? aClass.sections.length : 3
+  const [renderedSections, setRenderedSections] = useState(aClass.sections.slice(0, sectionsShownByDefault))
+  const hideShowAll =  sectionsShownByDefault === aClass.sections.length
   const optionalDisplay = useResultRequisite(history);
+
+  useEffect(() => {
+    if (showAll) {
+      setRenderedSections(aClass.sections)
+    } else {
+      setRenderedSections(aClass.sections.slice(0, sectionsShownByDefault))
+    }
+  }, [showAll])
 
   return (
     <div className='MobileSearchResult'>
@@ -67,7 +81,7 @@ function MobileSearchResult({ aClass, history } : MobileSearchResultProps) {
         </div>
         <div className='MobileSearchResult__panel--sections'>
           {
-            aClass.sections.map((section) => (
+            renderedSections.map((section) => (
               <MobileSectionPanel
                 key={ section.crn }
                 section={ section }
@@ -76,6 +90,10 @@ function MobileSearchResult({ aClass, history } : MobileSearchResultProps) {
             ))
           }
         </div>
+        {!hideShowAll && <div className={'MobileSearchResult__showAll'} onClick={() => setShowAll(!showAll)}>
+          <span>{showAll ? 'Collapse sections' : 'Show all sections'}</span>
+          <IconArrow className={showAll && 'MobileSearchResult__showAll--collapse'}/>
+        </div>}
       </div>
       )}
     </div>

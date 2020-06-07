@@ -20,11 +20,19 @@ export default function SearchResult({ aClass, history } : SearchResultProps) {
 
   console.log('class', aClass)
 
-
+  const [showAll, setShowAll] = useState(false)
   const sectionsShownByDefault = aClass.sections.length < 3 ? aClass.sections.length : 3
   const [renderedSections, setRenderedSections] = useState(aClass.sections.slice(0, sectionsShownByDefault))
-  const [hideShowAll, setHideShowAll] = useState(sectionsShownByDefault === aClass.sections.length)
+  const hideShowAll = sectionsShownByDefault === aClass.sections.length
   const [userIsWatchingClass, setUserIsWatchingClass] = useState(false)
+
+  useEffect(() => {
+    if (showAll) {
+      setRenderedSections(aClass.sections)
+    } else {
+      setRenderedSections(aClass.sections.slice(0, sectionsShownByDefault))
+    }
+  }, [showAll])
 
   // useEffect(() => {
   //   setUserIsWatchingClass(user.userIsWatchingClass(Keys.getClassHash(aClass)))
@@ -100,9 +108,9 @@ export default function SearchResult({ aClass, history } : SearchResultProps) {
       </table>
       {!hideShowAll
       && (
-      <div className='SearchResult__showAll' onClick={ () => { setRenderedSections(aClass.sections); setHideShowAll(true) } }>
-        Show all class information
-        <IconArrow />
+      <div className='SearchResult__showAll' onClick={ () => setShowAll(!showAll) }>
+        <span>{showAll ? 'Collapse sections' : 'Show all sections'}</span>
+        <IconArrow className={showAll && 'SearchResult__showAll--collapse'}/>
       </div>
       )}
     </div>

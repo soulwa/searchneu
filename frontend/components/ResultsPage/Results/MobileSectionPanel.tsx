@@ -46,7 +46,12 @@ function MobileSectionPanel({section, showNotificationSwitches} : MobileSectionP
       <div className='MobileSectionPanel__secondRow'>
         <WeekdayBoxes section={section}/>
       </div>
-
+      <div className='MobileSectionPanel__meetings'>
+        {renderTimes()}
+      </div>
+      <div className={ getSeatsClass() }>
+          {`${section.seatsRemaining}/${section.seatsCapacity} Seats Available `}
+      </div>
     </div>
   )
 

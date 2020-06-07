@@ -1,10 +1,9 @@
 .MobileSectionPanel {
-  height: 196px;
   border: 1px solid #cbcbcb;
   box-sizing: border-box;
   border-radius: 20px;
   margin-bottom: 16px;
-  padding: 24px;
+  padding: 16px;
   color: black;
 
   &__header {
@@ -33,6 +32,29 @@
   }
 
   &__secondRow {
+    display: flex;
+    justify-content: space-between
+  }
 
+  &__meetings {
+    & > span {
+      margin-top: 16px;
+      display: inline-block;
+    }
+  }
+  
+  & > .green {
+    margin-top: 16px;
+    color: #27ae34;
+  }
+
+  & > .yellow {
+    margin-top: 16px;
+    color: #ffbf3d;
+  }
+
+  & > .red {
+    margin-top: 16px;
+    color: #d41b2c;
   }
 }

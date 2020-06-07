@@ -82,9 +82,9 @@
         position: absolute;
         bottom: 0;
         right: 0;
-        width: 70%;
+        width: 90%;
         height: 18px;
-        background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1) 70%);
+        background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1) 90%);
       }
     }
 
@@ -128,6 +128,32 @@
 
     &--sections {
       padding: 16px;
+
+      & .MobileSectionPanel:last-child {
+        margin-bottom: 0;
+      }
     }
   }
+
+  &__showAll {
+    background: #FAFAFB;
+    border: 1px solid #DEDEDF;
+    border-radius: 0px 0px 8px 8px;
+    padding: 10px 20px 10px 20px;
+
+    & > span {
+      font-weight: bold;
+      margin-right: 8px;
+      
+
+    }
+
+    &--collapse {
+      transform: rotate(-180deg);
+    }
+
+
+
+  }
+  
 }
