@@ -74,7 +74,7 @@
   "_comment2": "Async adds about 30k to the final bundled output. There are smaller libraries that can also do async.retry (only thing that is being used in async)",
   "_comment3": "but that is only about 3% of the final JS size.",
   "dependencies": {
-    "@babel/core": "^7.2.2",
+    "@babel/core": "^7.10.2",
     "@babel/node": "^7.0.0",
     "@babel/plugin-proposal-class-properties": "^7.8.3",
     "@babel/plugin-transform-arrow-functions": "^7.2.0",
@@ -162,7 +162,7 @@
     "xmldom": "^0.1.27"
   },
   "devDependencies": {
-    "@babel/cli": "^7.0.0",
+    "@babel/cli": "^7.10.1",
     "@babel/plugin-proposal-decorators": "^7.0.0",
     "@babel/plugin-proposal-do-expressions": "^7.0.0",
     "@babel/plugin-proposal-export-default-from": "^7.0.0",

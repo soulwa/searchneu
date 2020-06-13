@@ -2,22 +2,17 @@
  * This file is part of Search NEU and licensed under AGPL3.
  * See the license file in the root folder for details.  */
 
+import pMap from 'p-map';
 import fs from 'fs-extra';
 import _ from 'lodash';
 import path from 'path';
 import Keys from '../common/Keys';
 import macros from './macros';
-import {
-  Professor, Course, Section, Op, sequelize,
-} from './database/models/index';
-
-const profAttributes = Object.keys(_.omit(Professor.rawAttributes, ['id', 'createdAt', 'updatedAt']));
-const courseAttributes = Object.keys(_.omit(Course.rawAttributes, ['id', 'createdAt', 'updatedAt']));
-const secAttributes = Object.keys(_.omit(Section.rawAttributes, ['id', 'createdAt', 'updatedAt']));
+import { PrismaClient } from '@prisma/client';
 
 class DumpProcessor {
   constructor() {
-    this.CHUNK_SIZE = 2000;
+    this.CHUNK_SIZE = 5;
   }
 
   /**
@@ -25,15 +20,29 @@ class DumpProcessor {
    * @param {Object} profDump object containing all professor data, normally acquired from scrapers
    */
   async main({ termDump = {}, profDump = {}, destroy = false }) {
-    // the logs on prod are literally running out of space, so stopping sequelize logs for now
-    sequelize.options.logging = false;
+    const prisma = new PrismaClient();
     const coveredTerms = new Set();
 
-    const profPromises = _.chunk(Object.values(profDump), this.CHUNK_SIZE).map(async (profChunk) => {
-      return Professor.bulkCreate(profChunk, { updateOnDuplicate: profAttributes });
-    });
-    await Promise.all(profPromises);
+    console.log(Object.values(termDump.classes).length);
 
+    /*
+    await pMap(Object.values(profDump), async (prof) => {
+      return prisma.professors.create({ data: this.processProf(prof) })
+    }, { concurrency: this.CHUNK_SIZE })
+    */
+
+    await pMap(Object.values(termDump.classes), async (course) => {
+      const courseData = this.processCourse(course, coveredTerms);
+      return prisma.courses.upsert({
+        where: { id: courseData.id },
+        create: courseData,
+        update: courseData,
+      });
+    }, { concurrency: this.CHUNK_SIZE });
+    console.log("BIG CHUNGUS");
+
+
+    /*
     const classPromises = _.chunk(termDump.classes, this.CHUNK_SIZE).map(async (classChunk) => {
       const processedChunk = classChunk.map((aClass) => { return this.processClass(aClass, coveredTerms); });
       return Course.bulkCreate(processedChunk, { updateOnDuplicate: courseAttributes });
@@ -58,11 +67,17 @@ class DumpProcessor {
     // Upsert ES
     await Course.bulkUpsertES(courseInstances);
     sequelize.options.logging = true;
+    */
   }
 
-  processClass(classInfo, coveredTerms) {
+  processProf(profInfo) {
+    const additionalProps = { emails: { set: profInfo.emails }, createdAt: new Date(), updatedAt: new Date() };
+    return _.omit({ ...profInfo, ...additionalProps }, ['title', 'interests', 'officeStreetAddress']);
+  }
+
+  processCourse(classInfo, coveredTerms) {
     coveredTerms.add(classInfo.termId);
-    const additionalProps = { id: `${Keys.getClassHash(classInfo)}`, minCredits: Math.floor(classInfo.minCredits), maxCredits: Math.floor(classInfo.maxCredits) };
+    const additionalProps = { id: `${Keys.getClassHash(classInfo)}`, minCredits: Math.floor(classInfo.minCredits), maxCredits: Math.floor(classInfo.maxCredits), lastUpdateTime: new Date(classInfo.lastUpdateTime), createdAt: new Date(), updatedAt: new Date(), classAttributes: { set: classInfo.classAttributes }, nupath: { set: classInfo.nupath } };
     return { ...classInfo, ...additionalProps };
   }
 
