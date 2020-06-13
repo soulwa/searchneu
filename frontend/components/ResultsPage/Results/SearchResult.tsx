@@ -24,7 +24,21 @@ export default function SearchResult({ aClass, history } : SearchResultProps) {
   const sectionsShownByDefault = aClass.sections.length < 3 ? aClass.sections.length : 3
   const [renderedSections, setRenderedSections] = useState(aClass.sections.slice(0, sectionsShownByDefault))
   const hideShowAll = sectionsShownByDefault === aClass.sections.length
-  const [userIsWatchingClass, setUserIsWatchingClass] = useState(false)
+  const [userIsWatchingClass, setUserIsWatchingClass] = useState(user.isWatchingClass(Keys.getClassHash(aClass)))
+
+  const onUserUpdate = () => {
+    // Show the notification toggles if the user is watching this class.
+    const isWatching = user.isWatchingClass(Keys.getClassHash(aClass));
+    if (isWatching !== userIsWatchingClass) {
+      setUserIsWatchingClass(isWatching)
+    }
+  }
+
+  useEffect(() => {
+    user.registerUserChangeHandler(onUserUpdate)
+    return () => user.unregisterUserChangeHandler(onUserUpdate)
+  }, [])
+
 
   useEffect(() => {
     if (showAll) {
@@ -34,9 +48,6 @@ export default function SearchResult({ aClass, history } : SearchResultProps) {
     }
   }, [showAll])
 
-  // useEffect(() => {
-  //   setUserIsWatchingClass(user.userIsWatchingClass(Keys.getClassHash(aClass)))
-  // }, [userIsWatchingClass]);
 
 
   return (

@@ -6,7 +6,7 @@ import IconArrow from '../../images/IconArrow'
 import useResultRequisite from './useResultRequisite'
 import macros from '../../macros'
 import MobileSectionPanel from './MobileSectionPanel'
-import { IncomingMessage } from 'http';
+
 
 
 interface MobileSearchResultProps {
