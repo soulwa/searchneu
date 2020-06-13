@@ -7,124 +7,94 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Courses {
-  classAttributes String[]
-  classId         String?
-  coreqs          Json?
-  createdAt       DateTime
-  desc            String?
-  feeAmount       Int?
-  feeDescription  String?
-  host            String?
-  id              String            @id
-  lastUpdateTime  DateTime?
-  maxCredits      Int?
-  minCredits      Int?
-  name            String?
-  nupath          String[]
-  optPrereqsFor   Json?
-  prereqs         Json?
-  prereqsFor      Json?
-  prettyUrl       String?
-  subject         String?
-  termId          String?
-  updatedAt       DateTime
-  url             String?
-  FollowedCourses FollowedCourses[]
-  Sections        Sections[]
-
-  @@index([classId, termId, subject], name: "courses_class_id_term_id_subject")
-}
-
-model FollowedCourses {
-  courseId  String
-  createdAt DateTime
-  updatedAt DateTime
-  userId    String
-  Courses   Courses  @relation(fields: [courseId], references: [id])
-  Users     Users    @relation(fields: [userId], references: [id])
-
-  @@id([userId, courseId])
-}
-
-model FollowedSections {
-  createdAt DateTime
-  sectionId String
-  updatedAt DateTime
-  userId    String
-  Sections  Sections @relation(fields: [sectionId], references: [id])
-  Users     Users    @relation(fields: [userId], references: [id])
-
-  @@id([userId, sectionId])
-}
-
-model MajorData {
-  catalogYear  Int?
-  createdAt    DateTime
-  id           Int      @default(autoincrement()) @id
-  majorId      String?
-  name         String?
-  plansOfStudy Json?
-  requirements Json?
-  updatedAt    DateTime
-}
-
-model Professors {
-  bigPictureUrl     String?
-  createdAt         DateTime
-  email             String?
-  emails            String[]
-  firstName         String?
-  googleScholarId   String?
-  id                String   @id
-  lastName          String?
-  link              String?
-  name              String?
-  officeRoom        String?
-  personalSite      String?
-  phone             String?
-  pic               Json?
-  primaryDepartment String?
-  primaryRole       String?
-  streetAddress     String?
-  updatedAt         DateTime
-  url               String?
-}
-
-model Sections {
-  campus           String?
-  classHash        String?
-  classType        String?
-  createdAt        DateTime
-  crn              String?
-  honors           Boolean?
+model Course {
+  class_attributes String[]
+  class_id         String?
+  coreqs           Json?
+  description      String?
+  fee_amount       Int?
+  fee_description  String?
+  host             String?
   id               String             @id
-  info             String?
-  meetings         Json?
-  online           Boolean?
-  profs            String[]
-  seatsCapacity    Int?
-  seatsRemaining   Int?
-  updatedAt        DateTime
+  last_update_time DateTime?
+  max_credits      Int?
+  min_credits      Int?
+  name             String?
+  nupath           String[]
+  opt_prereqs_for  Json?
+  prereqs          Json?
+  prereqs_for      Json?
+  pretty_url       String?
+  subject          String?
+  term_id          String?
   url              String?
-  waitCapacity     Int?
-  waitRemaining    Int?
-  Courses          Courses?           @relation(fields: [classHash], references: [id])
-  FollowedSections FollowedSections[]
+  followed_courses followed_courses[]
+  sections         sections[]
+
+  @@map(name: "courses")
+  @@index([class_id, term_id, subject], name: "unique_course_props")
 }
 
-model SequelizeMeta {
-  name String @id
+model FollowedCourse {
+  course_id String
+  user_id   String
+  courses   courses @relation(fields: [course_id], references: [id])
+  users     users   @relation(fields: [user_id], references: [id])
+
+  @@map(name: "followed_courses")
+  @@id([user_id, course_id])
 }
 
-model Users {
-  createdAt        DateTime
-  facebookPageId   String?
-  firstName        String?
-  id               String             @id
-  lastName         String?
-  loginKeys        String[]
-  updatedAt        DateTime
-  FollowedCourses  FollowedCourses[]
-  FollowedSections FollowedSections[]
+model FollowedSection {
+  section_id String
+  user_id    String
+  sections   sections @relation(fields: [section_id], references: [id])
+  users      users    @relation(fields: [user_id], references: [id])
+
+  @@map(name: "followed_sections")
+  @@id([user_id, section_id])
+}
+
+model Major {
+  catalog_year   Int?
+  id             Int     @default(autoincrement()) @id
+  major_id       String?
+  name           String?
+  plans_of_study Json?
+  requirements   Json?
+
+  @@map(name: "majors")
+}
+
+model Section {
+  class_hash        String?
+  class_type        String?
+  crn               String?
+  honors            Boolean?
+  id                String              @id
+  info              String?
+  meetings          Json?
+  online            Boolean?
+  profs             String[]
+  seats_capacity    Int?
+  seats_remaining   Int?
+  url               String?
+  wait_capacity     Int?
+  wait_remaining    Int?
+  courses           courses?            @relation(fields: [class_hash], references: [id])
+  followed_sections followed_sections[]
+
+  @@map(name: "sections")
+}
+
+model User {
+  facebook_page_id  String?
+  first_name        String?
+  id                String              @id
+  last_name         String?
+  login_keys        String[]
+  followed_courses  followed_courses[]
+  followed_sections followed_sections[]
+
+  @@map(name: "users")
 }
