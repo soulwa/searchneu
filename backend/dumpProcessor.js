@@ -25,12 +25,11 @@ class DumpProcessor {
 
     console.log(Object.values(termDump.classes).length);
 
-    /*
     await pMap(Object.values(profDump), async (prof) => {
       return prisma.professors.create({ data: this.processProf(prof) })
-    }, { concurrency: this.CHUNK_SIZE })
-    */
+    }, { concurrency: this.CHUNK_SIZE });
 
+    /*
     await pMap(Object.values(termDump.classes), async (course) => {
       const courseData = this.processCourse(course, coveredTerms);
       return prisma.courses.upsert({
@@ -39,7 +38,16 @@ class DumpProcessor {
         update: courseData,
       });
     }, { concurrency: this.CHUNK_SIZE });
-    console.log("BIG CHUNGUS");
+
+    await pMap(Object.values(termDump.sections), async (section) => {
+      const sectionData = this.processSection(section);
+      return prisma.sections.upsert({
+        where: { id: sectionData.id },
+        create: sectionData,
+        update: sectionData,
+      });
+    }, { concurrency: this.CHUNK_SIZE });
+    */
 
 
     /*
@@ -71,14 +79,20 @@ class DumpProcessor {
   }
 
   processProf(profInfo) {
-    const additionalProps = { emails: { set: profInfo.emails }, createdAt: new Date(), updatedAt: new Date() };
-    return _.omit({ ...profInfo, ...additionalProps }, ['title', 'interests', 'officeStreetAddress']);
+    const correctedQuery = { ...profInfo, emails: { set: profInfo.emails } };
+    return _.omit(correctedQuery, ['title', 'interests', 'officeStreetAddress']);
   }
 
   processCourse(classInfo, coveredTerms) {
     coveredTerms.add(classInfo.termId);
-    const additionalProps = { id: `${Keys.getClassHash(classInfo)}`, minCredits: Math.floor(classInfo.minCredits), maxCredits: Math.floor(classInfo.maxCredits), lastUpdateTime: new Date(classInfo.lastUpdateTime), createdAt: new Date(), updatedAt: new Date(), classAttributes: { set: classInfo.classAttributes }, nupath: { set: classInfo.nupath } };
-    return { ...classInfo, ...additionalProps };
+    const additionalProps = { id: `${Keys.getClassHash(classInfo)}`, minCredits: Math.floor(classInfo.minCredits), maxCredits: Math.floor(classInfo.maxCredits), lastUpdateTime: new Date(classInfo.lastUpdateTime) };
+
+    return {
+      ...classInfo,
+      ...additionalProps,
+      classAttributes: { set: classInfo.classAttributes },
+      nupath: { set: classInfo.nupath }
+    };
   }
 
   processSection(secInfo) {

@@ -8,36 +8,36 @@ datasource db {
 }
 
 model Course {
-  class_attributes String[]
-  class_id         String?
-  coreqs           Json?
-  description      String?
-  fee_amount       Int?
-  fee_description  String?
-  host             String?
-  id               String             @id
-  last_update_time DateTime?
-  max_credits      Int?
-  min_credits      Int?
-  name             String?
-  nupath           String[]
-  opt_prereqs_for  Json?
-  prereqs          Json?
-  prereqs_for      Json?
-  pretty_url       String?
-  subject          String?
-  term_id          String?
-  url              String?
-  followed_courses followed_courses[]
-  sections         sections[]
+  classAttributes String[]         @map(name: "class_attributes")
+  classId         String?          @map(name: "class_id")
+  coreqs          Json?
+  description     String?
+  feeAmount       Int?             @map(name: "fee_amount")
+  feeDescription  String?          @map(name: "fee_description")
+  host            String?
+  id              String           @id
+  lastUpdateTime  DateTime?        @map(name: "last_update_time")
+  maxCredits      Int?             @map(name: "max_credits")
+  minCredits      Int?             @map(name: "min_credits")
+  name            String?
+  nupath          String[]
+  optPrereqsFor   Json?            @map(name: "opt_prereqs_for")
+  prereqs         Json?
+  prereqsFor      Json?            @map(name: "prereqs_for")
+  prettyUrl       String?          @map(name: "pretty_url")
+  subject         String?
+  termId          String?          @map(name: "term_id")
+  url             String?
+  followedCourses FollowedCourse[] // @map(name: "followed_courses") NOT SURE ABOUT THIS ONE
+  sections        Section[]
 
   @@map(name: "courses")
   @@index([class_id, term_id, subject], name: "unique_course_props")
 }
 
 model FollowedCourse {
-  course_id String
-  user_id   String
+  courseId  String  @map(name: "course_id")
+  userId    String  @map(name: "user_id")
   courses   courses @relation(fields: [course_id], references: [id])
   users     users   @relation(fields: [user_id], references: [id])
 
@@ -46,55 +46,77 @@ model FollowedCourse {
 }
 
 model FollowedSection {
-  section_id String
-  user_id    String
-  sections   sections @relation(fields: [section_id], references: [id])
-  users      users    @relation(fields: [user_id], references: [id])
+  sectionId String   @map(name: "section_id")
+  userId    String   @map(name: "user_id")
+  sections  sections @relation(fields: [section_id], references: [id])
+  users     users    @relation(fields: [user_id], references: [id])
 
   @@map(name: "followed_sections")
   @@id([user_id, section_id])
 }
 
 model Major {
-  catalog_year   Int?
-  id             Int     @default(autoincrement()) @id
-  major_id       String?
-  name           String?
-  plans_of_study Json?
-  requirements   Json?
+  catalogYear  Int?    @map(name: "catalog_year")
+  id           Int     @default(autoincrement()) @id
+  majorId      String? @map(name: "major_id")
+  name         String?
+  plansOfStudy Json?   @map(name: "plans_of_study")
+  requirements Json?
 
   @@map(name: "majors")
 }
 
-model Section {
-  class_hash        String?
-  class_type        String?
-  crn               String?
-  honors            Boolean?
-  id                String              @id
-  info              String?
-  meetings          Json?
-  online            Boolean?
-  profs             String[]
-  seats_capacity    Int?
-  seats_remaining   Int?
+model Professor {
+  bigPictureUrl     String?  @map(name: "big_picture_url")
+  email             String?
+  emails            String[]
+  firstName         String?  @map(name: "first_name")
+  googleScholarId   String?  @map(name: "google_scholar_id")
+  id                String   @id
+  lastName          String?  @map(name: "last_name")
+  link              String?
+  name              String?
+  officeRoom        String?  @map(name: "office_room")
+  personalSite      String?  @map(name: "personal_site")
+  phone             String?
+  pic               Json?
+  primaryDepartment String?  @map(name: "primary_department")
+  primaryRole       String?  @map(name: "primary_role")
+  streetAddress     String?  @map(name: "street_address")
   url               String?
-  wait_capacity     Int?
-  wait_remaining    Int?
-  courses           courses?            @relation(fields: [class_hash], references: [id])
-  followed_sections followed_sections[]
+
+  @@map(name: "professors")
+}
+
+model Section {
+  classHash        String?           @map(name: "class_hash")
+  classType        String?           @map(name: "class_type")
+  crn              String?
+  honors           Boolean?
+  id               String            @id
+  info             String?
+  meetings         Json?
+  online           Boolean?
+  profs            String[]
+  seatsCapacity    Int?              @map(name: "seats_capacity")
+  seatsRemaining   Int?              @map(name: "seats_remaining")
+  url              String?
+  waitCapacity     Int?              @map(name: "wait_capacity")
+  waitRemaining    Int?              @map(name: "wait_remaining")
+  course           Course?           @relation(fields: [class_hash], references: [id])
+  followedSections FollowedSection[]
 
   @@map(name: "sections")
 }
 
 model User {
-  facebook_page_id  String?
-  first_name        String?
-  id                String              @id
-  last_name         String?
-  login_keys        String[]
-  followed_courses  followed_courses[]
-  followed_sections followed_sections[]
+  facebookPageId   String?           @map(name: "facebook_page_id")
+  firstName        String?           @map(name: "first_name")
+  id               String            @id
+  lastName         String?           @map(name: "last_name")
+  loginKeys        String[]          @map(name: "login_keys")
+  followedCourses  FollowedCourse[]
+  followedSections FollowedSection[]
 
   @@map(name: "users")
 }
