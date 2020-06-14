@@ -6,39 +6,23 @@ import Course from '../../classModels/Course'
 import IconGlobe from '../../images/IconGlobe'
 import IconArrow from '../../images/IconArrow'
 import SignUpForNotifications from '../../SignUpForNotifications'
-import user from '../../user'
-import Keys from '../../../../common/Keys'
 import useResultRequisite from './useResultRequisite'
+import useUserChange from './useUserChange';
 
 interface SearchResultProps {
   aClass: Course,
   history: History
 }
 export default function SearchResult({ aClass, history } : SearchResultProps) {
-  const feeString = aClass.feeDescription && aClass.feeAmount ? `${aClass.feeDescription}- $${aClass.feeAmount}` : null
-  const optionalDisplay = useResultRequisite(history);
-
-  console.log('class', aClass)
-
+  const optionalDisplay = useResultRequisite(history)
+  const userIsWatchingClass = useUserChange(aClass)
   const [showAll, setShowAll] = useState(false)
+  
   const sectionsShownByDefault = aClass.sections.length < 3 ? aClass.sections.length : 3
   const [renderedSections, setRenderedSections] = useState(aClass.sections.slice(0, sectionsShownByDefault))
+  
   const hideShowAll = sectionsShownByDefault === aClass.sections.length
-  const [userIsWatchingClass, setUserIsWatchingClass] = useState(user.isWatchingClass(Keys.getClassHash(aClass)))
-
-  const onUserUpdate = () => {
-    // Show the notification toggles if the user is watching this class.
-    const isWatching = user.isWatchingClass(Keys.getClassHash(aClass));
-    if (isWatching !== userIsWatchingClass) {
-      setUserIsWatchingClass(isWatching)
-    }
-  }
-
-  useEffect(() => {
-    user.registerUserChangeHandler(onUserUpdate)
-    return () => user.unregisterUserChangeHandler(onUserUpdate)
-  }, [])
-
+  const feeString = aClass.feeDescription && aClass.feeAmount ? `${aClass.feeDescription}- $${aClass.feeAmount}` : null
 
   useEffect(() => {
     if (showAll) {

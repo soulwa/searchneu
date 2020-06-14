@@ -2,7 +2,6 @@ import React from 'react'
 import { History } from 'history'
 import macros from '../../macros'
 import RequisiteBranch from '../../classModels/RequisiteBranch'
-import Course from '../../classModels/Course'
 
 export default function useResultRequisite(history: History) {
   const optionalDisplay = (prereqType, aClass) => {
