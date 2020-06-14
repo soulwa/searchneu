@@ -68,3 +68,23 @@ CREATE TABLE majors (
   requirements   JSONB,
   plans_of_study JSONB
 );
+
+CREATE TABLE professors (
+  id                 VARCHAR(255) PRIMARY KEY,
+  name               VARCHAR(255),
+  first_name         VARCHAR(255),
+  last_name          VARCHAR(255),
+  phone              VARCHAR(255),
+  emails             VARCHAR(255)[],
+  primary_role       VARCHAR(255),
+  primary_department VARCHAR(255),
+  url                VARCHAR(255),
+  street_address     VARCHAR(255),
+  personal_site      VARCHAR(255),
+  google_scholar_id  VARCHAR(255),
+  big_picture_url    VARCHAR(255),
+  email              VARCHAR(255),
+  link               VARCHAR(255),
+  office_room        VARCHAR(255),
+  pic                JSONB
+);
