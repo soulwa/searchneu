@@ -1,0 +1,44 @@
+.notif-switch-checkbox {
+  height: 0;
+  width: 0;
+  visibility: hidden;
+}
+
+.notif-switch-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  margin-bottom: 16px;
+  width: 45px;
+  height: 20px;
+  background: #d3d3d3;
+  border-radius: 36px;
+  transition: background-color 0.01s;
+
+  .notif-switch-button {
+    content: "";
+    position: relative;
+    left: 0;
+    width: 25px;
+    height: 25px;
+    border-radius: 25px;
+    transition: 0.4s;
+    background: #a0a0a0;
+    box-shadow: 0 0 2px 0 rgba(10, 10, 10, 0.29);
+  }
+}
+
+.notif-switch-checkbox:checked + .notif-switch-label {
+  background: #AFC1D3;
+
+  .notif-switch-button {
+    background:  #338EF1;;
+    left: 100%;
+    transform: translateX(-100%);
+  }
+}
+
+.notifSwitch {
+  display: flex;
+}
