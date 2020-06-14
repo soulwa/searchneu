@@ -4,6 +4,7 @@
  */
 
 .sign-up-for-notifications-container {
+  
   .disabledButton {
     font-family: Lato, 'Helvetica Neue', Arial, Helvetica, sans-serif;
     margin: 0 0.25em 0 0;
@@ -70,7 +71,7 @@
     }
 
   }
-  
+
 
 
   @media only screen and (min-width: 767px) {
@@ -126,6 +127,8 @@
     
   }
 
+
+
   .sendToMessengerButtonLabel {
     display: inline-block;
     max-width: 137px;
@@ -157,5 +160,37 @@
 
   .inlineBlock {
     display: inline-block;
+  }
+
+  @media only screen and (max-width: 600px) {
+    .initialNotificationButton {
+      width: max-content;
+    }
+    
+    .toggleCTA {
+      margin-top: 0;
+      margin-left: 0;
+      width: 100%;
+      
+      & > span {
+        width: 60%;
+        display: inline-block;
+      }
+    }
+
+    .allSeatsAvailable {
+      margin-top: 0;
+      margin-left: 0;
+      width: 100%;
+      
+      & > span {
+        width: 60%;
+        display: inline-block;
+      }
+    }
+
+    .facebookButtonContainer {
+      margin-right: 16px;
+    }
   }
 }

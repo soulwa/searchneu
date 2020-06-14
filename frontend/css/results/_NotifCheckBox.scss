@@ -42,3 +42,38 @@
 .notifSwitch {
   display: flex;
 }
+
+.notifSubscribeButton {
+  background: #338EF1;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  padding: 4px 8px 4px 8px;
+  cursor: pointer;
+
+  & > span {
+    font-size: 14px;
+    line-height: 17px;
+    color: #FFFFFF;
+  }
+}
+
+.notifSubscribeButton--checked {
+  background: #27AE34;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  padding: 4px 8px 4px 8px;
+  cursor: pointer;
+  
+  & > svg {
+    margin-right: 4px;
+  }
+
+  & > span {
+    font-size: 14px;
+    line-height: 17px;
+    color: #FFFFFF;
+  }
+
+}

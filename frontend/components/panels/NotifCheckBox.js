@@ -9,6 +9,8 @@ import PropTypes from 'prop-types';
 import _ from 'lodash';
 import user from '../user';
 import Keys from '../../../common/Keys';
+import macros from '../macros';
+import IconCheckMark from '../images/IconCheckmark';
 
 
 // This file renders the checkboxes that control which sections a user signs up for
@@ -83,21 +85,30 @@ export default class NotifCheckBox extends React.Component {
 
     return (
       <div data-tip='Sign up for notifications for this section' className='inlineBlock'>
-        <div className='notifSwitch'>
-          <input
-            checked={ this.state.checked }
-            onChange={ this.onCheckboxClick }
-            className='notif-switch-checkbox'
-            id={ this.state.notifSwitchId }
-            type='checkbox'
-          />
-          <label
-            className='notif-switch-label'
-            htmlFor={ this.state.notifSwitchId }
-          >
-            <span className='notif-switch-button' />
-          </label>
-        </div>
+        { macros.isMobile ? (
+          <div className={ this.state.checked ? 'notifSubscribeButton--checked' : 'notifSubscribeButton' } role='button' tabIndex={ 0 } onClick={ this.onCheckboxClick }>
+            {this.state.checked && <IconCheckMark />}
+            <span>
+              {this.state.checked ? 'Subscribed' : 'Subscribe'}
+            </span>
+          </div>
+        ) : (
+          <div className='notifSwitch'>
+            <input
+              checked={ this.state.checked }
+              onChange={ this.onCheckboxClick }
+              className='notif-switch-checkbox'
+              id={ this.state.notifSwitchId }
+              type='checkbox'
+            />
+            <label
+              className='notif-switch-label'
+              htmlFor={ this.state.notifSwitchId }
+            >
+              <span className='notif-switch-button' />
+            </label>
+          </div>
+        )}
       </div>
     );
   }

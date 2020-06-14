@@ -40,8 +40,11 @@ function MobileSectionPanel({section, showNotificationSwitches} : MobileSectionP
         <span>Boston</span>
       </div>
       <div className='MobileSectionPanel__firstRow'>
+        <div>
         <IconGlobe/>
         <span>{section.crn}</span>
+        </div>
+        {showNotificationSwitches && <NotifCheckBox section={section}/>}
       </div>
       <div className='MobileSectionPanel__secondRow'>
         <WeekdayBoxes section={section}/>

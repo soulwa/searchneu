@@ -6,6 +6,9 @@ import IconArrow from '../../images/IconArrow'
 import useResultRequisite from './useResultRequisite'
 import macros from '../../macros'
 import MobileSectionPanel from './MobileSectionPanel'
+import SignUpForNotifications from '../../SignUpForNotifications'
+import user from '../../user'
+import Keys from '../../../../common/Keys'
 
 
 
@@ -20,13 +23,27 @@ function MobileSearchResult({ aClass, history } : MobileSearchResultProps) {
   const [showNUPath, setShowNUPath] = useState(false)
   const [showPrereq, setShowPrereq] = useState(false)
   const [showCoreq, setShowCoreq] = useState(false)
-  const [userIsWatchingClass, setUserIsWatchingClass] = useState(false)
+  const [userIsWatchingClass, setUserIsWatchingClass] = useState(user.isWatchingClass(Keys.getClassHash(aClass)))
   const [showAll, setShowAll] = useState(false)
   
   const sectionsShownByDefault = aClass.sections.length < 3 ? aClass.sections.length : 3
   const [renderedSections, setRenderedSections] = useState(aClass.sections.slice(0, sectionsShownByDefault))
   const hideShowAll =  sectionsShownByDefault === aClass.sections.length
   const optionalDisplay = useResultRequisite(history);
+
+
+  const onUserUpdate = () => {
+    // Show the notification toggles if the user is watching this class.
+    const isWatching = user.isWatchingClass(Keys.getClassHash(aClass));
+    if (isWatching !== userIsWatchingClass) {
+      setUserIsWatchingClass(isWatching)
+    }
+  }
+
+  useEffect(() => {
+    user.registerUserChangeHandler(onUserUpdate)
+    return () => user.unregisterUserChangeHandler(onUserUpdate)
+  }, [])
 
   useEffect(() => {
     if (showAll) {
@@ -77,6 +94,9 @@ function MobileSearchResult({ aClass, history } : MobileSearchResultProps) {
               <span>COREQUISITES</span>
             </div>
             {showCoreq && <div>{optionalDisplay(macros.prereqTypes.COREQ, aClass)}</div>}
+          </div>
+          <div className='MobileSearchResult__panel--notifContainer'>
+            <SignUpForNotifications aClass={ aClass } userIsWatchingClass={ userIsWatchingClass } />
           </div>
         </div>
         <div className='MobileSearchResult__panel--sections'>

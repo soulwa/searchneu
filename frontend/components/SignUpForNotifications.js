@@ -204,7 +204,7 @@ class SignUpForNotifications extends React.Component {
       if (this.props.aClass.sections.length === 0) {
         content = <Button basic disabled content="You're now signed up for notifications on this class" className='notificationButton' />;
       } else {
-        content = <div className='toggleCTA'>Toggle the sections you want to be notified for!</div>;
+        content = <div className='toggleCTA'><span>Toggle the sections you want to be notified for!</span></div>;
       }
     } else if (this.state.showMessengerButton) {
       if (facebook.didPluginFail()) {
@@ -239,7 +239,7 @@ class SignUpForNotifications extends React.Component {
       // Show a button that says there are currently seats available.
       content = (
         <div className='allSeatsAvailable'>
-          There are seats available in all sections.
+          <span>There are seats available in all sections.</span>
         </div>
       );
     }

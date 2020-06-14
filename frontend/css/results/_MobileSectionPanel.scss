@@ -20,14 +20,18 @@
     display: flex;
     align-items: center;
     margin-bottom: 16px;
+    justify-content: space-between;
+    & > div:first-of-type {
+      display: flex;
+      align-items: center;
 
-    & > svg {
-      margin-right: 8px;
-    }
-
-    & > span:first-of-type {
-      margin-bottom: 2px;
-      margin-right: 12px;
+      & > svg {
+        margin-right: 8px;
+      }
+      & > span:first-of-type {
+        margin-bottom: 2px;
+        margin-right: 12px;
+      }
     }
   }
 
