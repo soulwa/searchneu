@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { History } from 'history'
 import Course from '../../classModels/Course'
 import IconCollapseExpand from '../../images/IconCollapseExpand'
 import IconArrow from '../../images/IconArrow'
 import useResultRequisite from './useResultRequisite'
 import useUserChange from './useUserChange'
+import useShowAll from './useShowAll'
 import macros from '../../macros'
 import MobileSectionPanel from './MobileSectionPanel'
 import SignUpForNotifications from '../../SignUpForNotifications'
@@ -24,21 +25,10 @@ function MobileSearchResult({ aClass, history } : MobileSearchResultProps) {
   const [showPrereq, setShowPrereq] = useState(false)
   const [showCoreq, setShowCoreq] = useState(false)
   const userIsWatchingClass = useUserChange(aClass)
-  const [showAll, setShowAll] = useState(false)
-  
-  const sectionsShownByDefault = aClass.sections.length < 3 ? aClass.sections.length : 3
-  const [renderedSections, setRenderedSections] = useState(aClass.sections.slice(0, sectionsShownByDefault))
-  const hideShowAll =  sectionsShownByDefault === aClass.sections.length
+  const {showAll, setShowAll, renderedSections, hideShowAll } = useShowAll(aClass)
+
   const optionalDisplay = useResultRequisite(history);
 
-
-  useEffect(() => {
-    if (showAll) {
-      setRenderedSections(aClass.sections)
-    } else {
-      setRenderedSections(aClass.sections.slice(0, sectionsShownByDefault))
-    }
-  }, [showAll])
 
   return (
     <div className='MobileSearchResult'>

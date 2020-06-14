@@ -8,6 +8,7 @@ import IconArrow from '../../images/IconArrow'
 import SignUpForNotifications from '../../SignUpForNotifications'
 import useResultRequisite from './useResultRequisite'
 import useUserChange from './useUserChange';
+import useShowAll from './useShowAll';
 
 interface SearchResultProps {
   aClass: Course,
@@ -16,23 +17,9 @@ interface SearchResultProps {
 export default function SearchResult({ aClass, history } : SearchResultProps) {
   const optionalDisplay = useResultRequisite(history)
   const userIsWatchingClass = useUserChange(aClass)
-  const [showAll, setShowAll] = useState(false)
-  
-  const sectionsShownByDefault = aClass.sections.length < 3 ? aClass.sections.length : 3
-  const [renderedSections, setRenderedSections] = useState(aClass.sections.slice(0, sectionsShownByDefault))
-  
-  const hideShowAll = sectionsShownByDefault === aClass.sections.length
+  const {showAll, setShowAll, renderedSections, hideShowAll } = useShowAll(aClass)
+
   const feeString = aClass.feeDescription && aClass.feeAmount ? `${aClass.feeDescription}- $${aClass.feeAmount}` : null
-
-  useEffect(() => {
-    if (showAll) {
-      setRenderedSections(aClass.sections)
-    } else {
-      setRenderedSections(aClass.sections.slice(0, sectionsShownByDefault))
-    }
-  }, [showAll])
-
-
 
   return (
     <div className='SearchResult'>

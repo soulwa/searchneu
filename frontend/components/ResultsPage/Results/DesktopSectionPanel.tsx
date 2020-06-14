@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import Section from '../../classModels/Section'
 import WeekdayBoxes from './WeekdayBoxes'
 import NotifCheckBox from '../../panels/NotifCheckBox'
