@@ -3,6 +3,7 @@ import Section from '../../classModels/Section'
 import WeekdayBoxes from './WeekdayBoxes'
 import NotifCheckBox from '../../panels/NotifCheckBox'
 import IconGlobe from '../../images/IconGlobe'
+import useSectionPanelDetail from './useSectionPanelDetail';
 
 interface MobileSectionPanelProps {
   section: Section
@@ -10,28 +11,8 @@ interface MobileSectionPanelProps {
 }
 
 function MobileSectionPanel({section, showNotificationSwitches} : MobileSectionPanelProps) {
-  const getSeatsClass = () => {
-    const seatingPercentage = section.seatsRemaining / section.seatsCapacity
-    if (seatingPercentage > (2 / 3)) {
-      return 'green'
-    } if (seatingPercentage > (1 / 3)) {
-      return 'yellow'
-    }
-    return 'red'
-  }
-
-  const renderTimes = () => {
-    return section.meetings.map((meeting) => {
-      return meeting.times.map((time) => (
-        <>
-          <span>
-            {`${time.start.format('h:mm')}-${time.end.format('h:mm a')} | ${meeting.getLocation()}`}
-          </span>
-          <br />
-        </>
-      ))
-    })
-  }
+  
+  const {renderTimes, getSeatsClass} = useSectionPanelDetail(section)
 
   return (
     <div className='MobileSectionPanel'>
