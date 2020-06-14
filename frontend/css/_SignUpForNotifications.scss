@@ -24,6 +24,34 @@
     margin-right: 0;
   }
 
+  .initialNotificationButton {
+    cursor: pointer;
+    border-radius: 5px;
+    background: #FFFFFF;
+    border: 1px solid rgba(79, 79, 79, 0.5);
+    display: flex;
+    align-items: center;
+    padding: 10px;
+
+    &:focus {
+      outline: none;
+    }
+
+    & > svg {
+      margin-right: 8px;
+    }
+    
+    & > span {
+      font-style: normal;
+      font-weight: normal;
+      font-size: 13px;
+      line-height: 25px;
+    }
+
+  }
+  
+
+
   @media only screen and (min-width: 767px) {
     .notificationButton {
       font-size: 15px !important;
@@ -47,6 +75,34 @@
   .facebookButtonContainer {
     display: flex;
     margin-top: 4px;
+    position: relative;
+
+    & > .inlineBlock > .fb-send-to-messenger {
+        opacity: 1;
+        height: 100%;
+    }
+
+    &__button {
+      border-radius: 5px;
+      background: #FFFFFF;
+      cursor: pointer;
+      display: flex;
+      align-content: center;
+      padding: 10px;
+      border: 1px solid rgba(79, 79, 79, 0.5);
+      &:focus {
+        outline: none;
+      }
+
+      & > span {
+        font-size: 13px;
+        line-height: 25px;
+      }
+      & > svg {
+        margin-right: 8px;
+      }
+    }
+    
   }
 
   .sendToMessengerButtonLabel {

@@ -7,6 +7,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Button, Modal } from 'semantic-ui-react';
 
+
+import IconFacebook from './images/IconFacebook'
+import LogoInput from './images/LogoInput'
 import macros from './macros';
 import facebook from './facebook';
 import user from './user';
@@ -227,7 +230,12 @@ class SignUpForNotifications extends React.Component {
     } else if (this.props.aClass.sections.length === 0) {
       content = <Button basic onClick={ this.onSubscribeToggleChange } content='Get notified when sections are added!' className='notificationButton' />;
     } else if (this.props.aClass.hasAtLeastOneSectionFull()) {
-      content = <Button basic onClick={ this.onSubscribeToggleChange } content='Get notified when seats open up!' className='notificationButton' />;
+      content = (
+        <div className='initialNotificationButton' role='button' focusable='true' tabIndex={ 0 } onClick={ this.onSubscribeToggleChange }>
+          <LogoInput height='14' width='18' fill='#d41b2c' />
+          <span>Get notified when seats open up!</span>
+        </div>
+      );
     } else {
       // Show a button that says there are currently seats available.
       content = (
