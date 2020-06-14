@@ -8,7 +8,6 @@ import PropTypes from 'prop-types';
 import { Button, Modal } from 'semantic-ui-react';
 
 
-import IconFacebook from './images/IconFacebook'
 import LogoInput from './images/LogoInput'
 import macros from './macros';
 import facebook from './facebook';
@@ -205,7 +204,7 @@ class SignUpForNotifications extends React.Component {
       if (this.props.aClass.sections.length === 0) {
         content = <Button basic disabled content="You're now signed up for notifications on this class" className='notificationButton' />;
       } else {
-        content = <Button basic disabled content='Toggle the sections you want to be notified for!' className='notificationButton' />;
+        content = <div className='toggleCTA'>Toggle the sections you want to be notified for!</div>;
       }
     } else if (this.state.showMessengerButton) {
       if (facebook.didPluginFail()) {
@@ -239,7 +238,7 @@ class SignUpForNotifications extends React.Component {
     } else {
       // Show a button that says there are currently seats available.
       content = (
-        <div className='disabledButton notificationButton'>
+        <div className='allSeatsAvailable'>
           There are seats available in all sections.
         </div>
       );
