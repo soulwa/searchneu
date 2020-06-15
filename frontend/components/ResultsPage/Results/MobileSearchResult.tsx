@@ -51,7 +51,7 @@ function MobileSearchResult({ aClass, history } : MobileSearchResultProps) {
             {aClass.desc}
           </div>
           <div className='MobileSearchResult__panel--showMore' role='button' tabIndex={ 0 } onClick={ () => setShowMore(!showMore) }>{showMore ? 'Show less' : 'Show more'}</div>
-          <div className='MobileSearchResult__panel--collapsableContainer' role='button' tabIndex={ 0 } onClick={ () => setShowNUPath(!showNUPath)}>
+          <div className='MobileSearchResult__panel--collapsableContainer' role='button' tabIndex={ 0 } onClick={ () => setShowNUPath(!showNUPath) }>
             <div className='MobileSearchResult__panel--collapsableTitle'>
               <IconCollapseExpand width='6' height='12' fill='#000000' className={ showNUPath && 'MobileSearchResult__panel--rotatedIcon' } />
               <span>NUPATHS</span>

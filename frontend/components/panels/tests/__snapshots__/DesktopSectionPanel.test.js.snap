@@ -16,6 +16,8 @@ exports[`should render a section 1`] = `
     <WeekdayBoxes
       section={
         Section {
+          "campus": undefined,
+          "campusDescription": undefined,
           "classId": "1210",
           "crn": "13502",
           "dataStatus": undefined,
@@ -115,6 +117,8 @@ exports[`should render a section 1`] = `
       <NotifCheckBox
         section={
           Section {
+            "campus": undefined,
+            "campusDescription": undefined,
             "classId": "1210",
             "crn": "13502",
             "dataStatus": undefined,
@@ -183,6 +187,8 @@ exports[`should render a section w/ notif check boxes 1`] = `
     <WeekdayBoxes
       section={
         Section {
+          "campus": undefined,
+          "campusDescription": undefined,
           "classId": "1210",
           "crn": "13502",
           "dataStatus": undefined,
@@ -282,6 +288,8 @@ exports[`should render a section w/ notif check boxes 1`] = `
       <NotifCheckBox
         section={
           Section {
+            "campus": undefined,
+            "campusDescription": undefined,
             "classId": "1210",
             "crn": "13502",
             "dataStatus": undefined,
@@ -350,6 +358,8 @@ exports[`should render another section 1`] = `
     <WeekdayBoxes
       section={
         Section {
+          "campus": undefined,
+          "campusDescription": undefined,
           "classId": "1210",
           "crn": "14404",
           "dataStatus": undefined,
@@ -449,6 +459,8 @@ exports[`should render another section 1`] = `
       <NotifCheckBox
         section={
           Section {
+            "campus": undefined,
+            "campusDescription": undefined,
             "classId": "1210",
             "crn": "14404",
             "dataStatus": undefined,

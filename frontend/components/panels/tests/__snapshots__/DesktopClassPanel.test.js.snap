@@ -131,6 +131,8 @@ exports[`should render some stuff 1`] = `
                 "14405",
               ],
               "desc": "Continues the preparation of students for careers in the computing and information fields by discussing co-op and co-op processes. Offers students an opportunity to prepare a professional résumé; practice proper interviewing techniques; explore current job opportunities; learn how to engage in the job and referral process; and to understand co-op policies, procedures, and expectations. Discusses professional behavior and ethical issues in the workplace. 1.000 Lecture hours",
+              "feeAmount": undefined,
+              "feeDescription": undefined,
               "honors": false,
               "host": "neu.edu",
               "isString": false,
@@ -138,6 +140,7 @@ exports[`should render some stuff 1`] = `
               "maxCredits": 1,
               "minCredits": 1,
               "name": "Computer Science/Information Science Overview 2: Co-op Preparation",
+              "nupath": undefined,
               "optPrereqsFor": Object {
                 "values": Array [],
               },
@@ -151,6 +154,8 @@ exports[`should render some stuff 1`] = `
               "prettyUrl": "https://wl11gp.neu.edu/udcprod8/bwckctlg.p_disp_course_detail?cat_term_in=201810&subj_code_in=CS&crse_numb_in=1210",
               "sections": Array [
                 Section {
+                  "campus": undefined,
+                  "campusDescription": undefined,
                   "classId": "1210",
                   "crn": "13502",
                   "dataStatus": undefined,
@@ -183,6 +188,8 @@ exports[`should render some stuff 1`] = `
                   "waitRemaining": 0,
                 },
                 Section {
+                  "campus": undefined,
+                  "campusDescription": undefined,
                   "classId": "1210",
                   "crn": "14404",
                   "dataStatus": undefined,
@@ -215,6 +222,8 @@ exports[`should render some stuff 1`] = `
                   "waitRemaining": 0,
                 },
                 Section {
+                  "campus": undefined,
+                  "campusDescription": undefined,
                   "classId": "1210",
                   "crn": "14405",
                   "dataStatus": undefined,
@@ -247,6 +256,8 @@ exports[`should render some stuff 1`] = `
                   "waitRemaining": 0,
                 },
                 Section {
+                  "campus": undefined,
+                  "campusDescription": undefined,
                   "classId": "1210",
                   "crn": "13503",
                   "dataStatus": undefined,
@@ -279,6 +290,8 @@ exports[`should render some stuff 1`] = `
                   "waitRemaining": 0,
                 },
                 Section {
+                  "campus": undefined,
+                  "campusDescription": undefined,
                   "classId": "1210",
                   "crn": "14386",
                   "dataStatus": undefined,
@@ -389,6 +402,8 @@ exports[`should render some stuff 1`] = `
         key="13502"
         section={
           Section {
+            "campus": undefined,
+            "campusDescription": undefined,
             "classId": "1210",
             "crn": "13502",
             "dataStatus": undefined,
@@ -430,6 +445,8 @@ exports[`should render some stuff 1`] = `
         key="14404"
         section={
           Section {
+            "campus": undefined,
+            "campusDescription": undefined,
             "classId": "1210",
             "crn": "14404",
             "dataStatus": undefined,
@@ -471,6 +488,8 @@ exports[`should render some stuff 1`] = `
         key="14405"
         section={
           Section {
+            "campus": undefined,
+            "campusDescription": undefined,
             "classId": "1210",
             "crn": "14405",
             "dataStatus": undefined,

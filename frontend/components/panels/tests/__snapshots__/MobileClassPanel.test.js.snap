@@ -60,6 +60,8 @@ exports[`should render some stuff 1`] = `
       key="neu.edu/201810/CS/1210/13502"
       section={
         Section {
+          "campus": undefined,
+          "campusDescription": undefined,
           "classId": "1210",
           "crn": "13502",
           "dataStatus": undefined,
