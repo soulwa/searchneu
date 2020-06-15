@@ -94,6 +94,11 @@
     margin-top: 4px;
     position: relative;
 
+    &:focus,
+    &:active {
+      outline: none;
+    }
+
     & > .inlineBlock > .fb-send-to-messenger {
       opacity: 1;
       height: 100%;

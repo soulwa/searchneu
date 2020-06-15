@@ -56,6 +56,11 @@
     line-height: 17px;
     color: #fff;
   }
+
+  &:focus,
+  &:active {
+    outline: none;
+  }
 }
 
 .notifSubscribeButton--checked {
@@ -74,5 +79,10 @@
     font-size: 14px;
     line-height: 17px;
     color: #fff;
+  }
+
+  &:focus,
+  &:active {
+    outline: none;
   }
 }
