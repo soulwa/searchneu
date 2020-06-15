@@ -1,4 +1,4 @@
-import {useState, useEffect} from 'react'
+import { useState, useEffect } from 'react'
 import Course from '../../classModels/Course'
 import Section from '../../classModels/Section'
 
@@ -10,20 +10,19 @@ interface UseShowAllReturn {
 }
 
 export default function useShowAll(aClass: Course) : UseShowAllReturn {
-
   const [showAll, setShowAll] = useState(false)
-  
+
   const sectionsShownByDefault = aClass.sections.length < 3 ? aClass.sections.length : 3
   const [renderedSections, setRenderedSections] = useState(aClass.sections.slice(0, sectionsShownByDefault))
   const hideShowAll = sectionsShownByDefault === aClass.sections.length
-  
+
   useEffect(() => {
     if (showAll) {
       setRenderedSections(aClass.sections)
     } else {
       setRenderedSections(aClass.sections.slice(0, sectionsShownByDefault))
     }
-  }, [showAll])
+  }, [aClass.sections, sectionsShownByDefault, showAll])
 
   return {
     showAll: showAll,
@@ -31,5 +30,4 @@ export default function useShowAll(aClass: Course) : UseShowAllReturn {
     renderedSections: renderedSections,
     hideShowAll: hideShowAll,
   }
-
 }

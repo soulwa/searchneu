@@ -10,9 +10,8 @@ interface MobileSectionPanelProps {
   showNotificationSwitches: boolean
 }
 
-function MobileSectionPanel({section, showNotificationSwitches} : MobileSectionPanelProps) {
-  
-  const {renderTimes, getSeatsClass} = useSectionPanelDetail(section)
+function MobileSectionPanel({ section, showNotificationSwitches } : MobileSectionPanelProps) {
+  const { renderTimes, getSeatsClass } = useSectionPanelDetail(section)
 
   return (
     <div className='MobileSectionPanel'>
@@ -22,23 +21,22 @@ function MobileSectionPanel({section, showNotificationSwitches} : MobileSectionP
       </div>
       <div className='MobileSectionPanel__firstRow'>
         <div>
-        <IconGlobe/>
-        <span>{section.crn}</span>
+          <IconGlobe />
+          <span>{section.crn}</span>
         </div>
-        {showNotificationSwitches && <NotifCheckBox section={section}/>}
+        {showNotificationSwitches && <NotifCheckBox section={ section } />}
       </div>
       <div className='MobileSectionPanel__secondRow'>
-        <WeekdayBoxes section={section}/>
+        <WeekdayBoxes section={ section } />
       </div>
       <div className='MobileSectionPanel__meetings'>
         {renderTimes()}
       </div>
       <div className={ getSeatsClass() }>
-          {`${section.seatsRemaining}/${section.seatsCapacity} Seats Available `}
+        {`${section.seatsRemaining}/${section.seatsCapacity} Seats Available `}
       </div>
     </div>
   )
-
 }
 
 export default MobileSectionPanel

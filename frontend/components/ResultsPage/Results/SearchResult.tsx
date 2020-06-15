@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { History } from 'history'
 import macros from '../../macros'
 import DesktopSectionPanel from './DesktopSectionPanel'
@@ -17,7 +17,9 @@ interface SearchResultProps {
 export default function SearchResult({ aClass, history } : SearchResultProps) {
   const optionalDisplay = useResultRequisite(history)
   const userIsWatchingClass = useUserChange(aClass)
-  const {showAll, setShowAll, renderedSections, hideShowAll } = useShowAll(aClass)
+  const {
+    showAll, setShowAll, renderedSections, hideShowAll,
+  } = useShowAll(aClass)
 
   const feeString = aClass.feeDescription && aClass.feeAmount ? `${aClass.feeDescription}- $${aClass.feeAmount}` : null
 
@@ -80,19 +82,19 @@ export default function SearchResult({ aClass, history } : SearchResultProps) {
         </thead>
         <tbody>
           {renderedSections.map((section) => (
-              <DesktopSectionPanel
-                key={ section.crn }
-                section={ section }
-                showNotificationSwitches={ userIsWatchingClass }
-              />
-            ))}
+            <DesktopSectionPanel
+              key={ section.crn }
+              section={ section }
+              showNotificationSwitches={ userIsWatchingClass }
+            />
+          ))}
         </tbody>
       </table>
       {!hideShowAll
       && (
-      <div className='SearchResult__showAll' onClick={ () => setShowAll(!showAll) }>
+      <div className='SearchResult__showAll' role='button' tabIndex={ 0 } onClick={ () => setShowAll(!showAll) }>
         <span>{showAll ? 'Collapse sections' : 'Show all sections'}</span>
-        <IconArrow className={showAll ? 'SearchResult__showAll--collapse' : null}/>
+        <IconArrow className={ showAll ? 'SearchResult__showAll--collapse' : null } />
       </div>
       )}
     </div>

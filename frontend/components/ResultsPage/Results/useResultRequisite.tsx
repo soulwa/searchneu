@@ -4,10 +4,41 @@ import macros from '../../macros'
 import RequisiteBranch from '../../classModels/RequisiteBranch'
 
 export default function useResultRequisite(history: History) {
-  const optionalDisplay = (prereqType, aClass) => {
-    const data = getReqsString(prereqType, aClass);
+  const onReqClick = (reqType, childBranch, event, hash) => {
+    history.push(hash);
 
-    return data;
+    // Create the React element and add it to retVal
+    const searchEvent = new CustomEvent(macros.searchEvent, { detail: `${childBranch.subject} ${childBranch.classId}` });
+    window.dispatchEvent(searchEvent);
+    event.preventDefault();
+
+    // Rest of this function is analytics
+    const classCode = `${childBranch.subject} ${childBranch.classId}`;
+    let reqTypeString;
+
+    switch (reqType) {
+      case macros.prereqTypes.PREREQ:
+        reqTypeString = 'Prerequisite';
+        break;
+      case macros.prereqTypes.COREQ:
+        reqTypeString = 'Corequisite';
+        break;
+      case macros.prereqTypes.PREREQ_FOR:
+        reqTypeString = 'Required Prerequisite For';
+        break;
+      case macros.prereqTypes.OPT_PREREQ_FOR:
+        reqTypeString = 'Optional Prerequisite For';
+        break;
+      default:
+        macros.error('unknown type.', reqType);
+    }
+
+    macros.logAmplitudeEvent('Requisite Click', {
+      type: reqTypeString,
+      subject: childBranch.subject,
+      classId: childBranch.classId,
+      classCode: classCode,
+    });
   }
 
   // returns an array made to be rendered by react to display the prereqs
@@ -116,42 +147,12 @@ export default function useResultRequisite(history: History) {
     return retVal;
   }
 
-  const onReqClick = (reqType, childBranch, event, hash) => {
-    history.push(hash);
+  const optionalDisplay = (prereqType, aClass) => {
+    const data = getReqsString(prereqType, aClass);
 
-    // Create the React element and add it to retVal
-    const searchEvent = new CustomEvent(macros.searchEvent, { detail: `${childBranch.subject} ${childBranch.classId}` });
-    window.dispatchEvent(searchEvent);
-    event.preventDefault();
-
-    // Rest of this function is analytics
-    const classCode = `${childBranch.subject} ${childBranch.classId}`;
-    let reqTypeString;
-
-    switch (reqType) {
-      case macros.prereqTypes.PREREQ:
-        reqTypeString = 'Prerequisite';
-        break;
-      case macros.prereqTypes.COREQ:
-        reqTypeString = 'Corequisite';
-        break;
-      case macros.prereqTypes.PREREQ_FOR:
-        reqTypeString = 'Required Prerequisite For';
-        break;
-      case macros.prereqTypes.OPT_PREREQ_FOR:
-        reqTypeString = 'Optional Prerequisite For';
-        break;
-      default:
-        macros.error('unknown type.', reqType);
-    }
-
-    macros.logAmplitudeEvent('Requisite Click', {
-      type: reqTypeString,
-      subject: childBranch.subject,
-      classId: childBranch.classId,
-      classCode: classCode,
-    });
+    return data;
   }
+
 
   return optionalDisplay
 }

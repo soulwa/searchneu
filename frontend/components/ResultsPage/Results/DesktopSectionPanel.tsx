@@ -12,8 +12,7 @@ interface DesktopSectionPanelProps {
 
 
 function DesktopSectionPanel({ section, showNotificationSwitches } : DesktopSectionPanelProps) {
-
-  const {renderTimes, getSeatsClass} = useSectionPanelDetail(section)
+  const { renderTimes, getSeatsClass } = useSectionPanelDetail(section)
 
   return (
     <tr className='DesktopSectionPanel' key={ section.getHash() }>
