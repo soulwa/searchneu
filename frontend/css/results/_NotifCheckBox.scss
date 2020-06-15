@@ -30,10 +30,10 @@
 }
 
 .notif-switch-checkbox:checked + .notif-switch-label {
-  background: #AFC1D3;
+  background: #afc1d3;
 
   .notif-switch-button {
-    background:  #338EF1;;
+    background: #338ef1;
     left: 100%;
     transform: translateX(-100%);
   }
@@ -44,7 +44,7 @@
 }
 
 .notifSubscribeButton {
-  background: #338EF1;
+  background: #338ef1;
   border-radius: 4px;
   display: flex;
   align-items: center;
@@ -54,18 +54,18 @@
   & > span {
     font-size: 14px;
     line-height: 17px;
-    color: #FFFFFF;
+    color: #fff;
   }
 }
 
 .notifSubscribeButton--checked {
-  background: #27AE34;
+  background: #27ae34;
   border-radius: 4px;
   display: flex;
   align-items: center;
   padding: 4px 8px 4px 8px;
   cursor: pointer;
-  
+
   & > svg {
     margin-right: 4px;
   }
@@ -73,7 +73,6 @@
   & > span {
     font-size: 14px;
     line-height: 17px;
-    color: #FFFFFF;
+    color: #fff;
   }
-
 }

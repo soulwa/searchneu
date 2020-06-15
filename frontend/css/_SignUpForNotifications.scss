@@ -4,7 +4,6 @@
  */
 
 .sign-up-for-notifications-container {
-  
   .disabledButton {
     font-family: Lato, 'Helvetica Neue', Arial, Helvetica, sans-serif;
     margin: 0 0.25em 0 0;
@@ -27,29 +26,28 @@
 
   .toggleCTA {
     margin-top: 4px;
-    color: #338EF1;
+    color: #338ef1;
     width: 60%;
     margin-left: 40%;
     text-align: center;
-    line-height: 16px; 
+    line-height: 16px;
     font-size: 13px;
-   
   }
 
   .allSeatsAvailable {
     margin-top: 4px;
-    color: #27AE34;
+    color: #27ae34;
     width: 60%;
     margin-left: 40%;
     text-align: center;
-    line-height: 16px; 
+    line-height: 16px;
     font-size: 13px;
   }
 
   .initialNotificationButton {
     cursor: pointer;
     border-radius: 5px;
-    background: #FFFFFF;
+    background: #fff;
     border: 1px solid rgba(79, 79, 79, 0.5);
     display: flex;
     align-items: center;
@@ -62,17 +60,14 @@
     & > svg {
       margin-right: 8px;
     }
-    
+
     & > span {
       font-style: normal;
       font-weight: normal;
       font-size: 13px;
       line-height: 25px;
     }
-
   }
-
-
 
   @media only screen and (min-width: 767px) {
     .notificationButton {
@@ -100,18 +95,19 @@
     position: relative;
 
     & > .inlineBlock > .fb-send-to-messenger {
-        opacity: 1;
-        height: 100%;
+      opacity: 1;
+      height: 100%;
     }
 
     &__button {
       border-radius: 5px;
-      background: #FFFFFF;
+      background: #fff;
       cursor: pointer;
       display: flex;
       align-content: center;
       padding: 10px;
       border: 1px solid rgba(79, 79, 79, 0.5);
+
       &:focus {
         outline: none;
       }
@@ -120,14 +116,12 @@
         font-size: 13px;
         line-height: 25px;
       }
+
       & > svg {
         margin-right: 8px;
       }
     }
-    
   }
-
-
 
   .sendToMessengerButtonLabel {
     display: inline-block;
@@ -166,12 +160,12 @@
     .initialNotificationButton {
       width: max-content;
     }
-    
+
     .toggleCTA {
       margin-top: 0;
       margin-left: 0;
       width: 100%;
-      
+
       & > span {
         width: 60%;
         display: inline-block;
@@ -182,7 +176,7 @@
       margin-top: 0;
       margin-left: 0;
       width: 100%;
-      
+
       & > span {
         width: 60%;
         display: inline-block;

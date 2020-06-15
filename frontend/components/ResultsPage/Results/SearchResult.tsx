@@ -92,7 +92,7 @@ export default function SearchResult({ aClass, history } : SearchResultProps) {
       && (
       <div className='SearchResult__showAll' onClick={ () => setShowAll(!showAll) }>
         <span>{showAll ? 'Collapse sections' : 'Show all sections'}</span>
-        <IconArrow className={showAll && 'SearchResult__showAll--collapse'}/>
+        <IconArrow className={showAll ? 'SearchResult__showAll--collapse' : null}/>
       </div>
       )}
     </div>

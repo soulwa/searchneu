@@ -6,6 +6,13 @@
   padding: 16px;
   color: black;
 
+  &__meetings {
+    & > span {
+      margin-top: 16px;
+      display: inline-block;
+    }
+  }
+
   &__header {
     display: flex;
     justify-content: space-between;
@@ -21,6 +28,7 @@
     align-items: center;
     margin-bottom: 16px;
     justify-content: space-between;
+
     & > div:first-of-type {
       display: flex;
       align-items: center;
@@ -28,6 +36,7 @@
       & > svg {
         margin-right: 8px;
       }
+
       & > span:first-of-type {
         margin-bottom: 2px;
         margin-right: 12px;
@@ -37,16 +46,9 @@
 
   &__secondRow {
     display: flex;
-    justify-content: space-between
+    justify-content: space-between;
   }
 
-  &__meetings {
-    & > span {
-      margin-top: 16px;
-      display: inline-block;
-    }
-  }
-  
   & > .green {
     margin-top: 16px;
     color: #27ae34;

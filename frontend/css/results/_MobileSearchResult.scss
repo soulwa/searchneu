@@ -1,5 +1,6 @@
 .MobileSearchResult {
   margin: 16px 0;
+  font-family: Lato, sans-serif;
 
   &__header {
     background: #fafafa;
@@ -32,7 +33,6 @@
     }
 
     &--classTitle {
-      font-family: Lato;
       font-style: normal;
       font-weight: 800;
       font-size: 20px;
@@ -50,7 +50,6 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
     border-radius: 0 0 8px 8px;
     border: 1px solid #dededf;
-    font-family: Lato;
     font-weight: normal;
     font-size: 14px;
     line-height: 17px;
@@ -143,24 +142,18 @@
   }
 
   &__showAll {
-    background: #FAFAFB;
-    border: 1px solid #DEDEDF;
-    border-radius: 0px 0px 8px 8px;
+    background: #fafafb;
+    border: 1px solid #dededf;
+    border-radius: 0 0 8px 8px;
     padding: 10px 20px 10px 20px;
 
     & > span {
       font-weight: bold;
       margin-right: 8px;
-      
-
     }
 
     &--collapse {
       transform: rotate(-180deg);
     }
-
-
-
   }
-  
 }
