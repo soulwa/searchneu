@@ -9,12 +9,12 @@ class ElasticCourseSerializer extends CourseSerializer {
     return [];
   }
 
-  courseCols() {
-    return ['host', 'name', 'subject', 'classId', 'termId', 'nupath'];
+  finishCourseObj(course) {
+    return _.pick(course, ['host', 'name', 'subject', 'classId', 'termId', 'nupath']);
   }
 
-  sectionCols() {
-    return ['profs', 'online', 'classType', 'crn'];
+  finishSectionObj(section) {
+    return _.pick(section, ['profs', 'online', 'classType', 'crn']);
   }
 }
 

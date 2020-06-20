@@ -2,21 +2,19 @@
  * This file is part of Search NEU and licensed under AGPL3.
  * See the license file in the root folder for details.
  */
+
+import { PrismaClient } from '@prisma/client';
 import _ from 'lodash';
-import { Op } from 'sequelize';
 
 class CourseSerializer {
   // this is a hack to get around the circular dependency created by [elasticSerializer -> courseSerializer -> database/index -> database/course -> elasticSerializer]
-  constructor(sectionModel) {
-    this.sectionModel = sectionModel;
-  }
 
   async bulkSerialize(instances) {
     const courses = instances.map((course) => { return this.serializeCourse(course); });
 
-    const sections = await this.sectionModel.findAll({
+    const sections = await (new PrismaClient()).findMany({
       where: {
-        classHash: { [Op.in]: instances.map((instance) => instance.id) },
+        classHash: { in: instances.map((instance) => instance.id) },
       },
     });
 
@@ -45,15 +43,13 @@ class CourseSerializer {
   }
 
   serializeCourse(course) {
-    const obj = course.dataValues;
-    obj.lastUpdateTime = obj.lastUpdateTime.getTime();
-
-    return _(obj).pick(this.courseCols()).value();
+    // TODO unclear what type Prisma will return for lastUpdateTime
+    course.lastUpdateTime = course.lastUpdateTime.getTime();
+    return this.finishCourseObj(course);
   }
 
   serializeSection(section) {
-    const obj = section.dataValues;
-    return _(obj).pick(this.sectionCols()).value();
+    return this.finishSectionObj(section);
   }
 
   // TODO this should definitely be eliminated
@@ -61,15 +57,15 @@ class CourseSerializer {
     return ['neu.edu', course.termId, course.subject, course.classId].join('/');
   }
 
-  courseCols() {
-    throw new Error('not implemented');
-  }
-
   courseProps() {
     throw new Error('not implemented');
   }
 
-  sectionCols() {
+  finishCourseObj() {
+    throw new Error('not implemented');
+  }
+
+  finishSectionObj() {
     throw new Error('not implemented');
   }
 }

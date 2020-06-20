@@ -23,16 +23,18 @@ class DumpProcessor {
     const prisma = new PrismaClient();
     const coveredTerms = new Set();
 
-    console.log(Object.values(termDump.classes).length);
-
     await pMap(Object.values(profDump), async (prof) => {
-      return prisma.professors.create({ data: this.processProf(prof) })
+      const profData = this.processProf(prof);
+      return prisma.professor.upsert({
+        where: { id: profData.id },
+        create: profData,
+        update: profData,
+      });
     }, { concurrency: this.CHUNK_SIZE });
 
-    /*
     await pMap(Object.values(termDump.classes), async (course) => {
       const courseData = this.processCourse(course, coveredTerms);
-      return prisma.courses.upsert({
+      return prisma.course.upsert({
         where: { id: courseData.id },
         create: courseData,
         update: courseData,
@@ -41,28 +43,23 @@ class DumpProcessor {
 
     await pMap(Object.values(termDump.sections), async (section) => {
       const sectionData = this.processSection(section);
-      return prisma.sections.upsert({
+      return prisma.section.upsert({
         where: { id: sectionData.id },
         create: sectionData,
         update: sectionData,
       });
     }, { concurrency: this.CHUNK_SIZE });
-    */
 
+    if (destroy) {
+      await prisma.course.deleteMany({
+        where: {
+          termId: { in: Array.from(coveredTerms) },
+          lastUpdateTime: { lt: new Date(new Date() - 48 * 60 * 60 * 1000) },
+        },
+      });
+    }
 
     /*
-    const classPromises = _.chunk(termDump.classes, this.CHUNK_SIZE).map(async (classChunk) => {
-      const processedChunk = classChunk.map((aClass) => { return this.processClass(aClass, coveredTerms); });
-      return Course.bulkCreate(processedChunk, { updateOnDuplicate: courseAttributes });
-    });
-    const courseInstances = (await Promise.all(classPromises)).flat();
-
-    const secPromises = _.chunk(termDump.sections, this.CHUNK_SIZE).map(async (secChunk) => {
-      const processedChunk = secChunk.map((section) => { return this.processSection(section); });
-      return Section.bulkCreate(processedChunk, { updateOnDuplicate: secAttributes });
-    });
-    await Promise.all(secPromises);
-
     // destroy courses that haven't been updated in over 2 days
     if (destroy) {
       await Course.destroy({
@@ -85,19 +82,28 @@ class DumpProcessor {
 
   processCourse(classInfo, coveredTerms) {
     coveredTerms.add(classInfo.termId);
-    const additionalProps = { id: `${Keys.getClassHash(classInfo)}`, minCredits: Math.floor(classInfo.minCredits), maxCredits: Math.floor(classInfo.maxCredits), lastUpdateTime: new Date(classInfo.lastUpdateTime) };
 
-    return {
+    const additionalProps = {
+      id: `${Keys.getClassHash(classInfo)}`,
+      description: classInfo.desc,
+      minCredits: Math.floor(classInfo.minCredits),
+      maxCredits: Math.floor(classInfo.maxCredits),
+      lastUpdateTime: new Date(classInfo.lastUpdateTime),
+    };
+
+    const correctedQuery = {
       ...classInfo,
       ...additionalProps,
       classAttributes: { set: classInfo.classAttributes },
       nupath: { set: classInfo.nupath }
     };
+
+    return _.omit(correctedQuery, ['desc']);
   }
 
   processSection(secInfo) {
-    const additionalProps = { id: `${Keys.getSectionHash(secInfo)}`, classHash: Keys.getClassHash(secInfo) };
-    return { ...secInfo, ...additionalProps };
+    const additionalProps = { id: `${Keys.getSectionHash(secInfo)}`, classHash: Keys.getClassHash(secInfo), profs: { set: secInfo.profs } };
+    return _.omit({ ...secInfo, ...additionalProps }, ['classHash', 'classId', 'termId', 'subject', 'host']);
   }
 }
 
