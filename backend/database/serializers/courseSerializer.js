@@ -61,11 +61,11 @@ class CourseSerializer {
     throw new Error('not implemented');
   }
 
-  finishCourseObj() {
+  finishCourseObj(_course) {
     throw new Error('not implemented');
   }
 
-  finishSectionObj() {
+  finishSectionObj(_section) {
     throw new Error('not implemented');
   }
 }

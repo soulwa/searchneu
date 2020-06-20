@@ -5,8 +5,8 @@
 import ProfSerializer from './profSerializer';
 
 class ElasticProfSerializer extends ProfSerializer {
-  profCols() {
-    return ['name', 'emails', 'phone'];
+  _serializeProf(prof) {
+    return _.pick(prof, ['name', 'emails', 'phone']);
   }
 }
 
