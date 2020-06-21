@@ -11,13 +11,16 @@
   }
 
   &__inputElement {
+    display: inline-block;
+    vertical-align: top;
     border: 1px solid #afafaf;
     box-sizing: border-box;
     border-radius: 7px;
+    cursor: pointer;
   }
 
-  &__inputElemet:hover {
-    cursor: pointer;
+  &__inputDelete {
+    color: #d41b2c;
   }
 
   &__input {
