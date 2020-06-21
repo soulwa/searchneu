@@ -39,9 +39,22 @@ export default function DropdownFilter({
       <div className='DropdownFilter__title'>{title}</div>
       <div className='DropdownFilter_dropdown' ref={ dropdown } onClick={ handleClickOnTheDropdown }>
         <div className='DropdownFilter__search'>
+          {selected.map((selectElement) => (
+            <div className='DropdownFilter__inputElement'>
+              { selectElement }
+              <i
+                className='DropdownFilter__inputDelete'
+                role='button'
+                tabIndex={ 0 }
+                onClick={ () => setActive(pull(selected, selectElement)) }
+              >
+                X
+              </i>
+            </div>
+          ))}
           <input
             className='DropdownFilter__input'
-            tabIndex={ 1 }
+            tabIndex={ 0 }
             type='text'
             value={ filterString }
             placeholder='Choose one or multiple'
@@ -50,7 +63,7 @@ export default function DropdownFilter({
           <span className='DropdownFilter__icon' role='button' tabIndex={ -1 }>&#9660;</span>
         </div>
         <div className='DropdownFilter__selectable'>
-          {isOpen && options.filter((option) => option.value.toUpperCase().includes(filterString.toUpperCase())).map((option) => (
+          {isOpen && options.filter((option) => option.value.toUpperCase().includes(filterString.toUpperCase()) && !selected.includes(option.value)).map((option) => (
             <div
               role='option'
               tabIndex={ -1 }
