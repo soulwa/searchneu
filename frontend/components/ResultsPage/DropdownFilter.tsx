@@ -16,13 +16,13 @@ export default function DropdownFilter({
   const [areOptionsFresh, setAreOptionsFresh] = useState(true)
   const [filterString, setFilterString] = useState('');
   const [isOpen, setIsOpen] = useState(false)
-  
+
   useEffect(() => {
     setAreOptionsFresh(true);
   }, [options])
-  
+
   const dropdown = useRef(null);
-  
+
   useClickOutside(dropdown, isOpen, setIsOpen);
 
   function handleClickOnTheDropdown() {
@@ -37,19 +37,19 @@ export default function DropdownFilter({
   return (
     <div className='DropdownFilter'>
       <div className='DropdownFilter__title'>{title}</div>
-      <div className='DropdownFilter_dropdown' ref={ dropdown } onClick={ handleClickOnTheDropdown }>
+      <div className='DropdownFilter_dropdown' ref={ dropdown } role='button' tabIndex={ 0 } onClick={ handleClickOnTheDropdown }>
         <div className='DropdownFilter__search'>
           {selected.map((selectElement) => (
             <div className='DropdownFilter__inputElement'>
               { selectElement }
-              <i
+              <b
                 className='DropdownFilter__inputDelete'
                 role='button'
                 tabIndex={ 0 }
                 onClick={ () => setActive(pull(selected, selectElement)) }
               >
                 X
-              </i>
+              </b>
             </div>
           ))}
           <input
