@@ -134,6 +134,17 @@ class Macros extends commonMacros {
       Macros.warn('error Logging amplitude event failed:', error);
     });
   }
+  static getRollbar(...args: any) {
+    const rollbarKey = Macros.getEnvVariable('rollbarPostServerItemToken');
+
+    if (!rollbarKey) {
+      console.log("Don't have rollbar so not logging error in prod?"); // eslint-disable-line no-console
+      console.log(...args); // eslint-disable-line no-console
+      return;
+    }
+
+    return Rollbar.init({ accessToken: rollbarKey });
+  }
 
   // Takes an array of a bunch of thigs to log to rollbar
   // Any of the times in the args array can be an error, and it will be logs according to rollbar's API
@@ -143,16 +154,6 @@ class Macros extends commonMacros {
     if (!Macros.PROD) {
       return;
     }
-
-    const rollbarKey = Macros.getEnvVariable('rollbarPostServerItemToken');
-
-    if (!rollbarKey) {
-      console.log("Don't have rollbar so not logging error in prod?"); // eslint-disable-line no-console
-      console.log(...args); // eslint-disable-line no-console
-      return;
-    }
-
-    const rollbar = Rollbar.init({ accessToken: rollbarKey });
 
     const stack = (new Error()).stack;
 
@@ -172,7 +173,7 @@ class Macros extends commonMacros {
     if (possibleError) {
       // The arguments can come in any order. Any errors should be logged separately.
       // https://docs.rollbar.com/docs/nodejs#section-rollbar-log-
-      rollbar.error(possibleError, args, () => {
+      Macros.getRollbar().error(possibleError, args, () => {
         if (shouldExit) {
           // And kill the process to recover.
           // forver.js will restart it.
@@ -180,7 +181,7 @@ class Macros extends commonMacros {
         }
       });
     } else {
-      rollbar.error(args, () => {
+      Macros.getRollbar().error(args, () => {
         if (shouldExit) {
           process.exit(1);
         }

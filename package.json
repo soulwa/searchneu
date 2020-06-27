@@ -4,7 +4,7 @@
   "scripts": {
     "-development-": "--------development--------",
     "babel-node-ts": "babel-node --extensions '.js,.jsx,.ts,.tsx'",
-    "start": "./node_modules/.bin/cross-env NODE_ENV=dev yarn babel-node-ts backend/server.js",
+    "start": "./node_modules/.bin/cross-env NODE_ENV=dev yarn babel-node-ts backend/server.ts",
     "scrape": "yarn babel-node-ts --max_old_space_size=12000 backend/scrapers/main.js",
     "resetIndex": "yarn babel-node-ts backend/resetIndex.js",
     "populateES": "yarn babel-node-ts backend/populateES.ts",
@@ -38,7 +38,7 @@
     "prod:migrate": "npx sequelize-cli --env prod db:migrate",
     "prod:undo": "npx sequelize-cli --env prod db:migrate:undo:all",
     "prod:scrape": "node dist/backend/scrapers/main.js",
-    "prod:start": "node dist/backend/server.js",
+    "prod:start": "node dist/backend/server.ts",
     "prod:start:updater": "node dist/backend/updater.js"
   },
   "repository": {
@@ -102,7 +102,6 @@
     "enzyme": "^3.2.0",
     "enzyme-adapter-react-16": "^1.1.0",
     "express": "^4.15.2",
-    "express-async-wrap": "^1.0.0",
     "express-x-hub": "^1.0.4",
     "file-loader": "^4.0.0",
     "friendly-errors-webpack-plugin": "^1.7.0",
@@ -177,6 +176,7 @@
     "@babel/preset-env": "^7.0.0",
     "@babel/preset-react": "^7.0.0",
     "@babel/preset-typescript": "^7.8.3",
+    "@types/atob": "^2.1.2",
     "@types/jest": "^25.1.4",
     "@types/lodash": "^4.14.150",
     "@types/node": "^13.9.0",

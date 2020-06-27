@@ -168,12 +168,13 @@ class SignUpForNotifications extends React.Component {
     // Many characters arn't allowed to be in the ref attribute, including open and closing braces.
     // So base64 enocode it and then decode it on the server. Without the base64 encoding, the button will not render.
 
-    const dataRef = btoa(JSON.stringify({
+    const payload = { //TODO add type FBUserPayload
       classHash: aClass.getHash(),
       sectionHashes: sectionHashes,
       dev: macros.DEV,
       loginKey: loginKey,
-    }));
+    }
+    const dataRef = btoa(JSON.stringify(payload));
 
     return (
       <div ref={ (ele) => { this.facebookScopeRef = ele; } } className='inlineBlock'>
