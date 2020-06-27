@@ -14,7 +14,8 @@ function WeekdayBoxes({ section }: WeekdayBoxesProps) {
       {
       checked.map((box, index) => {
         return (
-          <span className={ `WeekdayBoxes__box${box ? '--checked' : ''}` }>
+        // eslint-disable-next-line react/no-array-index-key
+          <span key={ index } className={ `WeekdayBoxes__box${box ? '--checked' : ''}` }>
             {days[index]}
           </span>
         )

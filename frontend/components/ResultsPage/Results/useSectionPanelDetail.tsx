@@ -11,13 +11,14 @@ interface UseSectionPanelDetailReturn {
 export default function useSectionPanelDetail(section: Section): UseSectionPanelDetailReturn {
   const renderTimes = () => {
     return section.meetings.map((meeting) => {
-      return meeting.times.map((time) => (
-        <>
+      return meeting.times.map((time, index) => (
+        // eslint-disable-next-line react/no-array-index-key
+        <React.Fragment key={ index }>
           <span>
             {`${time.start.format('h:mm')}-${time.end.format('h:mm a')} | ${meeting.getLocation()}`}
           </span>
           <br />
-        </>
+        </React.Fragment>
       ))
     })
   }

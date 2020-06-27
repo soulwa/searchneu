@@ -89,6 +89,7 @@ export default function useResultRequisite(history: History) {
           const element = (
             <a
               role='link'
+              key={ hash }
               tabIndex={ 0 }
               onClick={ (event) => { onReqClick(reqType, childBranch, event, hash); } }
             >
