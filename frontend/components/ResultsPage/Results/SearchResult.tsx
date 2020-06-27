@@ -26,23 +26,25 @@ export default function SearchResult({ aClass, history } : SearchResultProps) {
   return (
     <div className='SearchResult'>
       <div className='SearchResult__header'>
-        <span className='SearchResult__header--classTitle'>
-          {aClass.subject} {aClass.classId}: {aClass.name}
-        </span>
+        <div className='SearchResult__header--left'>
+          <span className='SearchResult__header--classTitle'>
+            {aClass.subject} {aClass.classId}: {aClass.name}
+          </span>
+          <div className='SearchResult__header--sub'>
+            <a
+              target='_blank'
+              rel='noopener noreferrer'
+              data-tip={ `View on ${aClass.host}` }
+              href={ aClass.prettyUrl }
+            >
+              <IconGlobe />
+            </a>
+            <span>{`Updated ${(aClass.getLastUpdateString())}`}</span>
+          </div>
+        </div>
         <span className='SearchResult__header--creditString'>
           {aClass.maxCredits === aClass.minCredits ? `${aClass.maxCredits} CREDITS` : `${aClass.maxCredits}-${aClass.maxCredits} CREDITS`}
         </span>
-        <div className='SearchResult__header--sub'>
-          <a
-            target='_blank'
-            rel='noopener noreferrer'
-            data-tip={ `View on ${aClass.host}` }
-            href={ aClass.prettyUrl }
-          >
-            <IconGlobe />
-          </a>
-          <span>{`Updated ${(aClass.getLastUpdateString())}`}</span>
-        </div>
       </div>
       <div className='SearchResult__panel'>
         {aClass.desc}

@@ -12,6 +12,14 @@
     background: #fafafa;
     padding: 12px 16px 4px 16px;
     font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    &--left {
+      width: 50%;
+      display: inline-block;
+    }
 
     &--classTitle {
       margin-bottom: 4px;
@@ -23,9 +31,6 @@
     &--creditString {
       font-size: 15px;
       color: #474747;
-      position: absolute;
-      right: 4.5%;
-      margin-top: 8px;
     }
 
     &--sub {
