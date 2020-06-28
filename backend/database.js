@@ -3,20 +3,17 @@
  * See the license file in the root folder for details.
  */
 
-import { Op } from 'sequelize';
+import { PrismaClient } from '@prisma/client';
 import { User, FollowedSection, FollowedCourse } from './database/models/index';
 
 
-// everybody needs a local copy of Postgres, PERIOD.
-// TODO:
-// 1. remove all usages of getRef
-// 2. correct the keys
-// 3. fix up README
 class Database {
   // key is the primaryKey (id, facebookMessengerId) of the user
   // value is any updated columns plus all watchingSections and watchingClasses
   async set(key, value) {
-    await User.upsert({ id: key, ...value });
+    const prisma = new PrismaClient();
+    // TODO probably broken . . . need a `set` somewhere?
+    await prisma.user.upsert({ id: key, ...value });
 
     await Promise.all([FollowedSection.destroy({ where: { userId: key } }), FollowedCourse.destroy({ where: { userId: key } })]);
     if (value.watchingSections) {
