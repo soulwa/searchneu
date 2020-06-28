@@ -1,18 +1,16 @@
 import React from 'react'
-import Section from '../../classModels/Section'
 
 interface WeekdayBoxesProps {
-  section: Section
+  meetingDays: boolean[]
 }
 
-function WeekdayBoxes({ section }: WeekdayBoxesProps) {
-  const checked = section.getDaysOfWeekAsBooleans()
+function WeekdayBoxes({ meetingDays }: WeekdayBoxesProps) {
   const days = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
 
   return (
     <div className='WeekdayBoxes'>
       {
-      checked.map((box, index) => {
+      meetingDays.map((box, index) => {
         return (
         // eslint-disable-next-line react/no-array-index-key
           <span key={ index } className={ `WeekdayBoxes__box${box ? '--checked' : ''}` }>

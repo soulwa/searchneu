@@ -14,6 +14,15 @@ interface DesktopSectionPanelProps {
 function DesktopSectionPanel({ section, showNotificationSwitches } : DesktopSectionPanelProps) {
   const { renderTimes, getSeatsClass } = useSectionPanelDetail(section)
 
+  console.log('section', section)
+
+  //   <div className='DesktopSectionPanel__meetings'>
+  //   {section.online ? <span>Online Class</span> : <WeekdayBoxes section={ section } />}
+  //   <div className='DesktopSectionPanel__times'>
+  //     {renderTimes()}
+  //   </div>
+  // </div>
+
   return (
     <tr className='DesktopSectionPanel' key={ section.getHash() }>
       <td>
@@ -23,12 +32,22 @@ function DesktopSectionPanel({ section, showNotificationSwitches } : DesktopSect
         {section.getProfs().join(', ')}
       </td>
       <td>
-        <div className='DesktopSectionPanel__meetings'>
-          {section.online ? <span>Online Class</span> : <WeekdayBoxes section={ section } />}
-          <div className='DesktopSectionPanel__times'>
-            {renderTimes()}
-          </div>
-        </div>
+        {section.online ? <span>Online Class</span>
+          : section.meetings.map((m) => {
+            const meetingDays = Array(7).fill(false)
+            meetingDays.forEach((d, index) => { if (m.meetsOnDay(index)) meetingDays[index] = true })
+            return (
+              <div>
+                {(meetingDays.some((d) => d) && section.meetings.length > 1) || section.meetings.length === 1
+                  && (
+                  <div>
+                    <WeekdayBoxes meetingDays={ meetingDays } />
+                  </div>
+                  )}
+              </div>
+            )
+          })}
+
       </td>
       <td>
         Boston
