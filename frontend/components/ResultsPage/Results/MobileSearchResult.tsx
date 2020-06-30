@@ -53,21 +53,21 @@ function MobileSearchResult({ aClass, history } : MobileSearchResultProps) {
           <div className='MobileSearchResult__panel--showMore' role='button' tabIndex={ 0 } onClick={ () => setShowMore(!showMore) }>{showMore ? 'Show less' : 'Show more'}</div>
           <div className='MobileSearchResult__panel--collapsableContainer' role='button' tabIndex={ 0 } onClick={ () => setShowNUPath(!showNUPath) }>
             <div className='MobileSearchResult__panel--collapsableTitle'>
-              <IconCollapseExpand width='6' height='12' fill='#000000' className={ showNUPath && 'MobileSearchResult__panel--rotatedIcon' } />
+              <IconCollapseExpand width='6' height='12' fill='#000000' className={ showNUPath ? 'MobileSearchResult__panel--rotatedIcon' : '' } />
               <span>NUPATHS</span>
             </div>
             {showNUPath && <div>{aClass.nupath.length > 0 ? <div> {aClass.nupath.join(', ')}</div> : <span className='empty'> None</span>}</div>}
           </div>
           <div className='MobileSearchResult__panel--collapsableContainer' role='button' tabIndex={ 0 } onClick={ () => setShowPrereq(!showPrereq) }>
             <div className='MobileSearchResult__panel--collapsableTitle'>
-              <IconCollapseExpand width='6' height='12' fill='#000000' className={ showPrereq && 'MobileSearchResult__panel--rotatedIcon' } />
+              <IconCollapseExpand width='6' height='12' fill='#000000' className={ showPrereq ? 'MobileSearchResult__panel--rotatedIcon' : '' } />
               <span>PREREQUISITES</span>
             </div>
             {showPrereq && <div>{optionalDisplay(macros.prereqTypes.PREREQ, aClass)}</div>}
           </div>
           <div className='MobileSearchResult__panel--collapsableContainer' role='button' tabIndex={ 0 } onClick={ () => setShowCoreq(!showCoreq) }>
             <div className='MobileSearchResult__panel--collapsableTitle'>
-              <IconCollapseExpand width='6' height='12' fill='#000000' className={ showCoreq && 'MobileSearchResult__panel--rotatedIcon' } />
+              <IconCollapseExpand width='6' height='12' fill='#000000' className={ showCoreq ? 'MobileSearchResult__panel--rotatedIcon' : '' } />
               <span>COREQUISITES</span>
             </div>
             {showCoreq && <div>{optionalDisplay(macros.prereqTypes.COREQ, aClass)}</div>}
@@ -90,7 +90,7 @@ function MobileSearchResult({ aClass, history } : MobileSearchResultProps) {
         {!hideShowAll && (
         <div className='MobileSearchResult__showAll' role='button' tabIndex={ 0 } onClick={ () => setShowAll(!showAll) }>
           <span>{showAll ? 'Collapse sections' : 'Show all sections'}</span>
-          <IconArrow className={ showAll && 'MobileSearchResult__showAll--collapse' } />
+          <IconArrow className={ showAll ? 'MobileSearchResult__showAll--collapse' : '' } />
         </div>
         )}
       </div>

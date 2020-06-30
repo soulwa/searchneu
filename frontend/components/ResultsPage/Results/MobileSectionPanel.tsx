@@ -13,6 +13,8 @@ interface MobileSectionPanelProps {
 function MobileSectionPanel({ section, showNotificationSwitches } : MobileSectionPanelProps) {
   const { renderTimes, getSeatsClass } = useSectionPanelDetail(section)
 
+  console.log('section', section)
+
   return (
     <div className='MobileSectionPanel'>
       <div className='MobileSectionPanel__header'>
@@ -27,7 +29,7 @@ function MobileSectionPanel({ section, showNotificationSwitches } : MobileSectio
         {showNotificationSwitches && <NotifCheckBox section={ section } />}
       </div>
       <div className='MobileSectionPanel__secondRow'>
-        <WeekdayBoxes section={ section } />
+        <WeekdayBoxes meetingDays={section.getDaysOfWeekAsBooleans()} />
       </div>
       <div className='MobileSectionPanel__meetings'>
         {renderTimes()}
