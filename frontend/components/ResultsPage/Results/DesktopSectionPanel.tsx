@@ -30,13 +30,18 @@ function DesktopSectionPanel({ section, showNotificationSwitches } : DesktopSect
   const getMeetings = (daysMet, meeting) => {
     if (daysMet.some((d) => d)) {
       return (
-        <div>
-          <WeekdayBoxes meetingDays={ daysMet } />
+        <div className="DesktopSectionPanel__meetings">
+         <WeekdayBoxes meetingDays={ daysMet } />
+         <div className="DesktopSectionPanel__meetings--times">
           {getUniqueTimes(meeting.times).map((time) => (
+            <>
               <span>
-              {`${time.start.format('h:mm')}-${time.end.format('h:mm a')} | ${meeting.getLocation()}`}
-            </span>
+                {`${time.start.format('h:mm')}-${time.end.format('h:mm a')} | ${meeting.getLocation()}`}
+              </span>
+              <br/>
+            </>
             ))}
+          </div>
         </div>
       )
     } else if (section.meetings.length === 1) {
@@ -56,13 +61,9 @@ function DesktopSectionPanel({ section, showNotificationSwitches } : DesktopSect
       <td>
         {section.online ? <span>Online Class</span>
           : section.meetings.map((m) => {
-            const meetingDays = Array(7).fill(false)
-            meetingDays.forEach((d, index) => { if (m.meetsOnDay(index)) meetingDays[index] = true })
-            return (
-              <div>
-                {getMeetings(meetingDays, m)}
-              </div>
-            )
+              const meetingDays = Array(7).fill(false)
+              meetingDays.forEach((d, index) => { if (m.meetsOnDay(index)) meetingDays[index] = true })
+              return getMeetings(meetingDays, m)
           })}
 
       </td>
