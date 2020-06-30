@@ -3,6 +3,7 @@ import Section from '../../classModels/Section'
 import WeekdayBoxes from './WeekdayBoxes'
 import NotifCheckBox from '../../panels/NotifCheckBox'
 import useSectionPanelDetail from './useSectionPanelDetail';
+import Meeting, { MomentTuple } from '../../classModels/Meeting';
 
 interface DesktopSectionPanelProps {
   section: Section
@@ -14,12 +15,10 @@ interface DesktopSectionPanelProps {
 function DesktopSectionPanel({ section, showNotificationSwitches } : DesktopSectionPanelProps) {
   const { renderTimes, getSeatsClass } = useSectionPanelDetail(section)
 
-  console.log('section', section)
-
-  const getUniqueTimes = (times) => {
+  const getUniqueTimes = (times: MomentTuple[]) => {
     const seenTimes = new Set()
     return times.reduce((acc, t) => {
-      if(!seenTimes.has(t.start.format('h:mm'))) {
+      if (!seenTimes.has(t.start.format('h:mm'))) {
         acc.push(t)
       }
       seenTimes.add(t.start.format('h:mm'))
@@ -27,26 +26,28 @@ function DesktopSectionPanel({ section, showNotificationSwitches } : DesktopSect
     }, [])
   }
 
-  const getMeetings = (daysMet, meeting) => {
+  const getMeetings = (daysMet: boolean[], meeting: Meeting) => {
     if (daysMet.some((d) => d)) {
       return (
-        <div className="DesktopSectionPanel__meetings">
-         <WeekdayBoxes meetingDays={ daysMet } />
-         <div className="DesktopSectionPanel__meetings--times">
-          {getUniqueTimes(meeting.times).map((time) => (
-            <>
-              <span>
-                {`${time.start.format('h:mm')}-${time.end.format('h:mm a')} | ${meeting.getLocation()}`}
-              </span>
-              <br/>
-            </>
+        <div className='DesktopSectionPanel__meetings'>
+          <WeekdayBoxes meetingDays={ daysMet } />
+          <div className='DesktopSectionPanel__meetings--times'>
+            {getUniqueTimes(meeting.times).map((time) => (
+              <>
+                <span>
+                  {`${time.start.format('h:mm')}-${time.end.format('h:mm a')} | ${meeting.getLocation()}`}
+                </span>
+                <br />
+              </>
             ))}
           </div>
         </div>
       )
-    } else if (section.meetings.length === 1) {
-        return <span>See syllabus</span>
+      // eslint-disable-next-line react/prop-types
+    } if (section.meetings.length === 1) {
+      return <span>See syllabus</span>
     }
+    return null
   }
 
 
@@ -61,9 +62,9 @@ function DesktopSectionPanel({ section, showNotificationSwitches } : DesktopSect
       <td>
         {section.online ? <span>Online Class</span>
           : section.meetings.map((m) => {
-              const meetingDays = Array(7).fill(false)
-              meetingDays.forEach((d, index) => { if (m.meetsOnDay(index)) meetingDays[index] = true })
-              return getMeetings(meetingDays, m)
+            const meetingDays = Array(7).fill(false)
+            meetingDays.forEach((d, index) => { if (m.meetsOnDay(index)) meetingDays[index] = true })
+            return getMeetings(meetingDays, m)
           })}
 
       </td>
