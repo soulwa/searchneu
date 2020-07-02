@@ -13,7 +13,7 @@ interface DesktopSectionPanelProps {
 
 
 function DesktopSectionPanel({ section, showNotificationSwitches } : DesktopSectionPanelProps) {
-  const { renderTimes, getSeatsClass } = useSectionPanelDetail(section)
+  const { getSeatsClass } = useSectionPanelDetail(section)
 
   const getUniqueTimes = (times: MomentTuple[]) => {
     const seenTimes = new Set()
@@ -26,7 +26,7 @@ function DesktopSectionPanel({ section, showNotificationSwitches } : DesktopSect
     }, [])
   }
 
-  const getMeetings = (daysMet: boolean[], meeting: Meeting) => {
+  const singleMeeting = (daysMet: boolean[], meeting: Meeting) => {
     if (daysMet.some((d) => d)) {
       return (
         <div className='DesktopSectionPanel__meetings'>
@@ -50,6 +50,14 @@ function DesktopSectionPanel({ section, showNotificationSwitches } : DesktopSect
     return null
   }
 
+  const getMeetings = (s: Section) => {
+    return s.meetings.map((m) => {
+      const meetingDays = Array(7).fill(false)
+      meetingDays.forEach((d, index) => { if (m.meetsOnDay(index)) meetingDays[index] = true })
+      return singleMeeting(meetingDays, m)
+    })
+  }
+
 
   return (
     <tr className='DesktopSectionPanel' key={ section.getHash() }>
@@ -61,12 +69,7 @@ function DesktopSectionPanel({ section, showNotificationSwitches } : DesktopSect
       </td>
       <td>
         {section.online ? <span>Online Class</span>
-          : section.meetings.map((m) => {
-            const meetingDays = Array(7).fill(false)
-            meetingDays.forEach((d, index) => { if (m.meetsOnDay(index)) meetingDays[index] = true })
-            return getMeetings(meetingDays, m)
-          })}
-
+          : getMeetings(section)}
       </td>
       <td>
         Boston
