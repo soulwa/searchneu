@@ -8,7 +8,7 @@ import { Op } from 'sequelize';
 
 import macros from './macros';
 import Keys from '../common/Keys';
-import notifyer from './notifyer';
+import notifyer from './libs/notifyer';
 import dumpProcessor from './dumpProcessor';
 import { Course, Section, sequelize } from './database/models/index';
 import HydrateCourseSerializer from './database/serializers/hydrateCourseSerializer';
