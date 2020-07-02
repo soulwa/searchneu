@@ -44,7 +44,7 @@ function DesktopSectionPanel({ section, showNotificationSwitches } : DesktopSect
         </div>
       )
       // eslint-disable-next-line react/prop-types
-    } if (section.meetings.length === 1) {
+    } if (section.meetings.length <= 1) {
       return <span>See syllabus</span>
     }
     return null
@@ -83,7 +83,7 @@ function DesktopSectionPanel({ section, showNotificationSwitches } : DesktopSect
           {`${section.waitRemaining}/${section.waitCapacity} Waitlist Seats`}
         </span>
       </td>
-      {showNotificationSwitches && <td><NotifCheckBox section={ section } /></td>}
+      {showNotificationSwitches && <td><div className='DesktopSectionPanel__notifs'><NotifCheckBox section={ section }/></div></td>}
     </tr>
 
   )

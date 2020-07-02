@@ -149,5 +149,9 @@
     &--collapse {
       transform: rotate(-180deg);
     }
+
+    &:focus {
+      outline: none;
+    }
   }
 }

@@ -23,7 +23,7 @@ function MobileSectionPanel({ section, showNotificationSwitches } : MobileSectio
       return acc
     }, new Map())
   }
-  
+
   const getMeetings = (s: Section) => {
     return s.meetings.map((m) => (
       Array.from(groupedTimesAndDays(m.times)).map(([time, days]) => (
