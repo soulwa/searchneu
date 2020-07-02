@@ -45,9 +45,7 @@ const ResultItemMemoized = React.memo(({ result }:{result:SearchItem}) => {
   if (result.type === 'class') {
     const aClass = Course.create(result.class);
     aClass.loadSectionsFromServerList(result.sections);
-    // if (macros.isMobile) {
-    //   return <MobileClassPanel aClass={ aClass } history={ history } />;
-    // }
+
 
     return macros.isMobile ? <MobileSearchResult aClass={ aClass } history={ history } /> : <SearchResult aClass={ aClass } history={ history } />;
   }
