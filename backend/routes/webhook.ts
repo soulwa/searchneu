@@ -9,7 +9,8 @@ import { Course, Section } from '../database/models/index';
 import { FBUserPayload } from '../../common/types';
 import { getUserDataReqs } from './user';
 
-export const webhookRouter = express.Router();
+const webhookRouter = express.Router();
+export default webhookRouter;
 
 // for Facebook verification of the endpoint.
 webhookRouter.get('/', (req, res) => {

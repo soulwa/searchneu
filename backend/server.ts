@@ -12,21 +12,15 @@ import compress from 'compression';
 import bodyParser from 'body-parser';
 import xhub from 'express-x-hub';
 
-import Request from './scrapers/request';
 import webpackConfig from './webpack.config.babel';
 import macros from './macros';
 import graphql from './graphql';
 import generateSitemap from './generateSitemap';
-import { searchRouter } from './routes/search';
-import { webhookRouter } from './routes/webhook';
-import { subscriptionRouter } from './routes/subscription';
-import { userRouter } from './routes/user';
-import { feedbackRouter } from './routes/feedback';
-
-// This file manages every endpoint in the backend
-// and calls out to respective files depending on what was called
-
-const request = new Request('server');
+import searchRouter from './routes/search';
+import webhookRouter from './routes/webhook';
+import subscriptionRouter from './routes/subscription';
+import userRouter from './routes/user';
+import feedbackRouter from './routes/feedback';
 
 const app = express();
 
@@ -141,8 +135,8 @@ app.get('*', (req, res) => {
 // your express error handler
 // Express handles functions with four arguments as error handlers and functions with 3 arguments as middleware
 // Add the eslint comment to keep all the args.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((err, req, res, next) => {
-  // eslint-disable-line @typescript-eslint/no-unused-vars
   // in case of specific URIError
   if (err instanceof URIError) {
     macros.log('Warning, could not process malformed url: ', req.url);

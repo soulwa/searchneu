@@ -2,7 +2,8 @@ import express from 'express';
 import notifyer from '../notifyer';
 import macros from '../macros';
 
-export const feedbackRouter = express.Router()
+const feedbackRouter = express.Router()
+export default feedbackRouter;
 
 // This is more complicated than just req.connection.remoteAddress (which will always be 127.0.0.1)
 // because this Node.js server is running behind both nginx and Cloudflare.

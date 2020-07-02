@@ -171,13 +171,11 @@ class Macros extends commonMacros {
     });
   }
 
-  static getRollbar(...args: any) {
+  static getRollbar() {
     const rollbarKey = Macros.getEnvVariable('rollbarPostServerItemToken');
 
-    if (!rollbarKey) {
-      console.log("Don't have rollbar so not logging error in prod?"); // eslint-disable-line no-console
-      console.log(...args); // eslint-disable-line no-console
-      return;
+    if (Macros.PROD && !rollbarKey) {
+      console.error("Don't have rollbar so not logging error in prod?"); // eslint-disable-line no-console
     }
 
     return Rollbar.init({ accessToken: rollbarKey });

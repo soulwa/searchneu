@@ -2,7 +2,8 @@ import express from 'express';
 import macros from '../macros';
 import database from '../database';
 
-export const userRouter = express.Router()
+const userRouter = express.Router()
+export default userRouter;
 
 // All of the requests/responses that haven't been pushed yet. Added here when
 // requests come in for data that isn't quite in the backend yet
@@ -71,6 +72,12 @@ function addToUserDataReqs(loginKey, res) {
       MAX_HOLD_TIME_FOR_GET_USER_DATA_REQS / 4,
     );
   }
+}
+
+// finds the user with the login key that's been requested
+// if the user doesn't exist, return
+async function findMatchingUser(requestLoginKey: string) {
+  return database.getByLoginKey(requestLoginKey);
 }
 
 userRouter.post('/', async (req, res) => {
@@ -176,9 +183,3 @@ userRouter.post('/', async (req, res) => {
     }),
   );
 });
-
-// finds the user with the login key that's been requested
-// if the user doesn't exist, return
-async function findMatchingUser(requestLoginKey: string) {
-  return database.getByLoginKey(requestLoginKey);
-}

@@ -4,7 +4,8 @@ import macros from '../macros';
 import elastic from '../elastic';
 import searcher from '../searcher';
 
-export const searchRouter = express.Router()
+const searchRouter = express.Router()
+export default searchRouter
 
 searchRouter.get('/', async (req, res) => {
   if (macros.DEV && !(await elastic.isConnected())) {

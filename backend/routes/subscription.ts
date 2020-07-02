@@ -5,7 +5,63 @@ import notifyer from '../notifyer';
 import database from '../database';
 import { Section, Course } from '../database/models/index';
 
-export const subscriptionRouter = express.Router();
+const subscriptionRouter = express.Router();
+export default subscriptionRouter;
+
+// sends data to the database in the backend
+async function verifyRequestAndGetDbUser(req: Request, res: Response) {
+  // Don't cache this endpoint.
+  res.setHeader('Cache-Control', 'no-cache, no-store');
+
+  // if there's no body in the request, well, we'll crash, so let's not
+  if (!req.body || !req.body.loginKey) {
+    return null;
+  }
+
+  // Checks checks checks
+  // Make sure the login key is valid
+  if (
+    typeof req.body.loginKey !== 'string'
+    || req.body.loginKey.length !== 100
+  ) {
+    macros.log('Invalid login key', req.body.loginKey);
+    return null;
+  }
+
+  const senderId = req.body.senderId;
+
+  // Ensure sender id exists and is valid.
+  if (
+    !senderId
+    || typeof senderId !== 'string'
+    || senderId.length !== 16
+    || !macros.isNumeric(senderId)
+  ) {
+    macros.log('Invalid senderId', req.body, senderId);
+    return null;
+  }
+
+  // Get the user from the db.
+  const user = await database.get(senderId);
+  if (!user) {
+    macros.log(
+      `Didn't find valid user from client request: ${JSON.stringify(user)}`,
+      req.body.loginKey,
+    );
+    return null;
+  }
+
+  // Verify the loginkey
+  if (!user.loginKeys.includes(req.body.loginKey)) {
+    macros.log(
+      `Login Key's didn't match: ${JSON.stringify(user.loginKeys, null, 4)}`,
+      req.body.loginKey,
+    );
+    return null;
+  }
+
+  return user;
+}
 
 subscriptionRouter.post('/', async (req, res) => {
   const userObject = await verifyRequestAndGetDbUser(req, res);
@@ -115,58 +171,3 @@ subscriptionRouter.delete('/', async (req, res) => {
     }),
   );
 });
-
-// sends data to the database in the backend
-async function verifyRequestAndGetDbUser(req: Request, res: Response) {
-  // Don't cache this endpoint.
-  res.setHeader('Cache-Control', 'no-cache, no-store');
-
-  // if there's no body in the request, well, we'll crash, so let's not
-  if (!req.body || !req.body.loginKey) {
-    return null;
-  }
-
-  // Checks checks checks
-  // Make sure the login key is valid
-  if (
-    typeof req.body.loginKey !== 'string'
-    || req.body.loginKey.length !== 100
-  ) {
-    macros.log('Invalid login key', req.body.loginKey);
-    return null;
-  }
-
-  const senderId = req.body.senderId;
-
-  // Ensure sender id exists and is valid.
-  if (
-    !senderId
-    || typeof senderId !== 'string'
-    || senderId.length !== 16
-    || !macros.isNumeric(senderId)
-  ) {
-    macros.log('Invalid senderId', req.body, senderId);
-    return null;
-  }
-
-  // Get the user from the db.
-  const user = await database.get(senderId);
-  if (!user) {
-    macros.log(
-      `Didn't find valid user from client request: ${JSON.stringify(user)}`,
-      req.body.loginKey,
-    );
-    return null;
-  }
-
-  // Verify the loginkey
-  if (!user.loginKeys.includes(req.body.loginKey)) {
-    macros.log(
-      `Login Key's didn't match: ${JSON.stringify(user.loginKeys, null, 4)}`,
-      req.body.loginKey,
-    );
-    return null;
-  }
-
-  return user;
-}
