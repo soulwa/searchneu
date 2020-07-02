@@ -1,42 +1,42 @@
 import express from 'express';
 import request from 'request-promise-native';
 import macros from '../macros';
-import elastic from "../elastic";
+import elastic from '../elastic';
 import searcher from '../searcher';
 
 export const searchRouter = express.Router()
 
-searchRouter.get("/", async (req, res) => {
+searchRouter.get('/', async (req, res) => {
   if (macros.DEV && !(await elastic.isConnected())) {
     const fromProd = await request.get(
-      `https://searchneu.com${req.originalUrl}`
+      `https://searchneu.com${req.originalUrl}`,
     );
     res.send(fromProd.body);
     macros.log(
-      "In dev mode and Elasticsearch not available. Hitting production search API endpoint"
+      'In dev mode and Elasticsearch not available. Hitting production search API endpoint',
     );
     return;
   }
 
-  if (typeof req.query.query !== "string" || req.query.query.length > 500) {
-    macros.log(macros.getTime(), "Need query.", req.query);
+  if (typeof req.query.query !== 'string' || req.query.query.length > 500) {
+    macros.log(macros.getTime(), 'Need query.', req.query);
     res.send(
       JSON.stringify({
-        error: "Need query param.",
-      })
+        error: 'Need query param.',
+      }),
     );
     return;
   }
 
   if (
-    !macros.isNumeric(req.query.minIndex) ||
-    !macros.isNumeric(req.query.maxIndex)
+    !macros.isNumeric(req.query.minIndex)
+    || !macros.isNumeric(req.query.maxIndex)
   ) {
-    macros.log("Need numbers as max and min index.");
+    macros.log('Need numbers as max and min index.');
     res.send(
       JSON.stringify({
-        error: "Max and Min index must be numbers.",
-      })
+        error: 'Max and Min index must be numbers.',
+      }),
     );
     return;
   }
@@ -52,11 +52,11 @@ searchRouter.get("/", async (req, res) => {
   }
 
   if (!req.query.termId || req.query.termId.length !== 6) {
-    macros.log("Invalid termId.");
+    macros.log('Invalid termId.');
     res.send(
       JSON.stringify({
-        error: "Invalid termid.",
-      })
+        error: 'Invalid termid.',
+      }),
     );
     return;
   }
@@ -64,22 +64,22 @@ searchRouter.get("/", async (req, res) => {
   let filters = {};
   if (req.query.filters) {
     // Ensure filters is a string
-    if (typeof req.query.filters !== "string") {
-      macros.log("Invalid filters.", req.query.filters);
+    if (typeof req.query.filters !== 'string') {
+      macros.log('Invalid filters.', req.query.filters);
       res.send(
         JSON.stringify({
-          error: "Invalid filters.",
-        })
+          error: 'Invalid filters.',
+        }),
       );
     } else {
       try {
         filters = JSON.parse(req.query.filters);
       } catch (e) {
-        macros.log("Invalid filters JSON.", req.query.filters);
+        macros.log('Invalid filters JSON.', req.query.filters);
         res.send(
           JSON.stringify({
-            error: "Invalid filters.",
-          })
+            error: 'Invalid filters.',
+          }),
         );
       }
     }
@@ -95,12 +95,12 @@ searchRouter.get("/", async (req, res) => {
     req.query.termId,
     req.query.minIndex,
     req.query.maxIndex,
-    filters
+    filters,
   );
   const midTime = Date.now();
 
   let string;
-  if (req.query.apiVersion === "2") {
+  if (req.query.apiVersion === '2') {
     string = JSON.stringify({
       results: searchContent,
       filterOptions: aggregations,
@@ -118,7 +118,7 @@ searchRouter.get("/", async (req, res) => {
     resultCount: resultCount,
   };
 
-  macros.logAmplitudeEvent("Backend Search", analytics);
+  macros.logAmplitudeEvent('Backend Search', analytics);
 
   macros.log(macros.getTime(), macros.getIpPath(req));
   macros.log(
@@ -128,10 +128,10 @@ searchRouter.get("/", async (req, res) => {
       took.es
     } internally. Stringify took ${Date.now() - midTime} with ${
       searchContent.length
-    } results`
+    } results`,
   );
 
   // Set the header for application/json and send the data.
-  res.setHeader("Content-Type", "application/json; charset=UTF-8");
+  res.setHeader('Content-Type', 'application/json; charset=UTF-8');
   res.send(string);
 });

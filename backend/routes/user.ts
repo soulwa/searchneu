@@ -1,6 +1,6 @@
 import express from 'express';
 import macros from '../macros';
-import database from "../database";
+import database from '../database';
 
 export const userRouter = express.Router()
 
@@ -20,24 +20,24 @@ let getUserDataInterval = null;
 
 // cleans up old requests that are more than 10 seconds old.
 function cleanOldGetUserDataReqs() {
-  macros.log("cleaning up old getUserDataReqs", Object.keys(getUserDataReqs));
+  macros.log('cleaning up old getUserDataReqs', Object.keys(getUserDataReqs));
 
   const now = Date.now();
 
   for (const loginKey of Object.keys(getUserDataReqs)) {
     // Purge all entries over 3s old
     if (
-      now - getUserDataReqs[loginKey].timeStamp >
-      MAX_HOLD_TIME_FOR_GET_USER_DATA_REQS
+      now - getUserDataReqs[loginKey].timeStamp
+      > MAX_HOLD_TIME_FOR_GET_USER_DATA_REQS
     ) {
       getUserDataReqs[loginKey].res.send(
         JSON.stringify({
-          error: "Request timed out",
-        })
+          error: 'Request timed out',
+        }),
       );
 
       delete getUserDataReqs[loginKey];
-      macros.log("cleaned out loginKey req", loginKey);
+      macros.log('cleaned out loginKey req', loginKey);
     }
   }
 
@@ -55,8 +55,8 @@ function addToUserDataReqs(loginKey, res) {
     getUserDataReqs[loginKey].res.send(
       JSON.stringify({
         warning:
-          "Warning, multiple requests from the same user in quick succession",
-      })
+          'Warning, multiple requests from the same user in quick succession',
+      }),
     );
   }
   getUserDataReqs[loginKey] = {
@@ -68,20 +68,20 @@ function addToUserDataReqs(loginKey, res) {
   if (!getUserDataInterval) {
     getUserDataInterval = setInterval(
       cleanOldGetUserDataReqs,
-      MAX_HOLD_TIME_FOR_GET_USER_DATA_REQS / 4
+      MAX_HOLD_TIME_FOR_GET_USER_DATA_REQS / 4,
     );
   }
 }
 
-userRouter.post("/", async (req, res) => {
+userRouter.post('/', async (req, res) => {
   // Don't cache this endpoint.
-  res.setHeader("Cache-Control", "no-cache, no-store");
+  res.setHeader('Cache-Control', 'no-cache, no-store');
 
   if (!req.body || !req.body.loginKey) {
     res.send(
       JSON.stringify({
-        error: "Error.",
-      })
+        error: 'Error.',
+      }),
     );
     return;
   }
@@ -89,14 +89,14 @@ userRouter.post("/", async (req, res) => {
   // Checks checks checks
   // Make sure the login key is valid
   if (
-    typeof req.body.loginKey !== "string" ||
-    req.body.loginKey.length !== 100
+    typeof req.body.loginKey !== 'string'
+    || req.body.loginKey.length !== 100
   ) {
-    macros.log("Invalid login key", req.body.loginKey);
+    macros.log('Invalid login key', req.body.loginKey);
     res.send(
       JSON.stringify({
-        error: "Error.",
-      })
+        error: 'Error.',
+      }),
     );
     return;
   }
@@ -105,16 +105,16 @@ userRouter.post("/", async (req, res) => {
 
   // If the sender is given, make sure it is valid
   if (
-    senderId &&
-    (typeof senderId !== "string" ||
-      senderId.length !== 16 ||
-      !macros.isNumeric(senderId))
+    senderId
+    && (typeof senderId !== 'string'
+      || senderId.length !== 16
+      || !macros.isNumeric(senderId))
   ) {
-    macros.log("Invalid senderId", req.body, senderId);
+    macros.log('Invalid senderId', req.body, senderId);
     res.send(
       JSON.stringify({
-        error: "Error.",
-      })
+        error: 'Error.',
+      }),
     );
     return;
   }
@@ -131,22 +131,22 @@ userRouter.post("/", async (req, res) => {
     // and the user doesn't exist in the db because
     // the only time this would happen is if the data was cleared out of the db.
     if (!user) {
-      macros.log("User with senderId not in database yet", senderId);
+      macros.log('User with senderId not in database yet', senderId);
       res.send(
         JSON.stringify({
-          error: "Error.",
-        })
+          error: 'Error.',
+        }),
       );
       return;
     }
 
     // Ensure that a loginKey matches
     if (!user.loginKeys.includes(req.body.loginKey)) {
-      macros.log("Invalid loginKey", senderId, req.body.loginKey, user);
+      macros.log('Invalid loginKey', senderId, req.body.loginKey, user);
       res.send(
         JSON.stringify({
-          error: "Error.",
-        })
+          error: 'Error.',
+        }),
       );
       return;
     }
@@ -171,9 +171,9 @@ userRouter.post("/", async (req, res) => {
 
   res.send(
     JSON.stringify({
-      status: "Success",
+      status: 'Success',
       user: matchingUser,
-    })
+    }),
   );
 });
 

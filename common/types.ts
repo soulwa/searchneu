@@ -5,7 +5,7 @@ export interface BackendMeeting {
   where: string;
   type: string;
   times: Partial<
-    Record<"0" | "1" | "2" | "3" | "4" | "5" | "6", MeetingTime[]>
+  Record<'0' | '1' | '2' | '3' | '4' | '5' | '6', MeetingTime[]>
   >;
 }
 

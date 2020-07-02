@@ -1,55 +1,55 @@
-import express, { Request, Response } from "express";
-import macros from "../macros";
-import notifyer from "../notifyer";
-import database from "../database";
-import _ from "lodash";
-import { Section, Course } from "../database/models/index";
+import express, { Request, Response } from 'express';
+import _ from 'lodash';
+import macros from '../macros';
+import notifyer from '../notifyer';
+import database from '../database';
+import { Section, Course } from '../database/models/index';
 
 export const subscriptionRouter = express.Router();
 
-subscriptionRouter.post("/", async (req, res) => {
+subscriptionRouter.post('/', async (req, res) => {
   const userObject = await verifyRequestAndGetDbUser(req, res);
 
   if (!userObject) {
     res.status(401).send(
       JSON.stringify({
-        error: "Error.",
-      })
+        error: 'Error.',
+      }),
     );
     return;
   }
 
   const { sectionHash = null, classHash = null } = req.body;
 
-  if ((sectionHash &&typeof sectionHash !== "string") || (classHash && typeof classHash !== "string")) {
+  if ((sectionHash && typeof sectionHash !== 'string') || (classHash && typeof classHash !== 'string')) {
     res.status(400).send(
       JSON.stringify({
-        error: "Error.",
-      })
+        error: 'Error.',
+      }),
     );
     return;
   }
 
   // Early exit if user is already watching this section and class.
   if (
-    userObject.watchingSections.includes(sectionHash) &&
-    userObject.watchingClasses.includes(classHash)
+    userObject.watchingSections.includes(sectionHash)
+    && userObject.watchingClasses.includes(classHash)
   ) {
-    macros.log("User was already watching", userObject);
+    macros.log('User was already watching', userObject);
     res.send(
       JSON.stringify({
-        status: "Success",
-      })
+        status: 'Success',
+      }),
     );
     return;
   }
 
   if (sectionHash) {
     userObject.watchingSections.push(sectionHash);
-    const section = await Section.findByPk(sectionHash, {include: Course});
+    const section = await Section.findByPk(sectionHash, { include: Course });
     notifyer.sendFBNotification(
       req.body.senderId,
-      `You have subscribed to notification for a section in ${section.course.subject} ${section.course.classId} (CRN: ${section.crn})!`
+      `You have subscribed to notification for a section in ${section.course.subject} ${section.course.classId} (CRN: ${section.crn})!`,
     );
   }
   if (classHash) {
@@ -57,30 +57,30 @@ subscriptionRouter.post("/", async (req, res) => {
     const course = await Course.findByPk(classHash);
     notifyer.sendFBNotification(
       req.body.senderId,
-      `You have subscribed to notifications for the class ${course.subject} ${course.classId}`
+      `You have subscribed to notifications for the class ${course.subject} ${course.classId}`,
     );
   }
 
   await database.set(req.body.senderId, userObject);
-  macros.log("sending done, section/class added. User:", userObject);
+  macros.log('sending done, section/class added. User:', userObject);
 
   // Send a status of success.
   res.send(
     JSON.stringify({
-      status: "Success",
-    })
+      status: 'Success',
+    }),
   );
 });
 
-subscriptionRouter.delete("/", async (req, res) => {
+subscriptionRouter.delete('/', async (req, res) => {
   const userObject = await verifyRequestAndGetDbUser(req, res);
 
   if (!userObject) {
-    macros.log("Invalid request", req.body);
+    macros.log('Invalid request', req.body);
     res.send(
       JSON.stringify({
-        error: "Error.",
-      })
+        error: 'Error.',
+      }),
     );
     return;
   }
@@ -91,8 +91,8 @@ subscriptionRouter.delete("/", async (req, res) => {
   if (!userObject.watchingSections.includes(sectionHash)) {
     res.send(
       JSON.stringify({
-        status: "Success",
-      })
+        status: 'Success',
+      }),
     );
     return;
   }
@@ -100,26 +100,26 @@ subscriptionRouter.delete("/", async (req, res) => {
   _.pull(userObject.watchingSections, sectionHash);
 
   await database.set(req.body.senderId, userObject);
-  macros.log("sending done, section removed.");
+  macros.log('sending done, section removed.');
 
   const section = await Section.findByPk(sectionHash);
 
   notifyer.sendFBNotification(
     req.body.senderId,
-    `You have unsubscribed from notifications for a section of ${section.subject} ${section.classId} (CRN: ${section.crn}).`
+    `You have unsubscribed from notifications for a section of ${section.subject} ${section.classId} (CRN: ${section.crn}).`,
   );
 
   res.send(
     JSON.stringify({
-      status: "Success",
-    })
+      status: 'Success',
+    }),
   );
 });
 
 // sends data to the database in the backend
 async function verifyRequestAndGetDbUser(req: Request, res: Response) {
   // Don't cache this endpoint.
-  res.setHeader("Cache-Control", "no-cache, no-store");
+  res.setHeader('Cache-Control', 'no-cache, no-store');
 
   // if there's no body in the request, well, we'll crash, so let's not
   if (!req.body || !req.body.loginKey) {
@@ -129,10 +129,10 @@ async function verifyRequestAndGetDbUser(req: Request, res: Response) {
   // Checks checks checks
   // Make sure the login key is valid
   if (
-    typeof req.body.loginKey !== "string" ||
-    req.body.loginKey.length !== 100
+    typeof req.body.loginKey !== 'string'
+    || req.body.loginKey.length !== 100
   ) {
-    macros.log("Invalid login key", req.body.loginKey);
+    macros.log('Invalid login key', req.body.loginKey);
     return null;
   }
 
@@ -140,12 +140,12 @@ async function verifyRequestAndGetDbUser(req: Request, res: Response) {
 
   // Ensure sender id exists and is valid.
   if (
-    !senderId ||
-    typeof senderId !== "string" ||
-    senderId.length !== 16 ||
-    !macros.isNumeric(senderId)
+    !senderId
+    || typeof senderId !== 'string'
+    || senderId.length !== 16
+    || !macros.isNumeric(senderId)
   ) {
-    macros.log("Invalid senderId", req.body, senderId);
+    macros.log('Invalid senderId', req.body, senderId);
     return null;
   }
 
@@ -154,7 +154,7 @@ async function verifyRequestAndGetDbUser(req: Request, res: Response) {
   if (!user) {
     macros.log(
       `Didn't find valid user from client request: ${JSON.stringify(user)}`,
-      req.body.loginKey
+      req.body.loginKey,
     );
     return null;
   }
@@ -163,7 +163,7 @@ async function verifyRequestAndGetDbUser(req: Request, res: Response) {
   if (!user.loginKeys.includes(req.body.loginKey)) {
     macros.log(
       `Login Key's didn't match: ${JSON.stringify(user.loginKeys, null, 4)}`,
-      req.body.loginKey
+      req.body.loginKey,
     );
     return null;
   }
