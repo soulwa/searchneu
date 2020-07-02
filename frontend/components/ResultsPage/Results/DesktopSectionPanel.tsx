@@ -83,7 +83,7 @@ function DesktopSectionPanel({ section, showNotificationSwitches } : DesktopSect
           {`${section.waitRemaining}/${section.waitCapacity} Waitlist Seats`}
         </span>
       </td>
-      {showNotificationSwitches && <td><div className='DesktopSectionPanel__notifs'><NotifCheckBox section={ section }/></div></td>}
+      {showNotificationSwitches && <td><div className='DesktopSectionPanel__notifs'><NotifCheckBox section={ section } /></div></td>}
     </tr>
 
   )

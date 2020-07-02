@@ -3,6 +3,7 @@ import { History } from 'history'
 import macros from '../../macros'
 import RequisiteBranch from '../../classModels/RequisiteBranch'
 
+
 export default function useResultRequisite(history: History) {
   const onReqClick = (reqType, childBranch, event, hash) => {
     history.push(hash);

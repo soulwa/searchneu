@@ -7,6 +7,7 @@ import useResultRequisite from './useResultRequisite'
 import useUserChange from './useUserChange'
 import useShowAll from './useShowAll'
 import macros from '../../macros'
+import MobileCollapsableDetail from './MobileCollapsableDetail'
 import MobileSectionPanel from './MobileSectionPanel'
 import SignUpForNotifications from '../../SignUpForNotifications'
 
@@ -30,6 +31,11 @@ function MobileSearchResult({ aClass, history } : MobileSearchResultProps) {
   const optionalDisplay = useResultRequisite(history);
 
 
+  const renderNUPaths = () => (
+    // eslint-disable-next-line react/prop-types
+    <div>{aClass.nupath.length > 0 ? <div> {aClass.nupath.join(', ')}</div> : <span className='empty'> None</span>}</div>
+  )
+
   return (
     <div className='MobileSearchResult'>
       <div className={ expanded ? 'MobileSearchResult__header--expanded' : 'MobileSearchResult__header' } role='button' tabIndex={ 0 } onClick={ () => setExpanded(!expanded) }>
@@ -51,27 +57,9 @@ function MobileSearchResult({ aClass, history } : MobileSearchResultProps) {
             {aClass.desc}
           </div>
           <div className='MobileSearchResult__panel--showMore' role='button' tabIndex={ 0 } onClick={ () => setShowMore(!showMore) }>{showMore ? 'Show less' : 'Show more'}</div>
-          <div className='MobileSearchResult__panel--collapsableContainer' role='button' tabIndex={ 0 } onClick={ () => setShowNUPath(!showNUPath) }>
-            <div className='MobileSearchResult__panel--collapsableTitle'>
-              <IconCollapseExpand width='6' height='12' fill='#000000' className={ showNUPath ? 'MobileSearchResult__panel--rotatedIcon' : '' } />
-              <span>NUPATHS</span>
-            </div>
-            {showNUPath && <div>{aClass.nupath.length > 0 ? <div> {aClass.nupath.join(', ')}</div> : <span className='empty'> None</span>}</div>}
-          </div>
-          <div className='MobileSearchResult__panel--collapsableContainer' role='button' tabIndex={ 0 } onClick={ () => setShowPrereq(!showPrereq) }>
-            <div className='MobileSearchResult__panel--collapsableTitle'>
-              <IconCollapseExpand width='6' height='12' fill='#000000' className={ showPrereq ? 'MobileSearchResult__panel--rotatedIcon' : '' } />
-              <span>PREREQUISITES</span>
-            </div>
-            {showPrereq && <div>{optionalDisplay(macros.prereqTypes.PREREQ, aClass)}</div>}
-          </div>
-          <div className='MobileSearchResult__panel--collapsableContainer' role='button' tabIndex={ 0 } onClick={ () => setShowCoreq(!showCoreq) }>
-            <div className='MobileSearchResult__panel--collapsableTitle'>
-              <IconCollapseExpand width='6' height='12' fill='#000000' className={ showCoreq ? 'MobileSearchResult__panel--rotatedIcon' : '' } />
-              <span>COREQUISITES</span>
-            </div>
-            {showCoreq && <div>{optionalDisplay(macros.prereqTypes.COREQ, aClass)}</div>}
-          </div>
+          <MobileCollapsableDetail title='NUPATH' expand={ showNUPath } setExpand={ setShowNUPath } renderChildren={ renderNUPaths } />
+          <MobileCollapsableDetail title='PREREQUISITES' expand={ showPrereq } setExpand={ setShowPrereq } renderChildren={ () => optionalDisplay(macros.prereqTypes.PREREQ, aClass) } />
+          <MobileCollapsableDetail title='COREQUISITES' expand={ showCoreq } setExpand={ setShowCoreq } renderChildren={ () => optionalDisplay(macros.prereqTypes.COREQ, aClass) } />
           <div className='MobileSearchResult__panel--notifContainer'>
             <SignUpForNotifications aClass={ aClass } userIsWatchingClass={ userIsWatchingClass } />
           </div>
