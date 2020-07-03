@@ -118,7 +118,7 @@ class Macros extends commonMacros {
     return envVariables;
   }
 
-  // Gets the current time, just used for loggin
+  // Gets the current time, just used for logging
   static getTime() {
     return moment().format('hh:mm:ss a');
   }
