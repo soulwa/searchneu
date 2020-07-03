@@ -253,7 +253,7 @@ class SignUpForNotifications extends React.Component {
         <Modal
           header='Please disable adblock and sign into Facebook.'
           open={ this.state.showAdblockModal }
-          content="Please disable any ad blocking extentions for this site because this feature does not work when adblock is enabled. If you are using Firefox in strict blocking mode, you will need to add an exception for this site for this feature to work. You will also have to uninstall Facebook Container for Firefox, if you have that installed. You can also try using a different browser. If you can't get it working send me a message at ryanhughes624@gmail.com."
+          content="Please disable any ad blocking extentions for this site because this feature does not work when adblock is enabled. If you are using Firefox in strict blocking mode, you will need to add an exception for this site for this feature to work. You will also have to uninstall Facebook Container for Firefox, if you have that installed. You can also try using a different browser. If you can't get it working send us a message at hey@searchneu.com."
           actions={ actions }
         />
       </div>
