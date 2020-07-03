@@ -1,6 +1,5 @@
 import React from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import { useHistory } from 'react-router-dom';
 import macros from '../macros';
 import EmployeePanel from '../panels/EmployeePanel';
 import SearchResult from './Results/SearchResult'
@@ -40,14 +39,12 @@ function ResultsLoader({ results, loadMore }: ResultsLoaderProps) {
 // Memoize result items to avoid unneeded re-renders and to reuse
 // If the Panels are updated to function components, we can memoize them instead and remove this
 const ResultItemMemoized = React.memo(({ result }:{result:SearchItem}) => {
-  const history = useHistory();
-
   if (result.type === 'class') {
     const aClass = Course.create(result.class);
     aClass.loadSectionsFromServerList(result.sections);
 
 
-    return macros.isMobile ? <MobileSearchResult aClass={ aClass } history={ history } /> : <SearchResult aClass={ aClass } history={ history } />;
+    return macros.isMobile ? <MobileSearchResult aClass={ aClass } /> : <SearchResult aClass={ aClass } />;
   }
 
   if (result.type === 'employee') {

@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { History } from 'history'
 import Course from '../../classModels/Course'
 import IconCollapseExpand from '../../images/IconCollapseExpand'
 import IconArrow from '../../images/IconArrow'
@@ -14,10 +13,9 @@ import SignUpForNotifications from '../../SignUpForNotifications'
 
 interface MobileSearchResultProps {
   aClass: Course,
-  history: History,
 }
 
-function MobileSearchResult({ aClass, history } : MobileSearchResultProps) {
+function MobileSearchResult({ aClass } : MobileSearchResultProps) {
   const [expanded, setExpanded] = useState(false)
   const [showMore, setShowMore] = useState(false)
   const [showNUPath, setShowNUPath] = useState(false)
@@ -28,7 +26,7 @@ function MobileSearchResult({ aClass, history } : MobileSearchResultProps) {
     showAll, setShowAll, renderedSections, hideShowAll,
   } = useShowAll(aClass)
 
-  const optionalDisplay = useResultRequisite(history);
+  const optionalDisplay = useResultRequisite();
 
 
   const renderNUPaths = () => (

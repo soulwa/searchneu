@@ -1,5 +1,4 @@
 import React from 'react'
-import { History } from 'history'
 import macros from '../../macros'
 import DesktopSectionPanel from './DesktopSectionPanel'
 import Course from '../../classModels/Course'
@@ -12,10 +11,9 @@ import useShowAll from './useShowAll';
 
 interface SearchResultProps {
   aClass: Course,
-  history: History
 }
-export default function SearchResult({ aClass, history } : SearchResultProps) {
-  const optionalDisplay = useResultRequisite(history)
+export default function SearchResult({ aClass } : SearchResultProps) {
+  const optionalDisplay = useResultRequisite()
   const userIsWatchingClass = useUserChange(aClass)
   const {
     showAll, setShowAll, renderedSections, hideShowAll,

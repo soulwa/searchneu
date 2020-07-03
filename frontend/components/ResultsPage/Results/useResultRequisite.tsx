@@ -1,10 +1,11 @@
 import React from 'react'
-import { History } from 'history'
+import { useHistory } from 'react-router-dom'
 import macros from '../../macros'
 import RequisiteBranch from '../../classModels/RequisiteBranch'
 
 
-export default function useResultRequisite(history: History) {
+export default function useResultRequisite() {
+  const history = useHistory();
   const onReqClick = (reqType, childBranch, event, hash) => {
     history.push(hash);
 
