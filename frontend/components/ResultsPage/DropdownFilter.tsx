@@ -4,6 +4,7 @@ import { Option } from './filters';
 import useClickOutside from './useClickOutside';
 import '../../css/_DropdownFilter.scss';
 import pillClose from '../images/pillClose.svg';
+import dropdownArrow from '../images/DropdownArrow.svg';
 
 interface DropdownFilter {
   title: string,
@@ -59,7 +60,7 @@ export default function DropdownFilter({
             placeholder={ selected.length === 0 ? 'Choose one or multiple' : '' }
             onChange={ (event) => setFilterString(event.target.value) }
           />
-          <span className='DropdownFilter__icon' role='button' tabIndex={ -1 }>&#9660;</span>
+          <img src={ dropdownArrow } alt='Dropdown arrow' className='DropdownFilter__icon' />
         </div>
         <div className='DropdownFilter__selectable'>
           {isOpen && options.filter((option) => option.value.toUpperCase().includes(filterString.toUpperCase()) && !selected.includes(option.value)).map((option) => (
