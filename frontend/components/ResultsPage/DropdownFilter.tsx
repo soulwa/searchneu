@@ -40,24 +40,24 @@ export default function DropdownFilter({
       <div className='DropdownFilter_dropdown' ref={ dropdown } role='button' tabIndex={ 0 } onClick={ handleClickOnTheDropdown }>
         <div className='DropdownFilter__search'>
           {selected.map((selectElement) => (
-            <div className='DropdownFilter__inputElement'>
+            <a className='DropdownFilter__inputElement'>
               { selectElement }
-              <b
+              <i
                 className='DropdownFilter__inputDelete'
                 role='button'
                 tabIndex={ 0 }
                 onClick={ () => setActive(pull(selected, selectElement)) }
               >
-                X
-              </b>
-            </div>
+                x
+              </i>
+            </a>
           ))}
           <input
             className='DropdownFilter__input'
             tabIndex={ 0 }
             type='text'
             value={ filterString }
-            placeholder='Choose one or multiple'
+            placeholder={ selected.length === 0 ? 'Choose one or multiple' : '' }
             onChange={ (event) => setFilterString(event.target.value) }
           />
           <span className='DropdownFilter__icon' role='button' tabIndex={ -1 }>&#9660;</span>
