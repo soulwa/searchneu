@@ -3,6 +3,7 @@ import { pull } from 'lodash';
 import { Option } from './filters';
 import useClickOutside from './useClickOutside';
 import '../../css/_DropdownFilter.scss';
+import pillClose from '../images/pillClose.svg';
 
 interface DropdownFilter {
   title: string,
@@ -42,14 +43,12 @@ export default function DropdownFilter({
           {selected.map((selectElement) => (
             <a className='DropdownFilter__inputElement'>
               { selectElement }
-              <i
+              <img
+                src={ pillClose }
                 className='DropdownFilter__inputDelete'
-                role='button'
-                tabIndex={ 0 }
+                alt='X to remove pill'
                 onClick={ () => setActive(pull(selected, selectElement)) }
-              >
-                x
-              </i>
+              />
             </a>
           ))}
           <input
