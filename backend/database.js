@@ -56,7 +56,7 @@ class Database {
     // 1. figure out why loginKeys isn't query-able
     // 2. can just execute a raw query for the ID information
     // 3. why isn't this abstracted behavior with this.get?
-    const user = await this.prisma.user.findMany({ where: { loginKeys: { contains: requestLoginKey } } });
+    const user = (await this.prisma.user.findMany({ where: { loginKeys: { contains: requestLoginKey } } }))[0];
 
     if (!user) {
       return null;
