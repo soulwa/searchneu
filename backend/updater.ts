@@ -3,14 +3,13 @@
  * See the license file in the root folder for details.
  */
 
+import { PrismaClient } from '@prisma/client';
 import _ from 'lodash';
-import { Op } from 'sequelize';
 
 import macros from './macros';
 import Keys from '../common/Keys';
 import notifyer from './notifyer';
 import dumpProcessor from './dumpProcessor';
-import { Course, Section, sequelize } from './database/models/index';
 import HydrateCourseSerializer from './database/serializers/hydrateCourseSerializer';
 import termParser from './scrapers/classes/parsersxe/termParser';
 import { Course as CourseType, Section as SectionType } from './types';
@@ -56,6 +55,8 @@ class Updater {
 
   SEM_TO_UPDATE: string;
 
+  prisma: PrismaClient;
+
   static create() {
     return new this();
   }
@@ -65,6 +66,7 @@ class Updater {
     this.COURSE_MODEL = 'course';
     this.SECTION_MODEL = 'section';
     this.SEM_TO_UPDATE = '202110';
+    this.prisma = new PrismaClient();
   }
 
   // TODO must call this in server
@@ -112,7 +114,7 @@ class Updater {
     }
 
     // scrape everything
-    const sections: Section[] = await termParser.parseSections(this.SEM_TO_UPDATE);
+    const sections: SectionType[] = await termParser.parseSections(this.SEM_TO_UPDATE);
     const newSectionsByClass: Record<string, string[]> = {};
 
     for (const sec of sections) {
@@ -141,7 +143,7 @@ class Updater {
     });
 
     await this.sendMessages(notifications, classHashToUsers, sectionHashToUsers);
-    await dumpProcessor.main({ termDump: { sections } });
+    await dumpProcessor.main({ termDump: { sections, classes: {} } });
 
     const totalTime = Date.now() - startTime;
 
@@ -157,15 +159,14 @@ class Updater {
   async modelToUserHash(modelName: ModelName): Promise<Record<string, string[]>> {
     const columnName = `${modelName}Id`;
     const capitalizedName = `${modelName.charAt(0).toUpperCase() + modelName.slice(1)}s`;
-    const dbResults = await sequelize.query(`SELECT "${columnName}", ARRAY_AGG("userId") FROM "Followed${capitalizedName}" GROUP BY "${columnName}"`,
-      { type: sequelize.QueryTypes.SELECT });
+    const dbResults = await this.prisma.raw(`SELECT "${columnName}", ARRAY_AGG("userId") FROM "Followed${capitalizedName}" GROUP BY "${columnName}"`);
     return Object.assign({}, ...dbResults.map((res) => ({ [res[columnName]]: res.array_agg })));
   }
 
 
   // return a collection of data structures used for simplified querying of data
   async getOldData(classHashes: string[]): Promise<OldData> {
-    const oldDocs: Record<string, SerializedResult> = await (new HydrateCourseSerializer(Section)).bulkSerialize(await Course.findAll({ where: { id: { [Op.in]: classHashes } } }));
+    const oldDocs: Record<string, SerializedResult> = await (new HydrateCourseSerializer()).bulkSerialize(await this.prisma.course.findMany({ where: { id: { in: classHashes } } }));
 
     const oldWatchedClasses: Record<string, CourseType> = {};
     for (const [classHash, doc] of Object.entries(oldDocs)) {
