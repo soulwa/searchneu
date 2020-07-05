@@ -4,7 +4,6 @@
  */
 
 import { PrismaClient } from '@prisma/client';
-import { User, FollowedSection, FollowedCourse } from './database/models/index';
 
 
 class Database {

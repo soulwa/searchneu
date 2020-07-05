@@ -63,7 +63,7 @@ CREATE TABLE followed_sections (
 CREATE TABLE majors (
   id             SERIAL PRIMARY KEY,
   major_id       VARCHAR(255),
-  catalog_year   INTEGER,
+  catalog_year   VARCHAR(255),
   name           VARCHAR(255),
   requirements   JSONB,
   plans_of_study JSONB

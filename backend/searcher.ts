@@ -3,9 +3,9 @@
  * See the license file in the root folder for details.
  */
 
+import { PrismaClient } from '@prisma/client';
 import _ from 'lodash';
 import elastic, { Elastic } from './elastic';
-import { Course, Section } from './database/models/index';
 import HydrateSerializer from './database/serializers/hydrateSerializer';
 import macros from './macros';
 import {
@@ -24,6 +24,8 @@ class Searcher {
   aggFilters: AggFilterPrelude;
 
   AGG_RES_SIZE: number;
+
+  prisma: PrismaClient;
 
   constructor() {
     this.elastic = elastic;
@@ -98,7 +100,7 @@ class Searcher {
 
   async initializeSubjects(): Promise<void> {
     if (!this.subjects) {
-      this.subjects = new Set((await Course.aggregate('subject', 'distinct', { plain: false })).map((hash) => hash.distinct.toUpperCase()));
+      this.subjects = new Set((await this.prisma.raw(`SELECT DISTINCT subject FROM courses;`)).map((res) => res.subject));
     }
   }
 
@@ -261,7 +263,7 @@ class Searcher {
       output, resultCount, took, aggregations,
     } = await this.getSearchResults(query, termId, min, max, filters);
     const startHydrate = Date.now();
-    const results = await (new HydrateSerializer(Section)).bulkSerialize(output);
+    const results = await (new HydrateSerializer()).bulkSerialize(output);
 
     return {
       searchContent: results,
