@@ -8,9 +8,12 @@ import _ from 'lodash';
 import path from 'path';
 import Keys from '../common/Keys';
 import macros from './macros';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, ProfessorCreateInput, CourseCreateInput, SectionCreateInput } from '@prisma/client';
+import { populateES } from './populateES';
 
 class DumpProcessor {
+  CHUNK_SIZE: number;
+
   constructor() {
     this.CHUNK_SIZE = 5;
   }
@@ -18,10 +21,15 @@ class DumpProcessor {
   /**
    * @param {Object} termDump object containing all class and section data, normally acquired from scrapers
    * @param {Object} profDump object containing all professor data, normally acquired from scrapers
+   * @param {boolean} destroy determines if courses that haven't been updated for the last two days will be removed from the database
    */
-  async main({ termDump = {}, profDump = {}, destroy = false }) {
+  async main({
+    termDump = { classes: {}, sections: {} },
+    profDump = {},
+    destroy = false
+  }) {
     const prisma = new PrismaClient();
-    const coveredTerms = new Set();
+    const coveredTerms: Set<string> = new Set();
 
     await pMap(Object.values(profDump), async (prof) => {
       const profData = this.processProf(prof);
@@ -54,33 +62,20 @@ class DumpProcessor {
       await prisma.course.deleteMany({
         where: {
           termId: { in: Array.from(coveredTerms) },
-          lastUpdateTime: { lt: new Date(new Date() - 48 * 60 * 60 * 1000) },
+          lastUpdateTime: { lt: new Date(new Date().getTime() - 48 * 60 * 60 * 1000) },
         },
       });
     }
 
-    /*
-    // destroy courses that haven't been updated in over 2 days
-    if (destroy) {
-      await Course.destroy({
-        where: {
-          termId: { [Op.in]: Array.from(coveredTerms) },
-          updatedAt: { [Op.lt]: new Date(new Date() - 48 * 60 * 60 * 1000) },
-        },
-      });
-    }
-    // Upsert ES
-    await Course.bulkUpsertES(courseInstances);
-    sequelize.options.logging = true;
-    */
+    await populateES();
   }
 
-  processProf(profInfo) {
+  processProf(profInfo: any): ProfessorCreateInput {
     const correctedQuery = { ...profInfo, emails: { set: profInfo.emails } };
-    return _.omit(correctedQuery, ['title', 'interests', 'officeStreetAddress']);
+    return _.omit(correctedQuery, ['title', 'interests', 'officeStreetAddress']) as ProfessorCreateInput;
   }
 
-  processCourse(classInfo, coveredTerms) {
+  processCourse(classInfo: any, coveredTerms: Set<string>): CourseCreateInput {
     coveredTerms.add(classInfo.termId);
 
     const additionalProps = {
@@ -98,12 +93,16 @@ class DumpProcessor {
       nupath: { set: classInfo.nupath }
     };
 
-    return _.omit(correctedQuery, ['desc']);
+    const { desc, ...finalCourse } = correctedQuery;
+
+    return finalCourse;
+    // TODO check that the above works
+    // return _.omit(correctedQuery, ['desc']);
   }
 
-  processSection(secInfo) {
+  processSection(secInfo: any): SectionCreateInput {
     const additionalProps = { id: `${Keys.getSectionHash(secInfo)}`, classHash: Keys.getClassHash(secInfo), profs: { set: secInfo.profs } };
-    return _.omit({ ...secInfo, ...additionalProps }, ['classHash', 'classId', 'termId', 'subject', 'host']);
+    return _.omit({ ...secInfo, ...additionalProps }, ['classHash', 'classId', 'termId', 'subject', 'host']) as SectionCreateInput;
   }
 }
 
