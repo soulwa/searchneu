@@ -51,6 +51,17 @@ class Course {
 
   optPrereqsFor : ReqFor;
 
+  minCredits: number;
+
+  maxCredits: number;
+
+  feeDescription: string;
+
+  feeAmount: number;
+
+  nupath: any;
+
+
   constructor() {
     //true, if for instance "AP placement exam, etc"
     this.isString = false;
