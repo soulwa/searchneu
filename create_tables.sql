@@ -21,7 +21,7 @@ CREATE TABLE courses (
   last_update_time  TIMESTAMPTZ
 );
 
-CREATE INDEX unique_course_props ON courses (class_id, term_id, subject);
+CREATE UNIQUE INDEX unique_course_props ON courses (class_id, term_id, subject);
 
 CREATE TABLE sections (
   id              VARCHAR(255) PRIMARY KEY,

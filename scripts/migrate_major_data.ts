@@ -12,7 +12,8 @@ interface Major {
 type MajorJSON = Record<string, Major[]>
 
 // return the javascript object equivalent of a file in data/
-function fetchData(filename: string): Object {
+// NOTE Prisma doesn't export its JsonValue/Object type, so have to use this return
+function fetchData(filename: string): Record<any, any> {
   return JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', filename)));
 }
 
@@ -27,11 +28,11 @@ function migrateData(majorDirectory: MajorJSON): void {
 
       prisma.major.create({
         data: {
-        requirements: majorObj,
-        plansOfStudy: planObj,
-        catalogYear: termId,
-        name: m.name,
-        majorId: m.majorId,
+          requirements: majorObj,
+          plansOfStudy: planObj,
+          catalogYear: termId,
+          name: m.name,
+          majorId: m.majorId,
         }
       });
     });
