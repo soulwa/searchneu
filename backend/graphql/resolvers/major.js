@@ -1,21 +1,20 @@
-import db from '../../database/models/index';
+import { PrismaClient } from '@prisma/client';
+import { UserInputError } from 'apollo-server';
 
-const { UserInputError } = require('apollo-server');
-
-const MajorData = db.MajorData;
+const prisma = new PrismaClient();
 
 const noResultsError = (recordType) => {
   throw new UserInputError(`${recordType} not found!`);
 };
 
 const getLatestMajorOccurrence = async (majorId, recordType) => {
-  const response = await MajorData.findOne({
+  const majors = await prisma.major.findMany({
     where: { majorId: majorId },
-    order: [['catalogYear', 'DESC']],
-    limit: 1,
+    orderBy: { catalogYear: { desc: 'desc' } },
+    take: 1
   });
 
-  return (response || noResultsError(recordType));
+  return majors[0] || noResultsError(recordType);
 };
 
 const resolvers = {
@@ -24,11 +23,11 @@ const resolvers = {
   },
   Major: {
     occurrence: async (major, args) => {
-      const response = await MajorData.findOne({
+      const majors = prisma.major.findMany({
         where: { majorId: major.majorId, catalogYear: args.year },
-        limit: 1,
+        take: 1,
       });
-      return (response || noResultsError('occurrence'));
+      return majors [0] || noResultsError('occurrence');
     },
     latestOccurrence: (major) => { return getLatestMajorOccurrence(major.majorId, 'latestOccurrence'); },
   },

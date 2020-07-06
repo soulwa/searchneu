@@ -32,7 +32,7 @@ model Course {
   sections        Section[]
 
   @@map(name: "courses")
-  @@index([classId, termId, subject], name: "unique_course_props")
+  @@unique([classId, termId, subject], name: "uniqueCourseProps")
 }
 
 model FollowedCourse {
@@ -56,7 +56,7 @@ model FollowedSection {
 }
 
 model Major {
-  catalogYear  Int?    @map(name: "catalog_year")
+  catalogYear  String? @map(name: "catalog_year")
   id           Int     @default(autoincrement()) @id
   majorId      String? @map(name: "major_id")
   name         String?
@@ -120,3 +120,4 @@ model User {
 
   @@map(name: "users")
 }
+
