@@ -38,7 +38,7 @@
     "prod:migrate": "npx sequelize-cli --env prod db:migrate",
     "prod:undo": "npx sequelize-cli --env prod db:migrate:undo:all",
     "prod:scrape": "node dist/backend/scrapers/main.js",
-    "prod:start": "node dist/backend/server.ts",
+    "prod:start": "node dist/backend/server.js",
     "prod:start:updater": "node dist/backend/updater.js"
   },
   "repository": {
