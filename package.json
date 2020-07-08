@@ -10,7 +10,7 @@
     "populateES": "yarn babel-node-ts backend/populateES.ts",
     "script": "cd $INIT_CWD; babel-node --extensions \".js,.jsx,.ts,.tsx\" --root-mode upward --ignore \".this_does_not_exit\"",
     "inspect": "cd $INIT_CWD;echo 'Open chrome://inspect in chrome and hit the node button';yarn -s script -- --inspect-brk",
-    "dev:docker": "docker-compose -f infrastructure/dev/docker-compose.yml up",
+    "dev:docker": "docker-compose -f infrastructure/dev/docker-compose.yml up -d",
     "dev:docker:del": "docker-compose -f infrastructure/dev/docker-compose.yml down -v",
     "dev:migrate": "npx sequelize-cli --env dev db:migrate",
     "dev:undo": "npx sequelize-cli --env dev db:migrate:undo:all",
