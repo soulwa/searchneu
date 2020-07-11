@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import Course from '../../classModels/Course'
 import IconCollapseExpand from '../../images/IconCollapseExpand'
 import IconArrow from '../../images/IconArrow'
-import useResultRequisite from './useResultRequisite'
+import useResultDetail from './useResultDetail'
 import useUserChange from './useUserChange'
 import useShowAll from './useShowAll'
 import macros from '../../macros'
@@ -26,7 +26,7 @@ function MobileSearchResult({ aClass } : MobileSearchResultProps) {
     showAll, setShowAll, renderedSections, hideShowAll,
   } = useShowAll(aClass)
 
-  const optionalDisplay = useResultRequisite();
+  const { optionalDisplay, creditsString } = useResultDetail(aClass);
 
 
   const renderNUPaths = () => (
@@ -46,9 +46,9 @@ function MobileSearchResult({ aClass } : MobileSearchResultProps) {
       <div className='MobileSearchResult__panel'>
         <div className='MobileSearchResult__panel--mainContainer'>
           <div className='MobileSearchResult__panel--infoStrings'>
-            <a href={ aClass.prettyUrl }>{`Updated ${(aClass.getLastUpdateString())}`}</a>
+            <a href={ aClass.prettyUrl } target='_blank' rel='noopener noreferrer'>{`Updated ${(aClass.getLastUpdateString())}`}</a>
             <span>
-              {aClass.maxCredits === aClass.minCredits ? `${aClass.maxCredits} Credits` : `${aClass.maxCredits}-${aClass.maxCredits} Credits`}
+              {creditsString()}
             </span>
           </div>
           <div className={ showMore ? 'MobileSearchResult__panel--description' : 'MobileSearchResult__panel--descriptionHidden' }>
