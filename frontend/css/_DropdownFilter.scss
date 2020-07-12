@@ -1,4 +1,11 @@
 .DropdownFilter {
+  min-height: 36px;
+  min-width: 238px;
+
+  &:focus {
+    outline: none;
+  }
+
   &__title {
     margin-bottom: 5px;
     font-weight: bold;
@@ -6,8 +13,8 @@
 
   &__search {
     background: white;
-    height: 36px;
-    width: 238px;    // TODO: will fix
+    position: relative;
+    padding: 5px 24px 5px 5px;
   }
 
   &__inputElement {
@@ -38,15 +45,17 @@
     border-radius: 7px 7px;
     padding-left: 10px;
     width: 220px;
+    display: inline;
 
     &:focus {
-      outline-width: 0;
+      outline: none;
     }
   }
 
   &__icon {
-    margin-top: 15px;
     position: absolute;
+    top: 12px;
+    right: 12px;
 
     &:hover {
       cursor: pointer;
@@ -55,6 +64,10 @@
 
   &__dropdown {
     position: relative;
+
+    &:focus {
+      outline: none;
+    }
   }
 
   &__selectable {

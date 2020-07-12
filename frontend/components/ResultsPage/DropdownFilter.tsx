@@ -39,10 +39,10 @@ export default function DropdownFilter({
   return (
     <div className='DropdownFilter'>
       <div className='DropdownFilter__title'>{title}</div>
-      <div className='DropdownFilter_dropdown' ref={ dropdown } role='button' tabIndex={ 0 } onClick={ handleClickOnTheDropdown }>
+      <div className='DropdownFilter__dropdown' ref={ dropdown } role='button' tabIndex={ 0 } onClick={ handleClickOnTheDropdown }>
         <div className='DropdownFilter__search'>
           {selected.map((selectElement) => (
-            <a className='DropdownFilter__inputElement'>
+            <span className='DropdownFilter__inputElement'>
               { selectElement }
               <img
                 src={ pillClose }
@@ -50,7 +50,7 @@ export default function DropdownFilter({
                 alt='X to remove pill'
                 onClick={ () => setActive(pull(selected, selectElement)) }
               />
-            </a>
+            </span>
           ))}
           <input
             className='DropdownFilter__input'
