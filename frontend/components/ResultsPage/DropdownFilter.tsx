@@ -40,7 +40,7 @@ export default function DropdownFilter({
     <div className='DropdownFilter'>
       <div className='DropdownFilter__title'>{title}</div>
       <div className='DropdownFilter__dropdown' ref={ dropdown } role='button' tabIndex={ 0 } onClick={ handleClickOnTheDropdown }>
-        <div className='DropdownFilter__search'>
+        <div className={ `DropdownFilter__search ${isOpen ? 'expanded' : ''}` }>
           {selected.map((selectElement) => (
             <span className='DropdownFilter__inputElement'>
               { selectElement }
