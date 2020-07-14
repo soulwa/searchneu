@@ -5,7 +5,7 @@ import Course from '../../classModels/Course'
 import IconGlobe from '../../images/IconGlobe'
 import IconArrow from '../../images/IconArrow'
 import SignUpForNotifications from '../../SignUpForNotifications'
-import useResultRequisite from './useResultRequisite'
+import useResultDetail from './useResultDetail'
 import useUserChange from './useUserChange';
 import useShowAll from './useShowAll';
 
@@ -13,7 +13,7 @@ interface SearchResultProps {
   aClass: Course,
 }
 export default function SearchResult({ aClass } : SearchResultProps) {
-  const optionalDisplay = useResultRequisite()
+  const { optionalDisplay, creditsString } = useResultDetail(aClass)
   const userIsWatchingClass = useUserChange(aClass)
   const {
     showAll, setShowAll, renderedSections, hideShowAll,
@@ -41,7 +41,7 @@ export default function SearchResult({ aClass } : SearchResultProps) {
           </div>
         </div>
         <span className='SearchResult__header--creditString'>
-          {aClass.maxCredits === aClass.minCredits ? `${aClass.maxCredits} CREDITS` : `${aClass.maxCredits}-${aClass.maxCredits} CREDITS`}
+          {creditsString()}
         </span>
       </div>
       <div className='SearchResult__panel'>

@@ -23,7 +23,7 @@
     margin-bottom: 16px;
 
     & > span:first-child {
-      max-width: 40%;
+      max-width: 50%;
     }
   }
 
@@ -37,7 +37,7 @@
       display: flex;
       align-items: center;
 
-      & > svg {
+      & > a {
         margin-right: 8px;
       }
 

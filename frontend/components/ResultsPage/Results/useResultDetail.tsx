@@ -2,9 +2,10 @@ import React from 'react'
 import { useHistory } from 'react-router-dom'
 import macros from '../../macros'
 import RequisiteBranch from '../../classModels/RequisiteBranch'
+import Course from '../../classModels/Course';
 
 
-export default function useResultRequisite() {
+export default function useResultDetail(aClass: Course) {
   const history = useHistory();
   const onReqClick = (reqType, childBranch, event, hash) => {
     history.push(hash);
@@ -44,7 +45,7 @@ export default function useResultRequisite() {
   }
 
   // returns an array made to be rendered by react to display the prereqs
-  const getReqsString = (reqType, aClass) => {
+  const getReqsString = (reqType, course) => {
     const retVal = [];
 
     // Keep track of which subject+classId combonations have been used so far.
@@ -56,13 +57,13 @@ export default function useResultRequisite() {
     let childNodes;
 
     if (reqType === macros.prereqTypes.PREREQ) {
-      childNodes = aClass.prereqs;
+      childNodes = course.prereqs;
     } else if (reqType === macros.prereqTypes.COREQ) {
-      childNodes = aClass.coreqs;
+      childNodes = course.coreqs;
     } else if (reqType === macros.prereqTypes.PREREQ_FOR) {
-      childNodes = aClass.prereqsFor;
+      childNodes = course.prereqsFor;
     } else if (reqType === macros.prereqTypes.OPT_PREREQ_FOR) {
-      childNodes = aClass.optPrereqsFor;
+      childNodes = course.optPrereqsFor;
     } else {
       macros.error('Invalid prereqType', reqType);
     }
@@ -150,12 +151,20 @@ export default function useResultRequisite() {
     return retVal;
   }
 
-  const optionalDisplay = (prereqType, aClass) => {
-    const data = getReqsString(prereqType, aClass);
+  const optionalDisplay = (prereqType, course) => {
+    const data = getReqsString(prereqType, course);
 
     return data;
   }
 
+  const creditsString = () => {
+    const creditDescriptor = aClass.maxCredits > 1 || aClass.maxCredits === 0 ? 'CREDITS' : 'CREDIT'
+    return aClass.maxCredits === aClass.minCredits ? `${aClass.maxCredits} ${creditDescriptor}` : `${aClass.maxCredits}-${aClass.maxCredits} ${creditDescriptor}`
+  }
 
-  return optionalDisplay
+
+  return {
+    optionalDisplay,
+    creditsString,
+  }
 }

@@ -46,7 +46,13 @@ function MobileSectionPanel({ section, showNotificationSwitches } : MobileSectio
       </div>
       <div className='MobileSectionPanel__firstRow'>
         <div>
-          <IconGlobe />
+          <a
+            target='_blank'
+            rel='noopener noreferrer'
+            href={ section.url }
+          >
+            <IconGlobe />
+          </a>
           <span>{section.crn}</span>
         </div>
         {showNotificationSwitches && <NotifCheckBox section={ section } />}

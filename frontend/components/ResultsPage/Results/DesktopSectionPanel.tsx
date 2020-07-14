@@ -62,7 +62,7 @@ function DesktopSectionPanel({ section, showNotificationSwitches } : DesktopSect
   return (
     <tr className='DesktopSectionPanel' key={ section.getHash() }>
       <td>
-        {section.crn}
+        <a href={ section.url } target='_blank' rel='noopener noreferrer'>{section.crn}</a>
       </td>
       <td>
         {section.getProfs().join(', ')}
