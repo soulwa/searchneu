@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { pull } from 'lodash';
 import { Option } from './filters';
 import useClickOutside from './useClickOutside';
@@ -15,24 +15,14 @@ interface DropdownFilter {
 export default function DropdownFilter({
   title, options, selected, setActive,
 }: DropdownFilter) {
-  const [areOptionsFresh, setAreOptionsFresh] = useState(true)
   const [filterString, setFilterString] = useState('');
   const [isOpen, setIsOpen] = useState(false)
-
-  useEffect(() => {
-    setAreOptionsFresh(true);
-  }, [options])
 
   const dropdown = useRef(null);
 
   useClickOutside(dropdown, isOpen, setIsOpen);
 
   function handleClickOnTheDropdown() {
-    if (areOptionsFresh) {
-      // calculate the new options
-      // if any selected no longer exist, remove them (filter)
-      setAreOptionsFresh(false)
-    }
     setIsOpen(!isOpen);
   }
 
