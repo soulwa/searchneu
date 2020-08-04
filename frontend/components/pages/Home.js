@@ -90,13 +90,6 @@ export default function Home() {
           <div className='centerTextContainer'>
             <img src={ logo } className='logo' alt='logo' />
             <HomeSearch setSearchFocused={ setSearchFocused } setTermId={ setTermId } termId={ termId } />
-            <div className={ cx({
-              hitEnterToSearch: true,
-              hitEnterToSearchVisible: searchFocused,
-            }) }
-            >
-              Hit Enter to Search ...
-            </div>
             {attentionSection}
           </div>
         </div>

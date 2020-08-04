@@ -1,22 +1,36 @@
 .HomeSearch {
+  background: rgba(239, 240, 241, 0.7);
+  border-radius: 4px;
+  height: 166px;
+  width: 782px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
   &__searchBar {
     margin: 10px;
     display: flex;
     align-items: center;
-    height: 50px;
+    height: 94px;
     width: 100%;
+    background: white;
+    padding: 24px 32px;
+    border-radius: 0 0 2px 2px;
+
 
     &--dropdown {
       border-radius: 5px 0 0 5px;
       height: 100%;
       width: 55%;
       background:  #F5F5F5;
+      display: flex;
+      align-items: center;
       
     }
     &--input {
+      border-radius: 0 5px 5px 0;
       height: 100%;
       width: 100%;
-      border-radius: 0 5px 5px 0;
       
       & > div {
         height: 100%;
@@ -43,6 +57,7 @@
           }
         }
         & > div {
+          width: 54px;
           border-radius: 0 5px 5px 0;
         }
 
