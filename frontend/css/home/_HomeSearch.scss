@@ -25,6 +25,7 @@
       width: 16px;
     }
     &--neu {
+      pointer-events: initial;
       display: inline-block;
       width: 68px;
       height: 28px;
@@ -38,6 +39,7 @@
     }
   
     &--cps {
+      pointer-events: initial;
       display: inline-block;
       width: 68px;
       height: 28px;
@@ -50,6 +52,7 @@
     }
   
     &--law {
+      pointer-events: initial;
       display: inline-block;
       width: 68px;
       height: 28px;
