@@ -20,15 +20,15 @@ const HomeSearch = ({setSearchFocused, setTermId, termId}) => {
       <div className='HomeSearch__campusSelector'>
           <input type='radio' id='campusSelectorNeu' name='CampusSelector' defaultChecked/>
           <label className='HomeSearch__campusSelector--neu' htmlFor='campusSelectorNeu' onClick={ () => setSelectedCampus('neu') }>
-            NEU
+          <span>NEU</span>
           </label>
           <input type='radio' id='campusSelectorCps' name='CampusSelector' />
           <label className='HomeSearch__campusSelector--cps' htmlFor='campusSelectorCps' onClick={ () => setSelectedCampus('cps') }>
-            CPS
+            <span>CPS</span>
           </label>
           <input type='radio' id='campusSelectorLaw' name='CampusSelector' />
           <label className='HomeSearch__campusSelector--law' htmlFor='campusSelectorLaw' onClick={ () => setSelectedCampus('law') }>
-            Law
+            <span>Law</span>
           </label>
       </div>
       <div className='HomeSearch__searchBar'>
