@@ -15,6 +15,59 @@
     border-bottom: 1px solid #E0E0E0;
     border-radius: 2px 2px 0 0;
     box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.25);
+    display: flex;
+    align-items: center;
+    & > input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+      height: 16px;
+      width: 16px;
+    }
+    &--neu {
+      display: inline-block;
+      width: 68px;
+      height: 28px;
+      text-align: center;
+      padding-top: 2px;
+      font-size: 11px;
+      background: #fff;
+      border: 1px solid #dededf;
+      border-radius: 3px 0 0 3px;
+      cursor: pointer;
+    }
+  
+    &--cps {
+      display: inline-block;
+      width: 68px;
+      height: 28px;
+      text-align: center;
+      padding-top: 2px;
+      font-size: 11px;
+      background: #fff;
+      border: 1px solid #dededf;
+      cursor: pointer;
+    }
+  
+    &--law {
+      display: inline-block;
+      width: 68px;
+      height: 28px;
+      text-align: center;
+      padding-top: 2px;
+      font-size: 11px;
+      background: #fff;
+      border: 1px solid #dededf;
+      border-radius: 0 3px 3px 0;
+      cursor: pointer;
+    }
+  
+    & > input:checked + .HomeSearch__campusSelector--neu,
+    & > input:checked + .HomeSearch__campusSelector--cps,
+    & > input:checked + .HomeSearch__campusSelector--law {
+      border: 1px solid #489fff;
+      color: #489fff;
+    }
   }
 
   &__searchBar {

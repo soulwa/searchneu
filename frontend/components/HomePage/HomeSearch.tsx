@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import {useHistory} from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 import SearchBar from '../ResultsPage/SearchBar'
 import TermDropdown from '../ResultsPage/TermDropdown';
 
@@ -13,11 +13,12 @@ interface HomeSearchProps {
 const HomeSearch = ({setSearchFocused, setTermId, termId}) => {
   const history = useHistory();
   const [selectedCampus, setSelectedCampus] = useState('neu');
+  console.log('selectedCampus', selectedCampus)
 
   return (
     <div className='HomeSearch'>
       <div className='HomeSearch__campusSelector'>
-          <input type='radio' id='campusSelectorNeu' name='CampusSelector' defaultChecked />
+          <input type='radio' id='campusSelectorNeu' name='CampusSelector' defaultChecked/>
           <label className='HomeSearch__campusSelector--neu' htmlFor='campusSelectorNeu' onClick={ () => setSelectedCampus('neu') }>
             NEU
           </label>
