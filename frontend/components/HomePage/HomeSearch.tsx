@@ -12,9 +12,24 @@ interface HomeSearchProps {
 
 const HomeSearch = ({setSearchFocused, setTermId, termId}) => {
   const history = useHistory();
+  const [selectedCampus, setSelectedCampus] = useState('neu');
 
   return (
     <div className='HomeSearch'>
+      <div className='HomeSearch__campusSelector'>
+          <input type='radio' id='campusSelectorNeu' name='CampusSelector' defaultChecked />
+          <label className='HomeSearch__campusSelector--neu' htmlFor='campusSelectorNeu' onClick={ () => setSelectedCampus('neu') }>
+            NEU
+          </label>
+          <input type='radio' id='campusSelectorCps' name='CampusSelector' />
+          <label className='HomeSearch__campusSelector--cps' htmlFor='campusSelectorCps' onClick={ () => setSelectedCampus('cps') }>
+            CPS
+          </label>
+          <input type='radio' id='campusSelectorLaw' name='CampusSelector' />
+          <label className='HomeSearch__campusSelector--law' htmlFor='campusSelectorLaw' onClick={ () => setSelectedCampus('law') }>
+            Law
+          </label>
+      </div>
       <div className='HomeSearch__searchBar'>
         <div className='HomeSearch__searchBar--dropdown'>
           <TermDropdown
