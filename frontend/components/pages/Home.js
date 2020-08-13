@@ -106,13 +106,14 @@ export default function Home() {
               onChange={ setTermId }
             />
 
-            <div className={ cx({
+            {/* <div className={ cx({
               hitEnterToSearch: true,
               hitEnterToSearchVisible: searchFocused,
             }) }
             >
               Hit Enter to Search ...
-            </div>
+            </div> */}
+            
             {attentionSection}
           </div>
         </div>
