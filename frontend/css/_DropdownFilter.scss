@@ -112,4 +112,12 @@
   &__elementCount {
     color: grey;
   }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: rgba(172, 172, 172, 1);
+  }
+
+  ::-webkit-scrollbar-track {
+    background-color: rgba(229, 229, 229, 1);
+  }
 }
