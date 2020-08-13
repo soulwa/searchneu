@@ -29,8 +29,7 @@
     border-radius: 3px;
 
     &:hover {
-      background-color: #EAEAEA;
-      
+      background-color: #eaeaea;
     }
   }
 
@@ -48,8 +47,7 @@
     width: 16px;
     background-color: transparent;
     border-radius: 5px;
-    border: 1px solid #888888;
-
+    border: 1px solid #888;
 
     &:hover {
       cursor: pointer;
@@ -87,8 +85,7 @@
   }
 
   &__text:hover > input:not(:checked) + .CheckboxFilter__checkbox {
-    background-color: #EAEAEA;
-  
+    background-color: #eaeaea;
   }
 
   &__text > input:checked + .CheckboxFilter__checkbox::after {

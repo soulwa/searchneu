@@ -29,7 +29,7 @@
   &__inputElement {
     display: inline-block;
     vertical-align: baseline;
-    border: 1px solid #E6E6E6;
+    border: 1px solid #e6e6e6;
     box-sizing: border-box;
     border-radius: 7px;
     cursor: pointer;
@@ -37,7 +37,7 @@
     white-space: nowrap;
     overflow: hidden;
     margin-right: 5px;
-    padding: 0px 5px 0px 5px;
+    padding: 0 5px 0 5px;
 
     &:hover {
       color: #4f4f4f;
@@ -115,12 +115,11 @@
     color: grey;
   }
 
-::-webkit-scrollbar-thumb {
-  background-color: rgba(172,172,172,1);  
-}
+  ::-webkit-scrollbar-thumb {
+    background-color: rgba(172, 172, 172, 1);
+  }
 
-::-webkit-scrollbar-track {
-  background-color: rgba(229,229,229,1);
-}
-
+  ::-webkit-scrollbar-track {
+    background-color: rgba(229, 229, 229, 1);
+  }
 }
