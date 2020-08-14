@@ -1,5 +1,5 @@
 .DropdownFilter {
-  font-family: Lato, sans-serif; //TO-DO: Change all fonts in filter sidebar
+  font-family: lato, sans-serif; //TO-DO: Change all fonts in filter sidebar
   min-height: 36px;
   min-width: 238px;
 
@@ -29,15 +29,16 @@
   &__inputElement {
     display: inline-block;
     vertical-align: baseline;
-    border: 1px solid #e6e6e6;
+    background: #e6e6e6;
+    border: 1px solid #afafaf;
     box-sizing: border-box;
     border-radius: 7px;
     cursor: pointer;
-    color: #646872;
+    color: #4f4f4f;
     white-space: nowrap;
     overflow: hidden;
     margin-right: 5px;
-    padding: 0 5px 0 5px;
+    padding: 0 5px;
 
     &:hover {
       color: #4f4f4f;
@@ -92,7 +93,7 @@
     padding-left: 10px;
     justify-content: flex-start;
     height: 55px;
-    background-color: #fff;
+    background: #fff;
     border: 1px solid #f5f5f5;
     box-sizing: border-box;
     border-radius: 0;
