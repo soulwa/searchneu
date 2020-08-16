@@ -17,6 +17,7 @@
     box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.25);
     display: flex;
     align-items: center;
+    padding-left: 32px;
     & > input {
       position: absolute;
       opacity: 0;
@@ -28,35 +29,37 @@
       pointer-events: initial;
       display: flex;
       align-items: center;
-      justify-content: center;
+      justify-content: space-evenly;
       color: #4C4C4C;
-      width: 75px;
+      width: 80px;
       height: 100%;
       font-size: 16px;
       background: #fff;
       cursor: pointer;
+      margin-right: 16px;
     }
   
     &--cps {
       pointer-events: initial;
       display: flex;
       align-items: center;
-      justify-content: center;
+      justify-content: space-evenly;
       color: #4C4C4C;
-      width: 75px;
+      width: 80px;
       height: 100%;
       font-size: 16px;
       background: #fff;
       cursor: pointer;
+      margin-right: 16px;
     }
   
     &--law {
       pointer-events: initial;
       display: flex;
       align-items: center;
-      justify-content: center;
+      justify-content: space-evenly;
       color: #4C4C4C;
-      width: 75px;
+      width: 80px;
       height: 100%;
       font-size: 16px;
       background: #fff;
