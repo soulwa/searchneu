@@ -5,6 +5,7 @@ import TermDropdown from '../ResultsPage/TermDropdown'
 import IconGradcap from '../images/IconGradcap'
 import IconScale from '../images/IconScale'
 import IconTie from '../images/IconTie'
+import macros from '../macros';
 
 
 interface HomeSearchProps {
@@ -40,7 +41,7 @@ const HomeSearch = ({ setTermId, termId }: HomeSearchProps) => {
           <TermDropdown
             termId={ termId }
             onChange={ setTermId }
-            compact={ false }
+            compact={ macros.isMobile ? true : false  }
           />
         </div>
         <div
