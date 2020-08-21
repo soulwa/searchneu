@@ -33,7 +33,7 @@ const HomeSearch = ({ setTermId, termId }: HomeSearchProps) => {
         <input type='radio' id='campusSelectorLaw' name='CampusSelector' />
         <label className='HomeSearch__campusSelector--law' htmlFor='campusSelectorLaw' onClick={ () => setSelectedCampus('law') }>
           <IconScale />
-          <span>Pee</span>
+          <span>Law</span>
         </label>
       </div>
       <div className='HomeSearch__searchBar'>
@@ -41,7 +41,7 @@ const HomeSearch = ({ setTermId, termId }: HomeSearchProps) => {
           <TermDropdown
             termId={ termId }
             onChange={ setTermId }
-            compact={ macros.isMobile ? true : false  }
+            compact={ !!macros.isMobile }
           />
         </div>
         <div
