@@ -5,8 +5,8 @@
  * script to fill elasticsearch by quering postgres
  */
 
-import { Professor, Course } from './database/models/index';
-import macros from './macros';
+import { Professor, Course } from '../database/models/index';
+import macros from '../macros';
 
 if (require.main === module) {
   macros.log(`Populating ES at ${macros.getEnvVariable('elasticURL')} from Postgres at ${macros.getEnvVariable('dbHost')}`);
