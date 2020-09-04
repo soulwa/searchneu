@@ -28,7 +28,7 @@ module.exports = {
     dialect: 'postgres',
     dialectOptions: {
       ssl: {
-        rejectUnauthorized: true,
+        rejectUnauthorized: !!dbCert,
         ca: dbCert,
       },
     },
