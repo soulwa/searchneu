@@ -103,18 +103,22 @@ subscriptionRouter.post('/', async (req, res) => {
   if (sectionHash) {
     userObject.watchingSections.push(sectionHash);
     const section = await Section.findByPk(sectionHash, { include: Course });
-    notifyer.sendFBNotification(
-      req.body.senderId,
-      `You have subscribed to notification for a section in ${section.course.subject} ${section.course.classId} (CRN: ${section.crn})!`,
-    );
+    if (section && section.course) {
+      notifyer.sendFBNotification(
+        req.body.senderId,
+        `You have subscribed to notification for a section in ${section.course.subject} ${section.course.classId} (CRN: ${section.crn})!`,
+      );
+    }
   }
   if (classHash) {
     userObject.watchingClasses.push(classHash);
     const course = await Course.findByPk(classHash);
-    notifyer.sendFBNotification(
-      req.body.senderId,
-      `You have subscribed to notifications for the class ${course.subject} ${course.classId}`,
-    );
+    if (course) {
+      notifyer.sendFBNotification(
+        req.body.senderId,
+        `You have subscribed to notifications for the class ${course.subject} ${course.classId}`,
+      );
+    }
   }
 
   await database.set(req.body.senderId, userObject);
