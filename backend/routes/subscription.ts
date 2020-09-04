@@ -104,7 +104,7 @@ subscriptionRouter.post('/', async (req, res) => {
     userObject.watchingSections.push(sectionHash);
     const section = await Section.findByPk(sectionHash, { include: Course });
     if (!section || !section.course) {
-      res.send(
+      res.status(404).send(
         JSON.stringify({
           status: 'No such section',
         }),
@@ -120,7 +120,7 @@ subscriptionRouter.post('/', async (req, res) => {
     userObject.watchingClasses.push(classHash);
     const course = await Course.findByPk(classHash);
     if (!course) {
-      res.send(
+      res.status(404).send(
         JSON.stringify({
           status: 'No such class',
         }),
