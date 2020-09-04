@@ -13,11 +13,6 @@ services:
         fromDatabase:
           name: postgres
           property: connectionString
-      - key: elasticURL
-        fromService:
-          name: elasticsearch
-          type: pserv
-          property: hostport
       - fromGroup: secrets
   - type: worker
     name: updater
@@ -32,11 +27,6 @@ services:
         fromDatabase:
           name: postgres
           property: connectionString
-      - key: elasticURL
-        fromService:
-          name: elasticsearch
-          type: pserv
-          property: hostport
       - fromGroup: secrets
   - type: pserv
     name: elasticsearch
@@ -71,3 +61,5 @@ envVarGroups:
     sync: false
   - key: rollbarPostServerItemToken
     sync: false
+  - key: elasticURL
+    value: elastic:9200
