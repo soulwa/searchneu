@@ -9,10 +9,22 @@ services:
     envVars:
       - key: NODE_ENV
         value: prod
-      - key: DATABASE_URL
+      - key: dbHost
         fromDatabase:
           name: postgres
-          property: connectionString
+          property: host
+      - key: dbName
+        fromDatabase:
+          name: postgres
+          property: database
+      - key: dbUsername
+        fromDatabase:
+          name: postgres
+          property: user
+      - key: dbPassword
+        fromDatabase:
+          name: postgres
+          property: password
       - fromGroup: secrets
   - type: worker
     name: updater
@@ -23,10 +35,22 @@ services:
     envVars:
       - key: NODE_ENV
         value: prod
-      - key: DATABASE_URL
+      - key: dbHost
         fromDatabase:
           name: postgres
-          property: connectionString
+          property: host
+      - key: dbName
+        fromDatabase:
+          name: postgres
+          property: database
+      - key: dbUsername
+        fromDatabase:
+          name: postgres
+          property: user
+      - key: dbPassword
+        fromDatabase:
+          name: postgres
+          property: password
       - fromGroup: secrets
   - type: pserv
     name: elasticsearch
