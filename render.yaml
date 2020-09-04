@@ -82,6 +82,8 @@ services:
     name: elasticsearch
     env: docker
     plan: standard
+    dockerfilePath: ./infrastructure/render/elasticsearch/Dockerfile
+    dockerContext: ./infrastructure/render/elasticsearch
     disk:
       name: esdata
       mountPath: /usr/share/elasticsearch/data
