@@ -27,7 +27,7 @@
     "test": "./node_modules/jest-cli/bin/jest.js --testPathIgnorePatterns='(seq|reg).[jt]s'",
     "test:migrate": "npx sequelize-cli --env test db:migrate",
     "regtest": "jest --projects regtests",
-    "seqtest": "jest -i seq.[jt]s",
+    "dbtest": "jest -i --projects dbtest",
     "prodtest": "PROD=true jest reg.[jt]s",
     "coverage": "./node_modules/jest-cli/bin/jest.js --coverage",
     "-building-": "--------building--------",
@@ -218,7 +218,8 @@
   },
   "jest": {
     "projects": [
-      "<rootDir>/regtests"
+      "<rootDir>/regtests",
+      "<rootDir>/backend/tests"
     ],
     "snapshotSerializers": [
       "enzyme-to-json/serializer"
