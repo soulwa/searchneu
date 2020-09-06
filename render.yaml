@@ -54,10 +54,11 @@ services:
       - fromGroup: secrets
   - type: cron
     name: scrape
-    env: node
+    env: docker
     schedule: "0 * * * *"
-    buildCommand: yarn install --frozen-lockfile --production=false; yarn build;
-    startCommand: yarn prod:scrape
+    # buildCommand: yarn install --frozen-lockfile --production=false; yarn build;
+    # startCommand: yarn prod:scrape
+    dockerCommand: yarn prod:scrape
     envVars:
       - key: NODE_ENV
         value: prod
