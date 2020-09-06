@@ -88,11 +88,4 @@ async function fromFile(termFilePath, empFilePath) {
   await instance.main({ termDump: termDump, profDump: profDump });
 }
 
-if (require.main === module) {
-  // If called directly, attempt to index the dump in public dir
-  const termFilePath = path.join(macros.PUBLIC_DIR, 'getTermDump', 'allTerms.json');
-  const empFilePath = path.join(macros.PUBLIC_DIR, 'employeeDump.json');
-  fromFile(termFilePath, empFilePath).catch(macros.error);
-}
-
 export default instance;

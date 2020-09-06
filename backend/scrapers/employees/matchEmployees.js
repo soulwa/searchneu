@@ -366,15 +366,6 @@ class CombineCCISandEmployees {
 
     macros.log(`Changed/Removed ${beforeModifyCount - mergedEmployees.length} person(s) from the employee list.`);
 
-    // Save the array to disk for the employees API.
-    await fs.ensureDir(macros.PUBLIC_DIR);
-    await fs.writeFile(path.join(macros.PUBLIC_DIR, 'employees.json'), JSON.stringify(mergedEmployees, null, 4));
-
-    // Turn it into a hashmap instead of a list for the dump
-    const employeeDump = _.keyBy(mergedEmployees, 'id');
-
-    await fs.writeFile(path.join(macros.PUBLIC_DIR, 'employeeDump.json'), JSON.stringify(employeeDump));
-
     return mergedEmployees;
   }
 }
