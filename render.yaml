@@ -5,8 +5,11 @@ services:
     env: docker
     plan: starter
     envVars:
-      - key: NODE_ENV
-        value: prod
+      - key: elasticURL
+        fromService:
+          name: elasticsearch
+          type: pserv
+          property: hostport
       - key: dbHost
         fromDatabase:
           name: postgres
@@ -31,8 +34,11 @@ services:
     buildCommand: yarn install --frozen-lockfile --production=false; yarn build;
     startCommand: yarn prod:start:updater
     envVars:
-      - key: NODE_ENV
-        value: prod
+      - key: elasticURL
+        fromService:
+          name: elasticsearch
+          type: pserv
+          property: hostport
       - key: dbHost
         fromDatabase:
           name: postgres
@@ -58,8 +64,11 @@ services:
     # startCommand: yarn prod:scrape
     dockerCommand: yarn prod:scrape
     envVars:
-      - key: NODE_ENV
-        value: prod
+      - key: elasticURL
+        fromService:
+          name: elasticsearch
+          type: pserv
+          property: hostport
       - key: dbHost
         fromDatabase:
           name: postgres
@@ -112,5 +121,3 @@ envVarGroups:
     sync: false
   - key: rollbarPostServerItemToken
     sync: false
-  - key: elasticURL
-    value: elastic:9200
