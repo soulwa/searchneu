@@ -12,7 +12,8 @@ import {
   EsBulkData, EsQuery, EsMapping, EsMultiResult, EsResult,
 } from './search_types';
 
-const URL: string = `http://${macros.getEnvVariable('elasticURL') || 'localhost:9200'}`;
+const HOST = macros.getEnvVariable('elasticURL') || 'localhost'
+const URL: string = `http://${HOST}:9200`;
 const client = new Client({ node: URL });
 
 const BULKSIZE = 5000;

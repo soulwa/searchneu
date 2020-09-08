@@ -9,7 +9,7 @@ services:
         fromService:
           name: elasticsearch
           type: pserv
-          property: hostport
+          property: host
       - key: dbHost
         fromDatabase:
           name: postgres
@@ -38,7 +38,7 @@ services:
         fromService:
           name: elasticsearch
           type: pserv
-          property: hostport
+          property: host
       - key: dbHost
         fromDatabase:
           name: postgres
@@ -68,7 +68,7 @@ services:
         fromService:
           name: elasticsearch
           type: pserv
-          property: hostport
+          property: host
       - key: dbHost
         fromDatabase:
           name: postgres
