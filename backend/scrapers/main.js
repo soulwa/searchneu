@@ -7,6 +7,9 @@ import matchEmployees from './employees/matchEmployees';
 import macros from '../macros';
 import classes from './classes/main';
 import dumpProcessor from '../dumpProcessor';
+import {
+  Professor
+} from '../database/models/index';
 
 
 // Main file for scraping
@@ -15,6 +18,7 @@ import dumpProcessor from '../dumpProcessor';
 class Main {
   async main() {
     const classesPromise = classes.main(['neu']);
+    console.log(await Professor.findAll())
 
     const promises = [classesPromise, matchEmployees.main()];
 
