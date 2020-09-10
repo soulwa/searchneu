@@ -2,7 +2,9 @@ const fs = require('fs');
 
 require('dotenv').config();
 
-const dbCert = process.env.dbCertPath ? fs.readFileSync(process.env.dbCertPath) : '';
+const dbCert = process.env.dbCertPath
+  ? fs.readFileSync(process.env.dbCertPath)
+  : '';
 
 module.exports = {
   dev: {
@@ -30,6 +32,9 @@ module.exports = {
       ssl: {
         rejectUnauthorized: false,
       },
+    },
+    pool: {
+      idleTimeoutMillis: 50000,
     },
   },
 };
