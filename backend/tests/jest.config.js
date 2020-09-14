@@ -13,7 +13,7 @@ module.exports = {
     'ts'
   ],
   testMatch: [
-    '**/.*(spec|test)\.seq\.[jt]s(x)?',
+    '**/*.{spec,test}\.seq\.[jt]s?(x)',
   ],
   testPathIgnorePatterns: [
     '<rootDir>/backend/tests/jest.config.js',
@@ -21,7 +21,7 @@ module.exports = {
     '<rootDir>/dist/',
   ],
   setupFiles: [
-    '<rootDir>/common/jestSetupFile.js',
+    '<rootDir>/regtests/jestSetupFile.js',
   ],
   testEnvironment: '<rootDir>/backend/tests/backend_test_env.ts',
 };
