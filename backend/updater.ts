@@ -157,10 +157,10 @@ class Updater {
 
   // Return an Object of the list of users associated with what class or section they are following
   async modelToUserHash(modelName: ModelName): Promise<Record<string, string[]>> {
-    const columnName = `${modelName}Id`;
-    const capitalizedName = `${modelName.charAt(0).toUpperCase() + modelName.slice(1)}s`;
-    const dbResults = await this.prisma.raw(`SELECT "${columnName}", ARRAY_AGG("userId") FROM "Followed${capitalizedName}" GROUP BY "${columnName}"`);
-    return Object.assign({}, ...dbResults.map((res) => ({ [res[columnName]]: res.array_agg })));
+    const columnName = `${modelName}_id`;
+    const pluralName = `${modelName}s`;
+    const dbResults = await this.prisma.queryRaw(`SELECT ${columnName}, ARRAY_AGG("user_id") FROM followed_${pluralName} GROUP BY ${columnName}`);
+    return Object.assign({}, ...dbResults.map((res) => ({ [res[columnName]]: res.array_agg.sort() })));
   }
 
 

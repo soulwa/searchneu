@@ -9,7 +9,7 @@ import path from 'path';
 import Keys from '../common/Keys';
 import macros from './macros';
 import { PrismaClient, ProfessorCreateInput, CourseCreateInput, SectionCreateInput } from '@prisma/client';
-import { populateES } from './populateES';
+import { populateES } from './scripts/populateES';
 
 class DumpProcessor {
   CHUNK_SIZE: number;
@@ -42,6 +42,7 @@ class DumpProcessor {
 
     await pMap(Object.values(termDump.classes), async (course) => {
       const courseData = this.processCourse(course, coveredTerms);
+      console.log(JSON.stringify(courseData, null, 2));
       return prisma.course.upsert({
         where: { id: courseData.id },
         create: courseData,
@@ -75,7 +76,7 @@ class DumpProcessor {
     return _.omit(correctedQuery, ['title', 'interests', 'officeStreetAddress']) as ProfessorCreateInput;
   }
 
-  processCourse(classInfo: any, coveredTerms: Set<string>): CourseCreateInput {
+  processCourse(classInfo: any, coveredTerms: Set<string> = new Set()): CourseCreateInput {
     coveredTerms.add(classInfo.termId);
 
     const additionalProps = {
@@ -89,8 +90,8 @@ class DumpProcessor {
     const correctedQuery = {
       ...classInfo,
       ...additionalProps,
-      classAttributes: { set: classInfo.classAttributes },
-      nupath: { set: classInfo.nupath }
+      classAttributes: { set: classInfo.classAttributes || [] },
+      nupath: { set: classInfo.nupath || [] }
     };
 
     const { desc, ...finalCourse } = correctedQuery;
@@ -100,6 +101,7 @@ class DumpProcessor {
     // return _.omit(correctedQuery, ['desc']);
   }
 
+  // FIXME including classHash this way may not work
   processSection(secInfo: any): SectionCreateInput {
     const additionalProps = { id: `${Keys.getSectionHash(secInfo)}`, classHash: Keys.getClassHash(secInfo), profs: { set: secInfo.profs } };
     return _.omit({ ...secInfo, ...additionalProps }, ['classHash', 'classId', 'termId', 'subject', 'host']) as SectionCreateInput;
