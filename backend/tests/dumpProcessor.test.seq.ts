@@ -3,35 +3,35 @@
  * See the license file in the root folder for details.
  */
 
+import { PrismaClient } from '@prisma/client';
+
 import dumpProcessor from '../dumpProcessor';
-import db from '../database/models/index';
 import elastic from '../elastic';
+
+let prisma: PrismaClient;
 
 jest.spyOn(elastic, 'bulkIndexFromMap').mockResolvedValue(true);
 
-const Professor = db.Professor;
-const Course = db.Course;
-const Section = db.Section;
-
 beforeAll(() => {
   dumpProcessor.CHUNK_SIZE = 2;
+  prisma = new PrismaClient();
 });
 
 beforeEach(async () => {
-  await Professor.truncate({ cascade: true, restartIdentity: true });
-  await Section.truncate({ cascade: true, restartIdentity: true });
-  await Course.truncate({ cascade: true, restartIdentity: true });
+  await prisma.professor.deleteMany({});
+  await prisma.section.deleteMany({});
+  await prisma.course.deleteMany({});
 });
 
 afterAll(async () => {
   jest.restoreAllMocks();
-  await db.sequelize.close();
+  await prisma.$disconnect();
 });
 
 it('does not create records if dump is empty', async () => {
-  const prevCounts = Promise.all([Professor.count(), Course.count(), Section.count()]);
+  const prevCounts = Promise.all([prisma.professor.count(), prisma.course.count(), prisma.section.count()]);
   await dumpProcessor.main({ termDump: { classes: [], sections: [] } });
-  expect(Promise.all([Professor.count(), Course.count(), Section.count()])).toEqual(prevCounts);
+  expect(Promise.all([prisma.professor.count(), prisma.course.count(), prisma.section.count()])).toEqual(prevCounts);
 });
 
 describe('with professors', () => {
@@ -43,7 +43,6 @@ describe('with professors', () => {
         firstName: 'Benjamin',
         lastName: 'Lerner',
         phone: '6173732462',
-        profId: 'qnCb2rE37jBVGwPZJ%2BmhIg%3D%3D',
         emails: ['be.lerner@northeastern.edu', 'blerner@ccs.neu.edu'],
         primaryRole: 'Assistant Teaching Professor',
         primaryDepartment: 'Khoury',
@@ -57,7 +56,6 @@ describe('with professors', () => {
         firstName: 'Neal',
         lastName: 'Lerner',
         phone: '6173732451',
-        profId: 'IhhKL%2BkX586x52IdGT5mRQ%3D%3D',
         emails: ['n.lerner@northeastern.edu'],
         primaryRole: 'Professor & Chair',
         primaryDepartment: 'English',
@@ -68,7 +66,6 @@ describe('with professors', () => {
         firstName: 'Alan',
         lastName: 'Mislove',
         phone: '6173737069',
-        profId: 'c69LPTvUpGHXJaH73AeRmg%3D%3D',
         emails: ['a.mislove@northeastern.edu', 'amislove@ccs.neu.edu'],
         primaryRole: 'Professor',
         primaryDepartment: 'Khoury',
@@ -80,7 +77,7 @@ describe('with professors', () => {
     };
 
     await dumpProcessor.main({ termDump: { classes: [], sections: [] }, profDump: profDump });
-    expect(await Professor.count()).toEqual(3);
+    expect(await prisma.professor.count()).toEqual(3);
   });
 });
 
@@ -135,13 +132,13 @@ describe('with classes', () => {
     };
 
     await dumpProcessor.main({ termDump: termDump });
-    expect(await Course.count()).toEqual(3);
+    expect(await prisma.course.count()).toEqual(3);
   });
 });
 
 describe('with sections', () => {
   beforeEach(async () => {
-    await Course.create({
+    await prisma.course.create({ data: {
       id: 'neu.edu/202030/CS/3500',
       maxCredits: 4,
       minCredits: 4,
@@ -149,8 +146,8 @@ describe('with sections', () => {
       name: 'Object-Oriented Design',
       termId: '202030',
       subject: 'CS',
-      lastUpdateTime: 123456789,
-    });
+      lastUpdateTime: new Date(123456789),
+    }});
   });
 
   it('creates sections', async () => {
@@ -199,13 +196,13 @@ describe('with sections', () => {
     };
 
     await dumpProcessor.main({ termDump: termDump });
-    expect(await Section.count()).toEqual(3);
+    expect(await prisma.section.count()).toEqual(3);
   });
 });
 
 describe('with updates', () => {
   beforeEach(async () => {
-    await Course.create({
+    await prisma.course.create({ data: {
       id: 'neu.edu/202030/CS/3500',
       maxCredits: 4,
       minCredits: 4,
@@ -213,10 +210,10 @@ describe('with updates', () => {
       name: 'Object-Oriented Design',
       termId: '202030',
       subject: 'CS',
-      lastUpdateTime: 123456789,
-    });
+      lastUpdateTime: new Date(123456789),
+    }});
 
-    await Section.create({
+    await prisma.section.create({ data: {
       id: 'neu.edu/202030/CS/3500/34567',
       seatsCapacity: 2,
       seatsRemaining: 2,
@@ -224,7 +221,7 @@ describe('with updates', () => {
       honors: false,
       crn: '34567',
       meetings: {},
-    });
+    }});
   });
 
   it('updates fields for courses', async () => {
@@ -246,8 +243,8 @@ describe('with updates', () => {
     };
 
     await dumpProcessor.main({ termDump: termDump });
-    expect(await Course.count()).toEqual(1);
-    expect(await Section.count()).toEqual(1);
-    expect((await Course.findByPk('neu.edu/202030/CS/3500')).name).toEqual('Compilers');
+    expect(await prisma.course.count()).toEqual(1);
+    expect(await prisma.section.count()).toEqual(1);
+    expect((await prisma.course.findOne({ where: { id: 'neu.edu/202030/CS/3500' }})).name).toEqual('Compilers');
   });
 });
