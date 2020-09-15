@@ -52,6 +52,7 @@ class DumpProcessor {
 
     await pMap(Object.values(termDump.sections), async (section) => {
       const sectionData = this.processSection(section);
+      console.log(sectionData);
       return prisma.section.upsert({
         where: { id: sectionData.id },
         create: sectionData,
@@ -103,7 +104,7 @@ class DumpProcessor {
 
   // FIXME including classHash this way may not work
   processSection(secInfo: any): SectionCreateInput {
-    const additionalProps = { id: `${Keys.getSectionHash(secInfo)}`, classHash: Keys.getClassHash(secInfo), profs: { set: secInfo.profs } };
+    const additionalProps = { id: `${Keys.getSectionHash(secInfo)}`, classHash: Keys.getClassHash(secInfo), profs: { set: secInfo.profs || [] } };
     return _.omit({ ...secInfo, ...additionalProps }, ['classHash', 'classId', 'termId', 'subject', 'host']) as SectionCreateInput;
   }
 }
