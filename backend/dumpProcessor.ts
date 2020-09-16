@@ -68,6 +68,7 @@ class DumpProcessor {
     }
 
     await populateES();
+    await prisma.$disconnect();
   }
 
   processProf(profInfo: any): ProfessorCreateInput {

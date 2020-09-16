@@ -153,6 +153,8 @@ class Updater {
       totalTime: totalTime,
       sent: notifications.length,
     });
+
+    await this.prisma.$disconnect();
   }
 
   // Return an Object of the list of users associated with what class or section they are following
