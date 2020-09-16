@@ -4,9 +4,12 @@
  */
 
 import { PrismaClient } from '@prisma/client';
+import _ from 'lodash';
 
 
 class Database {
+  prisma: PrismaClient;
+
   constructor() {
     this.prisma = new PrismaClient();
   }
@@ -15,29 +18,35 @@ class Database {
   // value is any updated columns plus all watchingSections and watchingClasses
   async set(key, value) {
     // TODO probably broken . . . need a `set` somewhere? --> login keys?
-    await this.prisma.user.upsert({ id: key, ...value });
+    const updatedUser = _.omit({ ...value, loginKeys: { set: value.loginKeys || [] } }, ['watchingClasses', 'watchingSections']);
+    await this.prisma.user.upsert({
+      where: { id: key },
+      create: { id: key, ...updatedUser },
+      update: updatedUser,
+    });
 
     await Promise.all([this.prisma.followedSection.deleteMany({ where: { userId: key } }), this.prisma.followedCourse.deleteMany({ where: { userId: key } })]);
+
     if (value.watchingSections) {
-      await Promise.all(value.watchingSections.map((section) => { return this.prisma.followedSection.create({ userId: key, sectionId: section }); }));
+      await Promise.all(value.watchingSections.map((section) => { return this.prisma.followedSection.create({ data: { user: { connect: { id: key } }, section: { connect: { id: section } } } }); }));
     }
 
     if (value.watchingClasses) {
-      await Promise.all(value.watchingClasses.map((course) => { return this.prisma.followedCourse.create({ userId: key, courseId: course }); }));
+      await Promise.all(value.watchingClasses.map((course) => { return this.prisma.followedCourse.create({ data: { user: { connect: { id: key } }, course: { connect: { id: course } } } }); }));
     }
   }
 
   // Get the value at this key.
   // Key follows the same form in the set method
   async get(key) {
-    const user = await this.prisma.user.findOne({ id: key });
+    const user = await this.prisma.user.findOne({ where: { id: key } });
 
     if (!user) {
       return null;
     }
 
-    const watchingSections = await this.prisma.followedSection.findMany({ where: { userId: user.id }, select: { sectionId: true } }).map(section => section.sectionId);
-    const watchingClasses = await this.prisma.followedCourse.findMany({ where: { userId: user.id }, select: { courseId: true } }).map(course => course.courseId);
+    const watchingSections = (await this.prisma.followedSection.findMany({ where: { userId: user.id }, select: { sectionId: true } })).map(section => section.sectionId);
+    const watchingClasses = (await this.prisma.followedCourse.findMany({ where: { userId: user.id }, select: { courseId: true } })).map(course => course.courseId);
 
     return {
       facebookMessengerId: user.id,
@@ -51,11 +60,8 @@ class Database {
   }
 
   async getByLoginKey(requestLoginKey) {
-    // TODO if this doesn't work, two things need to be done:
-    // 1. figure out why loginKeys isn't query-able
-    // 2. can just execute a raw query for the ID information
-    // 3. why isn't this abstracted behavior with this.get?
-    const user = (await this.prisma.user.findMany({ where: { loginKeys: { contains: requestLoginKey } } }))[0];
+
+    const user = (await this.prisma.$queryRaw(`SELECT * FROM users WHERE '${requestLoginKey}'=ANY(login_keys)`))[0];
 
     if (!user) {
       return null;
