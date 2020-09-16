@@ -3,16 +3,20 @@
  * See the license file in the root folder for details.
  */
 import { createTestClient } from 'apollo-server-testing';
+import { PrismaClient } from '@prisma/client';
 import { gql } from 'apollo-server';
 import server from '../index';
-import { Course, Section, sequelize } from '../../database/models/index';
 
 const { query } = createTestClient(server);
 
+let prisma: PrismaClient;
+
 beforeAll(async () => {
-  await Section.truncate({ cascade: true, restartIdentity: true });
-  await Course.truncate({ cascade: true, restartIdentity: true });
-  await Course.create({
+  prisma = new PrismaClient();
+
+  await prisma.section.deleteMany({});
+  await prisma.course.deleteMany({});
+  await prisma.course.create({ data: {
     id: 'neu.edu/201930/CS/2500',
     host: 'neu.edu',
     termId: '201930',
@@ -20,9 +24,9 @@ beforeAll(async () => {
     classId: '2500',
     name: 'Fundamentals of Computer Science 1',
     lastUpdateTime: new Date(),
-  });
+  }});
 
-  await Course.create({
+  await prisma.course.create({ data: {
     id: 'neu.edu/201830/CS/2500',
     host: 'neu.edu',
     termId: '201830',
@@ -30,11 +34,11 @@ beforeAll(async () => {
     classId: '2500',
     name: 'Fundamentals of Computer Science 1',
     lastUpdateTime: new Date(),
-  });
+  }});
 });
 
 afterAll(async () => {
-  await sequelize.close();
+  await prisma.$disconnect();
 });
 
 it('gets all occurrences', async () => {

@@ -1,42 +1,44 @@
+import { PrismaClient } from '@prisma/client';
 import { createTestClient } from 'apollo-server-testing';
 import { gql } from 'apollo-server';
 import server from '../index';
-import db from '../../database/models/index';
 
 const { query } = createTestClient(server);
-const MajorData = db.MajorData;
 
+let prisma: PrismaClient;
 
 beforeAll(async () => {
-  await MajorData.truncate({ cascade: true, restartIdentity: true });
+  prisma = new PrismaClient();
 
-  await MajorData.create({
+  await prisma.major.deleteMany({});
+
+  await prisma.major.create({ data: {
     majorId: 'computer-information-science/computer-science/bscs',
-    catalogYear: 2018,
+    catalogYear: '2018',
     name: 'Computer Science',
     requirements: { name: 'Computer Science, BSCS', yearVersion: 2018 },
     plansOfStudy: [{ years: [1000], id: '0' }],
-  });
+  }});
 
-  await MajorData.create({
+  await prisma.major.create({ data: {
     majorId: 'computer-information-science/computer-science/bscs',
-    catalogYear: 2017,
+    catalogYear: '2017',
     name: 'Computer Science',
     requirements: { name: 'Computer Science, BSCS', yearVersion: 2017 },
     plansOfStudy: [{ years: [1000], id: '0' }],
-  });
+  }});
 
-  await MajorData.create({
+  await prisma.major.create({ data: {
     majorId: 'science/biochemistry/biochemistry-bs',
-    catalogYear: 2018,
+    catalogYear: '2018',
     name: 'Biochemistry',
     requirements: { name: 'Biochemistry, BS', yearVersion: 2018 },
     plansOfStudy: [{ years: [1000], id: '0' }],
-  });
+  }});
 });
 
 afterAll(async () => {
-  await db.sequelize.close();
+  await prisma.$disconnect();
 });
 
 it('gets major from majorId', async () => {
