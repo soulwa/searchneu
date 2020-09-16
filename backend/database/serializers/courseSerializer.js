@@ -11,12 +11,15 @@ class CourseSerializer {
 
   async bulkSerialize(instances) {
     const courses = instances.map((course) => { return this.serializeCourse(course); });
+    const prisma = new PrismaClient();
 
-    const sections = await (new PrismaClient()).section.findMany({
+    const sections = await prisma.section.findMany({
       where: {
         classHash: { in: instances.map((instance) => instance.id) },
       },
     });
+
+    await prisma.$disconnect();
 
     const classToSections = _.groupBy(sections, 'classHash');
 

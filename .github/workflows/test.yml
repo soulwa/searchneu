@@ -41,4 +41,4 @@ jobs:
         node-version: 12
     - run: yarn install
     - run: yarn test:migrate
-    - run: yarn seqtest
+    - run: yarn dbtest
