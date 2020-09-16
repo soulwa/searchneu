@@ -42,7 +42,6 @@ class DumpProcessor {
 
     await pMap(Object.values(termDump.classes), async (course) => {
       const courseData = this.processCourse(course, coveredTerms);
-      console.log(JSON.stringify(courseData, null, 2));
       return prisma.course.upsert({
         where: { id: courseData.id },
         create: courseData,
@@ -52,7 +51,6 @@ class DumpProcessor {
 
     await pMap(Object.values(termDump.sections), async (section) => {
       const sectionData = this.processSection(section);
-      console.log(sectionData);
       return prisma.section.upsert({
         where: { id: sectionData.id },
         create: sectionData,

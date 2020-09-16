@@ -159,7 +159,7 @@ class Updater {
   async modelToUserHash(modelName: ModelName): Promise<Record<string, string[]>> {
     const columnName = `${modelName}_id`;
     const pluralName = `${modelName}s`;
-    const dbResults = await this.prisma.queryRaw(`SELECT ${columnName}, ARRAY_AGG("user_id") FROM followed_${pluralName} GROUP BY ${columnName}`);
+    const dbResults = await this.prisma.$queryRaw(`SELECT ${columnName}, ARRAY_AGG("user_id") FROM followed_${pluralName} GROUP BY ${columnName}`);
     return Object.assign({}, ...dbResults.map((res) => ({ [res[columnName]]: res.array_agg.sort() })));
   }
 

@@ -13,12 +13,12 @@ const serializeValues = (results) => {
 }
 
 const getLatestClassOccurrence = async (subject, classId) => {
-  const results = await prisma.course.findMany({ where: { subject, classId }, orderBy: { termId: { desc: 'desc' } } });
+  const results = await prisma.course.findMany({ where: { subject, classId }, orderBy: { termId: 'desc' } });
   return serializeValues(results)[0];
 }
 
 const getAllClassOccurrences = async (subject, classId) => {
-  const results = await prisma.course.findMany({ where: { subject, classId }, orderBy: { termId: { desc: 'desc' } } });
+  const results = await prisma.course.findMany({ where: { subject, classId }, orderBy: { termId: 'desc' } });
   return serializeValues(results);
 }
 
