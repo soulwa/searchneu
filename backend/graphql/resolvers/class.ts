@@ -5,7 +5,6 @@
 import { PrismaClient } from '@prisma/client';
 import HydrateCourseSerializer from '../../database/serializers/hydrateCourseSerializer';
 
-const prisma = new PrismaClient();
 const serializer = new HydrateCourseSerializer();
 
 const serializeValues = (results) => {
@@ -13,21 +12,27 @@ const serializeValues = (results) => {
 }
 
 const getLatestClassOccurrence = async (subject, classId) => {
+  const prisma = new PrismaClient();
   const results = await prisma.course.findMany({ where: { subject, classId }, orderBy: { termId: 'desc' } });
+  await prisma.$disconnect();
   return serializeValues(results)[0];
 }
 
 const getAllClassOccurrences = async (subject, classId) => {
+  const prisma = new PrismaClient();
   const results = await prisma.course.findMany({ where: { subject, classId }, orderBy: { termId: 'desc' } });
+  await prisma.$disconnect();
   return serializeValues(results);
 }
 
 const getClassOccurrence = async (subject, classId, termId) => {
+  const prisma = new PrismaClient();
   const res = await prisma.course.findOne({
     where: {
       uniqueCourseProps: { subject, classId, termId },
     },
   });
+  await prisma.$disconnect();
 
   return serializeValues([res])[0];
 }

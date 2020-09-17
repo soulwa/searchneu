@@ -217,10 +217,6 @@
     "typescript": "^3.8.3"
   },
   "jest": {
-    "projects": [
-      "<rootDir>/regtests",
-      "<rootDir>/backend/tests"
-    ],
     "snapshotSerializers": [
       "enzyme-to-json/serializer"
     ],
@@ -242,7 +238,7 @@
     ],
     "testMatch": [
       "**/__tests__/**/*.[jt]s?(x)",
-      "**/?(*.)+(spec|test)?(.(seq|reg)).[jt]s?(x)"
+      "**/?(*.)(spec|test).[jt]s?(x)"
     ],
     "moduleNameMapper": {
       "__comment": "The css import needs to be an object that returns a string",
