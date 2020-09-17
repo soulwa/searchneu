@@ -40,7 +40,7 @@ class HydrateSerializer {
     const serializedCourses = await this.courseSerializer.bulkSerialize(courseData);
 
     const serializedResults = { ...serializedProfs, ...serializedCourses };
-    return instances.map((instance) => serializedResults[instance._id]);
+    return instances.map((instance) => serializedResults[instance._id]).filter((elem) => elem);
   }
 }
 

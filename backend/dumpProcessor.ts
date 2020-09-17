@@ -13,6 +13,8 @@ import Keys from '../common/Keys';
 import macros from './macros';
 import { populateES } from './scripts/populateES';
 
+type Maybe<T> = T | null | undefined;
+
 class DumpProcessor {
   CHUNK_SIZE: number;
 
@@ -30,35 +32,92 @@ class DumpProcessor {
     profDump = {},
     destroy = false,
   }) {
+    const profTransforms = {
+      big_picture_url: this.strTransform, 
+      email: this.strTransform,
+      emails: this.arrayTransform,
+      emails_contents: this.arrayStrTransform,
+      first_name: this.strTransform,
+      name: this.strTransform,
+      google_scholar_id: this.strTransform,
+      id: this.strTransform,
+      last_name: this.strTransform,
+      link: this.strTransform,
+      office_room: this.strTransform,
+      personal_site: this.strTransform,
+      phone: this.strTransform,
+      pic: this.jsonTransform,
+      primary_department: this.strTransform,
+      primary_role: this.strTransform,
+      street_address: this.strTransform,
+      url: this.strTransform
+    }
+
+    const profCols = ['big_picture_url', 'email', 'emails', 'first_name', 'google_scholar_id', 'id', 'last_name', 'link', 'name', 'office_room', 'personal_site', 'phone', 'pic', 'primary_department', 'primary_role', 'street_address', 'url'];
+
+    const courseTransforms = {
+      class_attributes: this.arrayTransform,
+      class_attributes_contents: this.arrayStrTransform,
+      class_id: this.strTransform,
+      coreqs: this.jsonTransform,
+      description: this.strTransform,
+      fee_amount: this.intTransform,
+      fee_description: this.strTransform,
+      host: this.strTransform,
+      id: this.strTransform,
+      last_update_time: this.dateTransform,
+      max_credits: this.intTransform,
+      min_credits: this.intTransform,
+      name: this.strTransform,
+      nupath: this.arrayTransform,
+      nupath_contents: this.arrayStrTransform,
+      opt_prereqs_for: this.jsonTransform,
+      prereqs: this.jsonTransform,
+      prereqs_for: this.jsonTransform,
+      pretty_url: this.strTransform,
+      subject: this.strTransform,
+      term_id: this.strTransform,
+      url: this.strTransform,
+    };
+
+    const courseCols = ['class_attributes', 'class_id', 'coreqs', 'description', 'fee_amount', 'fee_description', 'host', 'id', 'last_update_time', 'max_credits', 'min_credits', 'name', 'nupath', 'opt_prereqs_for', 'prereqs', 'prereqs_for', 'pretty_url', 'subject', 'term_id', 'url'];
+
+    const sectionTransforms = {
+      class_hash: this.strTransform,
+      class_type: this.strTransform,
+      crn: this.strTransform,
+      honors: this.boolTransform,
+      id: this.strTransform,
+      info: this.strTransform,
+      meetings: this.jsonTransform,
+      online: this.boolTransform,
+      profs: this.arrayTransform,
+      profs_contents: this.arrayStrTransform,
+      seats_capacity: this.intTransform,
+      seats_remaining: this.intTransform,
+      url: this.strTransform,
+      wait_capacity: this.intTransform,
+      wait_remaining: this.intTransform,
+    };
+
+    const sectionCols = ['class_hash', 'class_type', 'crn', 'honors', 'id', 'info', 'meetings', 'online', 'profs', 'seats_capacity', 'seats_remaining', 'url', 'wait_capacity', 'wait_remaining'];
+
     const prisma = new PrismaClient();
     const coveredTerms: Set<string> = new Set();
+    let currTime = (new Date()).getTime();
+    let newTime;
 
-    await pMap(Object.values(profDump), async (prof) => {
-      const profData = this.processProf(prof);
-      return prisma.professor.upsert({
-        where: { id: profData.id },
-        create: profData,
-        update: profData,
-      });
-    }, { concurrency: this.CHUNK_SIZE });
+    await Promise.all(_.chunk(Object.values(profDump), 25).map(async (profs) => {
+      return prisma.$executeRaw(this.bulkUpsert('professors', profCols, profTransforms, profs));
+    }));
 
-    await pMap(Object.values(termDump.classes), async (course) => {
-      const courseData = this.processCourse(course, coveredTerms);
-      return prisma.course.upsert({
-        where: { id: courseData.id },
-        create: courseData,
-        update: courseData,
-      });
-    }, { concurrency: this.CHUNK_SIZE });
+    await Promise.all(_.chunk(Object.values(termDump.classes), 2000).map(async (courses) => {
+      return prisma.$executeRaw(this.bulkUpsert('courses', courseCols, courseTransforms, courses.map((c) => this.processCourse(c))));
+    }));
 
-    await pMap(Object.values(termDump.sections), async (section) => {
-      const sectionData = this.processSection(section);
-      return prisma.section.upsert({
-        where: { id: sectionData.id },
-        create: sectionData,
-        update: sectionData,
-      });
-    }, { concurrency: this.CHUNK_SIZE });
+    await Promise.all(_.chunk(Object.values(termDump.sections), 2).map(async (sections) => {
+      return prisma.$executeRaw(this.bulkUpsert('sections', sectionCols, sectionTransforms, sections.map((c) => this.processSection(c))));
+    }));
 
     if (destroy) {
       await prisma.course.deleteMany({
@@ -71,6 +130,44 @@ class DumpProcessor {
 
     await populateES();
     await prisma.$disconnect();
+  }
+
+  bulkUpsert(tableName: string, columnNames: string[], valTransforms: Record<string, Function>, vals: any[]): any {
+    let query = `INSERT INTO ${tableName} (${columnNames.join(',')}) VALUES `;
+    query += vals.map((val) => {
+      return `(${columnNames.map((c) => valTransforms[c](val[this.toCamelCase(c)], c, valTransforms)).join(',')})`;
+    }).join(',');
+
+    query += ` ON CONFLICT (id) DO UPDATE SET ${columnNames.map((c) => `${c} = excluded.${c}`).join(',')} WHERE ${tableName}.id = excluded.id;`;
+    return query;
+  }
+  
+  strTransform(val: Maybe<string>, kind: string, transforms: Record<string, Function>): string {
+    return val ? `'${val.replace(/'/g, "''")}'` : `''`;
+  }
+
+  arrayStrTransform(val: Maybe<string>, kind: string, transforms: Record<string, Function>): string {
+    return val ? `"${val}"` : `''`;
+  }
+
+  intTransform(val: Maybe<number>, kind: string, transforms: Record<string, Function>): string {
+    return val ? `${val}` : 'NULL';
+  }
+
+  arrayTransform(val: Maybe<any[]>, kind: string, transforms: Record<string, Function>): string {
+    return val && val.length !== 0 ? `'{${val.map((v) => transforms[`${kind}_contents`](v, `${kind}_contents`, transforms)).join(',')}}'` : `array[]::text[]`;
+  }
+
+  jsonTransform(val: Maybe<any>, kind: string, transforms: Record<string, Function>): string {
+    return val ? `'${JSON.stringify(val)}'` : `'{}'`;
+  }
+
+  dateTransform(val: Maybe<any>, kind: string, transforms: Record<string, Function>): string {
+    return val ? `to_timestamp(${val/1000})` : `now()`;
+  }
+
+  boolTransform(val: Maybe<any>, kind: string, transforms: Record<string, Function>): string {
+    return val ? 'TRUE' : 'FALSE';
   }
 
   processProf(profInfo: any): ProfessorCreateInput {
@@ -86,27 +183,28 @@ class DumpProcessor {
       description: classInfo.desc,
       minCredits: Math.floor(classInfo.minCredits),
       maxCredits: Math.floor(classInfo.maxCredits),
-      lastUpdateTime: new Date(classInfo.lastUpdateTime),
+      lastUpdateTime: classInfo.lastUpdateTime,
     };
 
     const correctedQuery = {
       ...classInfo,
       ...additionalProps,
-      classAttributes: { set: classInfo.classAttributes || [] },
-      nupath: { set: classInfo.nupath || [] },
+      classAttributes: classInfo.classAttributes || [],
+      nupath: classInfo.nupath || [],
     };
 
     const { desc, ...finalCourse } = correctedQuery;
 
     return finalCourse;
-    // TODO check that the above works
-    // return _.omit(correctedQuery, ['desc']);
   }
 
-  // FIXME including classHash this way may not work
   processSection(secInfo: any): SectionCreateInput {
-    const additionalProps = { id: `${Keys.getSectionHash(secInfo)}`, classHash: Keys.getClassHash(secInfo), profs: { set: secInfo.profs || [] } };
-    return _.omit({ ...secInfo, ...additionalProps }, ['classHash', 'classId', 'termId', 'subject', 'host']) as SectionCreateInput;
+    const additionalProps = { id: `${Keys.getSectionHash(secInfo)}`, classHash: Keys.getClassHash(secInfo), profs: secInfo.profs || [] };
+    return _.omit({ ...secInfo, ...additionalProps }, ['classId', 'termId', 'subject', 'host']) as SectionCreateInput;
+  }
+
+  toCamelCase(str: string): string {
+    return str.replace(/(_[a-z])/g, (group) => group.toUpperCase().replace('_', ''));
   }
 }
 
