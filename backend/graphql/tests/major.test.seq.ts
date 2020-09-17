@@ -12,29 +12,35 @@ beforeAll(async () => {
 
   await prisma.major.deleteMany({});
 
-  await prisma.major.create({ data: {
-    majorId: 'computer-information-science/computer-science/bscs',
-    catalogYear: '2018',
-    name: 'Computer Science',
-    requirements: { name: 'Computer Science, BSCS', yearVersion: 2018 },
-    plansOfStudy: [{ years: [1000], id: '0' }],
-  }});
+  await prisma.major.create({
+    data: {
+      majorId: 'computer-information-science/computer-science/bscs',
+      catalogYear: '2018',
+      name: 'Computer Science',
+      requirements: { name: 'Computer Science, BSCS', yearVersion: 2018 },
+      plansOfStudy: [{ years: [1000], id: '0' }],
+    },
+  });
 
-  await prisma.major.create({ data: {
-    majorId: 'computer-information-science/computer-science/bscs',
-    catalogYear: '2017',
-    name: 'Computer Science',
-    requirements: { name: 'Computer Science, BSCS', yearVersion: 2017 },
-    plansOfStudy: [{ years: [1000], id: '0' }],
-  }});
+  await prisma.major.create({
+    data: {
+      majorId: 'computer-information-science/computer-science/bscs',
+      catalogYear: '2017',
+      name: 'Computer Science',
+      requirements: { name: 'Computer Science, BSCS', yearVersion: 2017 },
+      plansOfStudy: [{ years: [1000], id: '0' }],
+    },
+  });
 
-  await prisma.major.create({ data: {
-    majorId: 'science/biochemistry/biochemistry-bs',
-    catalogYear: '2018',
-    name: 'Biochemistry',
-    requirements: { name: 'Biochemistry, BS', yearVersion: 2018 },
-    plansOfStudy: [{ years: [1000], id: '0' }],
-  }});
+  await prisma.major.create({
+    data: {
+      majorId: 'science/biochemistry/biochemistry-bs',
+      catalogYear: '2018',
+      name: 'Biochemistry',
+      requirements: { name: 'Biochemistry, BS', yearVersion: 2018 },
+      plansOfStudy: [{ years: [1000], id: '0' }],
+    },
+  });
 });
 
 afterAll(async () => {

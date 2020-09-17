@@ -6,6 +6,7 @@ import _ from 'lodash';
 import ProfSerializer from './profSerializer';
 
 class ElasticProfSerializer extends ProfSerializer {
+  /* eslint-disable no-underscore-dangle */
   _serializeProf(prof) {
     return _.pick(prof, ['name', 'emails', 'phone']);
   }

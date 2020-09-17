@@ -6,9 +6,11 @@ import pMap from 'p-map';
 import fs from 'fs-extra';
 import _ from 'lodash';
 import path from 'path';
+import {
+  PrismaClient, ProfessorCreateInput, CourseCreateInput, SectionCreateInput,
+} from '@prisma/client';
 import Keys from '../common/Keys';
 import macros from './macros';
-import { PrismaClient, ProfessorCreateInput, CourseCreateInput, SectionCreateInput } from '@prisma/client';
 import { populateES } from './scripts/populateES';
 
 class DumpProcessor {
@@ -26,7 +28,7 @@ class DumpProcessor {
   async main({
     termDump = { classes: {}, sections: {} },
     profDump = {},
-    destroy = false
+    destroy = false,
   }) {
     const prisma = new PrismaClient();
     const coveredTerms: Set<string> = new Set();
@@ -91,7 +93,7 @@ class DumpProcessor {
       ...classInfo,
       ...additionalProps,
       classAttributes: { set: classInfo.classAttributes || [] },
-      nupath: { set: classInfo.nupath || [] }
+      nupath: { set: classInfo.nupath || [] },
     };
 
     const { desc, ...finalCourse } = correctedQuery;

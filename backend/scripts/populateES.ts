@@ -18,6 +18,7 @@ export async function bulkUpsertCourses(courses: Course[]): Promise<void> {
 
 export async function bulkUpsertProfs(profs: Professor[]): Promise<void> {
   const serializedProfs = await ((new ElasticProfSerializer()).bulkSerialize(profs));
+  return elastic.bulkIndexFromMap(elastic.EMPLOYEE_INDEX, serializedProfs);
 }
 
 export async function populateES(): Promise<void> {

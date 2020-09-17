@@ -10,7 +10,7 @@ const getLatestMajorOccurrence = async (majorId) => {
   const majors = await prisma.major.findMany({
     where: { majorId: majorId },
     orderBy: { catalogYear: 'desc' },
-    take: 1
+    take: 1,
   });
   prisma.$disconnect();
 

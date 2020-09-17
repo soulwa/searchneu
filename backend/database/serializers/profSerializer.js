@@ -4,8 +4,8 @@
  */
 import _ from 'lodash';
 
-/* eslint-disable no-underscore-dangle */
 class ProfSerializer {
+  /* eslint-disable no-underscore-dangle */
   async bulkSerialize(instances) {
     return _.keyBy(instances.map((instance) => {
       return this._bulkSerializeProf(this._serializeProf(instance));
@@ -19,7 +19,7 @@ class ProfSerializer {
     };
   }
 
-  _serializeProf(_prof) {
+  _serializeProf() {
     throw new Error('serializeProf not implemented');
   }
 }
