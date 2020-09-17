@@ -33,6 +33,7 @@ class Searcher {
     this.filters = Searcher.generateFilters();
     this.aggFilters = _.pickBy<EsFilterStruct, EsAggFilterStruct>(this.filters, (f): f is EsAggFilterStruct => f.agg !== false);
     this.AGG_RES_SIZE = 1000;
+    this.prisma = new PrismaClient();
   }
 
   static generateFilters(): FilterPrelude {
@@ -262,8 +263,16 @@ class Searcher {
     const {
       output, resultCount, took, aggregations,
     } = await this.getSearchResults(query, termId, min, max, filters);
+
+    console.log('oof');
+    console.log(resultCount);
+    console.log(output);
+
     const startHydrate = Date.now();
     const results = await (new HydrateSerializer()).bulkSerialize(output);
+
+    console.log('jeez');
+    console.log(results);
 
     return {
       searchContent: results,

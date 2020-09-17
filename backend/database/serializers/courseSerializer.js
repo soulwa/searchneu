@@ -7,19 +7,24 @@ import { PrismaClient } from '@prisma/client';
 import _ from 'lodash';
 
 class CourseSerializer {
-  // this is a hack to get around the circular dependency created by [elasticSerializer -> courseSerializer -> database/index -> database/course -> elasticSerializer]
+  constructor() {
+    this.prisma = new PrismaClient({ log: ['query', 'info', 'warn' ]});
+  }
 
   async bulkSerialize(instances) {
     const courses = instances.map((course) => { return this.serializeCourse(course); });
-    const prisma = new PrismaClient();
 
-    const sections = await prisma.section.findMany({
-      where: {
-        classHash: { in: instances.map((instance) => instance.id) },
-      },
-    });
-
-    await prisma.$disconnect();
+    try {
+      const sections = await this.prisma.section.findMany({
+        where: {
+          classHash: { in: instances.map((instance) => instance.id) },
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      this.prisma = new PrismaClient();
+      await this.prisma.user.count();
+    }
 
     const classToSections = _.groupBy(sections, 'classHash');
 
