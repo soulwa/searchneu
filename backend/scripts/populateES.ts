@@ -4,9 +4,9 @@
  *
  * script to fill elasticsearch by quering postgres
  */
+import { PrismaClient, Course, Professor } from '@prisma/client';
 
 import elastic from '../elastic';
-import { PrismaClient, Course, Professor } from '@prisma/client';
 import ElasticCourseSerializer from '../database/serializers/elasticCourseSerializer';
 import ElasticProfSerializer from '../database/serializers/elasticProfSerializer';
 import macros from '../macros';
@@ -24,6 +24,7 @@ export async function populateES(): Promise<void> {
   const prisma = new PrismaClient();
   await bulkUpsertCourses(await prisma.course.findMany());
   await bulkUpsertProfs(await prisma.professor.findMany());
+  await prisma.$disconnect();
 }
 
 if (require.main === module) {
