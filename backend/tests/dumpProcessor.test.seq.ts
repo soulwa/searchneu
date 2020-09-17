@@ -138,16 +138,18 @@ describe('with classes', () => {
 
 describe('with sections', () => {
   beforeEach(async () => {
-    await prisma.course.create({ data: {
-      id: 'neu.edu/202030/CS/3500',
-      maxCredits: 4,
-      minCredits: 4,
-      classId: '3500',
-      name: 'Object-Oriented Design',
-      termId: '202030',
-      subject: 'CS',
-      lastUpdateTime: new Date(123456789),
-    }});
+    await prisma.course.create({
+      data: {
+        id: 'neu.edu/202030/CS/3500',
+        maxCredits: 4,
+        minCredits: 4,
+        classId: '3500',
+        name: 'Object-Oriented Design',
+        termId: '202030',
+        subject: 'CS',
+        lastUpdateTime: new Date(123456789),
+      },
+    });
   });
 
   it('creates sections', async () => {
@@ -202,26 +204,30 @@ describe('with sections', () => {
 
 describe('with updates', () => {
   beforeEach(async () => {
-    await prisma.course.create({ data: {
-      id: 'neu.edu/202030/CS/3500',
-      maxCredits: 4,
-      minCredits: 4,
-      classId: '3500',
-      name: 'Object-Oriented Design',
-      termId: '202030',
-      subject: 'CS',
-      lastUpdateTime: new Date(123456789),
-    }});
+    await prisma.course.create({
+      data: {
+        id: 'neu.edu/202030/CS/3500',
+        maxCredits: 4,
+        minCredits: 4,
+        classId: '3500',
+        name: 'Object-Oriented Design',
+        termId: '202030',
+        subject: 'CS',
+        lastUpdateTime: new Date(123456789),
+      },
+    });
 
-    await prisma.section.create({ data: {
-      id: 'neu.edu/202030/CS/3500/34567',
-      seatsCapacity: 2,
-      seatsRemaining: 2,
-      online: false,
-      honors: false,
-      crn: '34567',
-      meetings: {},
-    }});
+    await prisma.section.create({
+      data: {
+        id: 'neu.edu/202030/CS/3500/34567',
+        seatsCapacity: 2,
+        seatsRemaining: 2,
+        online: false,
+        honors: false,
+        crn: '34567',
+        meetings: {},
+      },
+    });
   });
 
   it('updates fields for courses', async () => {
@@ -245,6 +251,6 @@ describe('with updates', () => {
     await dumpProcessor.main({ termDump: termDump });
     expect(await prisma.course.count()).toEqual(1);
     expect(await prisma.section.count()).toEqual(1);
-    expect((await prisma.course.findOne({ where: { id: 'neu.edu/202030/CS/3500' }})).name).toEqual('Compilers');
+    expect((await prisma.course.findOne({ where: { id: 'neu.edu/202030/CS/3500' } })).name).toEqual('Compilers');
   });
 });

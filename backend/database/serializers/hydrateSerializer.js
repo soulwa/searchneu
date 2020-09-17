@@ -20,8 +20,8 @@ class HydrateSerializer {
     const courses = instances.filter((instance) => { return instance._source.type === 'class' });
 
     const profData = await prisma.professor.findMany({
-      where: { 
-        id: { 
+      where: {
+        id: {
           in: profs.map((prof) => prof._id),
         },
       },

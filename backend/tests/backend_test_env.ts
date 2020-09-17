@@ -4,6 +4,7 @@ const NodeEnvironment = require('jest-environment-node')
 const { v4: uuid } = require('uuid')
 const util = require('util')
 const exec = util.promisify(require('child_process').exec)
+
 const prismaBinary = './node_modules/.bin/prisma'
 
 /**
@@ -17,6 +18,7 @@ class PrismaTestEnvironment extends NodeEnvironment {
     // Generate the pg connection string for the test schema
     this.databaseUrl = `postgres://postgres@localhost:5432/searchneu_test?schema=${this.schema}`
   }
+
   async setup() {
     // Set the equired environment variable to contain the connection string
     // to our database test schema
@@ -27,6 +29,7 @@ class PrismaTestEnvironment extends NodeEnvironment {
     await exec(`${prismaBinary} generate`);
     return super.setup()
   }
+
   async teardown() {
     // Drop the schema after the tests have completed
     const client = new Client({

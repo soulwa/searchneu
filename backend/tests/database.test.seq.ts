@@ -14,71 +14,89 @@ beforeEach(async () => {
   await prisma.section.deleteMany({});
   await prisma.course.deleteMany({});
 
-  await prisma.course.create({ data: {
-    id: 'neu.edu/202030/CS/2500',
-    host: 'neu.edu',
-    classId: '2500',
-    name: 'Fundamentals of Computer Science 1',
-    termId: '202030',
-    subject: 'CS',
-  }});
+  await prisma.course.create({
+    data: {
+      id: 'neu.edu/202030/CS/2500',
+      host: 'neu.edu',
+      classId: '2500',
+      name: 'Fundamentals of Computer Science 1',
+      termId: '202030',
+      subject: 'CS',
+    },
+  });
 
-  await prisma.course.create({ data: {
-    id: 'neu.edu/202030/CS/2510',
-    host: 'neu.edu',
-    classId: '2510',
-    name: 'Fundamentals of Computer Science 2',
-    termId: '202030',
-    subject: 'CS',
-  }});
+  await prisma.course.create({
+    data: {
+      id: 'neu.edu/202030/CS/2510',
+      host: 'neu.edu',
+      classId: '2510',
+      name: 'Fundamentals of Computer Science 2',
+      termId: '202030',
+      subject: 'CS',
+    },
+  });
 
-  await prisma.course.create({ data: {
-    id: 'neu.edu/202030/CS/3500',
-    host: 'neu.edu',
-    classId: '3500',
-    name: 'Object-Oriented Design',
-    termId: '202030',
-    subject: 'CS',
-  }});
+  await prisma.course.create({
+    data: {
+      id: 'neu.edu/202030/CS/3500',
+      host: 'neu.edu',
+      classId: '3500',
+      name: 'Object-Oriented Design',
+      termId: '202030',
+      subject: 'CS',
+    },
+  });
 
-  await prisma.section.create({ data: {
-    id: 'neu.edu/202030/CS/2500/19350',
-    course: { connect: { id: 'neu.edu/202030/CS/2500' } },
-    seatsCapacity: 80,
-    seatsRemaining: 0,
-  }});
+  await prisma.section.create({
+    data: {
+      id: 'neu.edu/202030/CS/2500/19350',
+      course: { connect: { id: 'neu.edu/202030/CS/2500' } },
+      seatsCapacity: 80,
+      seatsRemaining: 0,
+    },
+  });
 
-  await prisma.section.create({ data: {
-    id: 'neu.edu/202030/CS/2500/19360',
-    course: { connect: { id: 'neu.edu/202030/CS/2500' } },
-    seatsCapacity: 80,
-    seatsRemaining: 5,
-  }});
+  await prisma.section.create({
+    data: {
+      id: 'neu.edu/202030/CS/2500/19360',
+      course: { connect: { id: 'neu.edu/202030/CS/2500' } },
+      seatsCapacity: 80,
+      seatsRemaining: 5,
+    },
+  });
 
-  await prisma.section.create({ data: {
-    id: 'neu.edu/202030/CS/3500/20350',
-    course: { connect: { id: 'neu.edu/202030/CS/3500' } },
-    seatsCapacity: 100,
-    seatsRemaining: 0,
-  }});
+  await prisma.section.create({
+    data: {
+      id: 'neu.edu/202030/CS/3500/20350',
+      course: { connect: { id: 'neu.edu/202030/CS/3500' } },
+      seatsCapacity: 100,
+      seatsRemaining: 0,
+    },
+  });
 
-  await prisma.user.create({ data: {
-    id: '123456789',
-    facebookPageId: '23456',
-    firstName: 'Wilbur',
-    lastName: 'Whateley',
-    loginKeys: { set: ['the key', 'the gate'] },
-  }});
+  await prisma.user.create({
+    data: {
+      id: '123456789',
+      facebookPageId: '23456',
+      firstName: 'Wilbur',
+      lastName: 'Whateley',
+      loginKeys: { set: ['the key', 'the gate'] },
+    },
+  });
 
-  await prisma.followedSection.create({ data: {
-    user: { connect: { id: '123456789' } },
-    section: { connect: { id: 'neu.edu/202030/CS/2500/19350' } },
-  }});
+  await prisma.followedSection.create({
+    data: {
+      user: { connect: { id: '123456789' } },
+      section: { connect: { id: 'neu.edu/202030/CS/2500/19350' } },
+    },
+  });
 
-  await prisma.followedCourse.create({ data: {
-    user: { connect: { id: '123456789' } },
-    course: { connect: { id: 'neu.edu/202030/CS/3500' } },
-  }});
+  await prisma.followedCourse.create({
+    data: {
+      user: { connect: { id: '123456789' } },
+      course: { connect: { id: 'neu.edu/202030/CS/3500' } },
+    },
+  });
 });
 
 afterAll(async () => {

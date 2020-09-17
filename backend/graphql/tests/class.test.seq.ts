@@ -16,25 +16,29 @@ beforeAll(async () => {
 
   await prisma.section.deleteMany({});
   await prisma.course.deleteMany({});
-  await prisma.course.create({ data: {
-    id: 'neu.edu/201930/CS/2500',
-    host: 'neu.edu',
-    termId: '201930',
-    subject: 'CS',
-    classId: '2500',
-    name: 'Fundamentals of Computer Science 1',
-    lastUpdateTime: new Date(),
-  }});
+  await prisma.course.create({
+    data: {
+      id: 'neu.edu/201930/CS/2500',
+      host: 'neu.edu',
+      termId: '201930',
+      subject: 'CS',
+      classId: '2500',
+      name: 'Fundamentals of Computer Science 1',
+      lastUpdateTime: new Date(),
+    },
+  });
 
-  await prisma.course.create({ data: {
-    id: 'neu.edu/201830/CS/2500',
-    host: 'neu.edu',
-    termId: '201830',
-    subject: 'CS',
-    classId: '2500',
-    name: 'Fundamentals of Computer Science 1',
-    lastUpdateTime: new Date(),
-  }});
+  await prisma.course.create({
+    data: {
+      id: 'neu.edu/201830/CS/2500',
+      host: 'neu.edu',
+      termId: '201830',
+      subject: 'CS',
+      classId: '2500',
+      name: 'Fundamentals of Computer Science 1',
+      lastUpdateTime: new Date(),
+    },
+  });
 });
 
 afterAll(async () => {

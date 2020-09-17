@@ -1,4 +1,4 @@
-import { PrismaClient, InputJsonValue, CourseCreateInput } from '@prisma/client';
+import { PrismaClient, InputJsonValue } from '@prisma/client';
 import pMap from 'p-map';
 import _ from 'lodash';
 
@@ -46,7 +46,7 @@ function createEmptySection(sec: SectionType) {
       meetings: sec.meetings as unknown as InputJsonValue, // FIXME sus
       profs: { set: sec.profs },
       course: { connect: { id: Keys.getClassHash(sec) } },
-    }
+    },
   });
 }
 
@@ -58,27 +58,31 @@ function createStubUser(name: string) {
       firstName: name,
       lastName: name,
       loginKeys: { set: [] },
-    }
+    },
   });
 }
 
-// FIXME correct return value 
+// FIXME correct return value
 function createFollowedCourses(courseId: string, users: string[]): Promise<any> {
   return pMap(users, async (userId: string) => {
-    return prisma.followedCourse.create({ data: {
-      course: { connect: { id: courseId } },
-      user: { connect: { id: userId } },
-    }});
+    return prisma.followedCourse.create({
+      data: {
+        course: { connect: { id: courseId } },
+        user: { connect: { id: userId } },
+      },
+    });
   });
 }
 
-// FIXME correct return value 
+// FIXME correct return value
 function createFollowedSections(sectionId: string, users: string[]): Promise<any> {
   return pMap(users, async (userId: string) => {
-    return prisma.followedSection.create({ data: {
-      section: { connect: { id: sectionId } },
-      user: { connect: { id: userId } },
-    }});
+    return prisma.followedSection.create({
+      data: {
+        section: { connect: { id: sectionId } },
+        user: { connect: { id: userId } },
+      },
+    });
   });
 }
 
@@ -318,7 +322,7 @@ describe('Updater', () => {
     });
 
     it('WORKS', async () => {
-      jest.spyOn(dumpProcessor, 'main').mockImplementation(() => {});
+      jest.spyOn(dumpProcessor, 'main').mockImplementation(async () => {});
       jest.spyOn(termParser, 'parseSections').mockImplementation(() => {
         return [
           FUNDIES_ONE_S1,
@@ -346,7 +350,7 @@ describe('Updater', () => {
     });
 
     it('does not send unnecessary messages', async () => {
-      jest.spyOn(dumpProcessor, 'main').mockImplementation(() => {});
+      jest.spyOn(dumpProcessor, 'main').mockImplementation(async () => {});
       jest.spyOn(termParser, 'parseSections').mockImplementation(() => {
         return [
           PL_S1,
@@ -361,7 +365,7 @@ describe('Updater', () => {
     });
 
     it('does not send messages if scraped classes do not match with followed terms', async () => {
-      jest.spyOn(dumpProcessor, 'main').mockImplementation(() => {});
+      jest.spyOn(dumpProcessor, 'main').mockImplementation(async () => {});
       jest.spyOn(termParser, 'parseSections').mockImplementation(() => {
         return [
           { ...FUNDIES_ONE_S2, termId: '202110' },
@@ -379,7 +383,7 @@ describe('Updater', () => {
 
     it('does not try to send messages to users associated with a class not being followed', async () => {
       await createEmptySection(FUNDIES_TWO_S3);
-      jest.spyOn(dumpProcessor, 'main').mockImplementation(() => {});
+      jest.spyOn(dumpProcessor, 'main').mockImplementation(async () => {});
       jest.spyOn(termParser, 'parseSections').mockImplementation(() => {
         return [
           FUNDIES_ONE_S2,

@@ -8,7 +8,6 @@ import _ from 'lodash';
 
 
 class Database {
-
   // key is the primaryKey (id, facebookMessengerId) of the user
   // value is any updated columns plus all watchingSections and watchingClasses
   async set(key, value) {
@@ -45,8 +44,8 @@ class Database {
       return null;
     }
 
-    const watchingSections = (await prisma.followedSection.findMany({ where: { userId: user.id }, select: { sectionId: true } })).map(section => section.sectionId);
-    const watchingClasses = (await prisma.followedCourse.findMany({ where: { userId: user.id }, select: { courseId: true } })).map(course => course.courseId);
+    const watchingSections = (await prisma.followedSection.findMany({ where: { userId: user.id }, select: { sectionId: true } })).map((section) => section.sectionId);
+    const watchingClasses = (await prisma.followedCourse.findMany({ where: { userId: user.id }, select: { courseId: true } })).map((course) => course.courseId);
 
     await prisma.$disconnect();
 
