@@ -6,8 +6,9 @@ import pMap from 'p-map';
 import fs from 'fs-extra';
 import _ from 'lodash';
 import path from 'path';
+import prisma from './prisma';
 import {
-  PrismaClient, ProfessorCreateInput, CourseCreateInput, SectionCreateInput,
+  ProfessorCreateInput, CourseCreateInput, SectionCreateInput,
 } from '@prisma/client';
 import Keys from '../common/Keys';
 import macros from './macros';
@@ -102,10 +103,7 @@ class DumpProcessor {
 
     const sectionCols = ['class_hash', 'class_type', 'crn', 'honors', 'id', 'info', 'meetings', 'online', 'profs', 'seats_capacity', 'seats_remaining', 'url', 'wait_capacity', 'wait_remaining'];
 
-    const prisma = new PrismaClient();
     const coveredTerms: Set<string> = new Set();
-    let currTime = (new Date()).getTime();
-    let newTime;
 
     await Promise.all(_.chunk(Object.values(profDump), 2000).map(async (profs) => {
       await prisma.$executeRaw(this.bulkUpsert('professors', profCols, profTransforms, profs));
@@ -120,7 +118,7 @@ class DumpProcessor {
     console.log('finished with courses');
 
     await Promise.all(_.chunk(Object.values(termDump.sections), 2000).map(async (sections) => {
-      await prisma.$executeRaw(this.bulkUpsert('sections', sectionCols, sectionTransforms, sections));
+      await prisma.$executeRaw(this.bulkUpsert('sections', sectionCols, sectionTransforms, sections.map((s) => this.constituteSection(s))));
     }));
 
     console.log('finished with sections');
@@ -170,7 +168,7 @@ class DumpProcessor {
   }
 
   dateTransform(val: Maybe<any>, kind: string, transforms: Record<string, Function>): string {
-    return val ? `to_timestamp(${val.getTime()/1000})` : `now()`;
+    return val ? `to_timestamp(${val/1000})` : `now()`;
   }
 
   boolTransform(val: Maybe<any>, kind: string, transforms: Record<string, Function>): string {
@@ -207,6 +205,11 @@ class DumpProcessor {
 
   processSection(secInfo: any): SectionCreateInput {
     const additionalProps = { id: `${Keys.getSectionHash(secInfo)}`, classHash: Keys.getClassHash(secInfo), profs: { set: secInfo.profs || [] } };
+    return _.omit({ ...secInfo, ...additionalProps }, ['classId', 'termId', 'subject', 'host']) as SectionCreateInput;
+  }
+
+  constituteSection(secInfo: any): SectionCreateInput {
+    const additionalProps = { id: `${Keys.getSectionHash(secInfo)}`, classHash: Keys.getClassHash(secInfo) };
     return _.omit({ ...secInfo, ...additionalProps }, ['classId', 'termId', 'subject', 'host']) as SectionCreateInput;
   }
 

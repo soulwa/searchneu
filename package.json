@@ -123,6 +123,7 @@
     "mockdate": "^2.0.1",
     "moment": "^2.19.3",
     "msgpack5": "^4.0.0",
+    "node-graceful-shutdown": "^1.0.5",
     "node-notifier": "^5.2.1",
     "object-hash": "^1.1.7",
     "p-map": "^3.0.0",
@@ -225,6 +226,9 @@
     ],
     "setupFiles": [
       "./common/jestSetupFile.js"
+    ],
+    "setupFilesAfterEnv": [
+      "<rootDir>/common/teardown.ts"
     ],
     "moduleFileExtensions": [
       "js",

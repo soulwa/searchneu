@@ -3,14 +3,10 @@
  * See the license file in the root folder for details.
  */
 
-import { PrismaClient } from '@prisma/client';
 import _ from 'lodash';
+import prisma from '../../prisma';
 
 class CourseSerializer {
-  constructor() {
-    this.prisma = new PrismaClient();
-  }
-
   // FIXME this pattern is bad
   async bulkSerialize(instances, all=false) {
     const courses = instances.map((course) => { return this.serializeCourse(course); });
@@ -18,9 +14,9 @@ class CourseSerializer {
     let sections;
 
     if (all) {
-      sections = await this.prisma.section.findMany();
+      sections = await prisma.section.findMany();
     } else {
-      sections = await this.prisma.section.findMany({
+      sections = await prisma.section.findMany({
         where: {
           classHash: { in: instances.slice(0, 100).map((instance) => instance.id) },
         },

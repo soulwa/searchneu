@@ -1,6 +1,6 @@
 import fs from 'fs-extra';
 import path from 'path';
-import { PrismaClient } from '@prisma/client';
+import prisma from '../backend/prisma';
 
 interface Major {
   name: string;
@@ -19,8 +19,6 @@ function fetchData(filename: string): Record<any, any> {
 
 // migrate all majors in the directory to the DB
 function migrateData(majorDirectory: MajorJSON): void {
-  const prisma = new PrismaClient();
-
   Object.entries(majorDirectory).forEach(([termId, majors]) => {
     majors.forEach((m: Major) => {
       const majorObj = fetchData(m.major);
@@ -34,7 +32,7 @@ function migrateData(majorDirectory: MajorJSON): void {
           name: m.name,
           majorId: m.majorId,
         }
-      });
+      }).then(() => prisma.$disconnect());
     });
   });
 }

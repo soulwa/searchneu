@@ -2,7 +2,7 @@
  * This file is part of Search NEU and licensed under AGPL3.
  * See the license file in the root folder for details.
  */
-import { PrismaClient } from '@prisma/client';
+import prisma from '../../prisma';
 import HydrateCourseSerializer from './hydrateCourseSerializer';
 import HydrateProfSerializer from './hydrateProfSerializer';
 
@@ -14,8 +14,6 @@ class HydrateSerializer {
   }
 
   async bulkSerialize(instances) {
-    const prisma = new PrismaClient();
-
     const profs = instances.filter((instance) => { return instance._source.type === 'employee' });
     const courses = instances.filter((instance) => { return instance._source.type === 'class' });
 

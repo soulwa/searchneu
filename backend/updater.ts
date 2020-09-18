@@ -3,10 +3,10 @@
  * See the license file in the root folder for details.
  */
 
-import { PrismaClient } from '@prisma/client';
 import _ from 'lodash';
 
 import macros from './macros';
+import prisma from './prisma';
 import Keys from '../common/Keys';
 import notifyer from './notifyer';
 import dumpProcessor from './dumpProcessor';
@@ -55,8 +55,6 @@ class Updater {
 
   SEM_TO_UPDATE: string;
 
-  prisma: PrismaClient;
-
   static create() {
     return new this();
   }
@@ -66,7 +64,6 @@ class Updater {
     this.COURSE_MODEL = 'course';
     this.SECTION_MODEL = 'section';
     this.SEM_TO_UPDATE = '202110';
-    this.prisma = new PrismaClient();
   }
 
   // TODO must call this in server
@@ -153,22 +150,20 @@ class Updater {
       totalTime: totalTime,
       sent: notifications.length,
     });
-
-    await this.prisma.$disconnect();
   }
 
   // Return an Object of the list of users associated with what class or section they are following
   async modelToUserHash(modelName: ModelName): Promise<Record<string, string[]>> {
     const columnName = `${modelName}_id`;
     const pluralName = `${modelName}s`;
-    const dbResults = await this.prisma.$queryRaw(`SELECT ${columnName}, ARRAY_AGG("user_id") FROM followed_${pluralName} GROUP BY ${columnName}`);
+    const dbResults = await prisma.$queryRaw(`SELECT ${columnName}, ARRAY_AGG("user_id") FROM followed_${pluralName} GROUP BY ${columnName}`);
     return Object.assign({}, ...dbResults.map((res) => ({ [res[columnName]]: res.array_agg.sort() })));
   }
 
 
   // return a collection of data structures used for simplified querying of data
   async getOldData(classHashes: string[]): Promise<OldData> {
-    const oldDocs: Record<string, SerializedResult> = await (new HydrateCourseSerializer()).bulkSerialize(await this.prisma.course.findMany({ where: { id: { in: classHashes } } }));
+    const oldDocs: Record<string, SerializedResult> = await (new HydrateCourseSerializer()).bulkSerialize(await prisma.course.findMany({ where: { id: { in: classHashes } } }));
 
     const oldWatchedClasses: Record<string, CourseType> = {};
     for (const [classHash, doc] of Object.entries(oldDocs)) {
