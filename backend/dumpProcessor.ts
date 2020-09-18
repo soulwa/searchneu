@@ -107,17 +107,35 @@ class DumpProcessor {
     let currTime = (new Date()).getTime();
     let newTime;
 
-    await Promise.all(_.chunk(Object.values(profDump), 25).map(async (profs) => {
-      return prisma.$executeRaw(this.bulkUpsert('professors', profCols, profTransforms, profs));
+    // for (const profs of _.chunk(Object.values(profDump), 2)) {
+    //   await prisma.$executeRaw(this.bulkUpsert('professors', profCols, profTransforms, profs));
+    // }
+
+    await Promise.all(_.chunk(Object.values(profDump), 2000).map(async (profs) => {
+      await prisma.$executeRaw(this.bulkUpsert('professors', profCols, profTransforms, profs));
     }));
+
+    console.log('finished with profs');
+
+    // for (const courses of _.chunk(Object.values(termDump.classes), 2)) {
+    //   await prisma.$executeRaw(this.bulkUpsert('courses', courseCols, courseTransforms, courses.map((c) => this.processCourse(c))));
+    // }
 
     await Promise.all(_.chunk(Object.values(termDump.classes), 2000).map(async (courses) => {
-      return prisma.$executeRaw(this.bulkUpsert('courses', courseCols, courseTransforms, courses.map((c) => this.processCourse(c))));
+      await prisma.$executeRaw(this.bulkUpsert('courses', courseCols, courseTransforms, courses.map((c) => this.processCourse(c))));
     }));
 
-    await Promise.all(_.chunk(Object.values(termDump.sections), 2).map(async (sections) => {
-      return prisma.$executeRaw(this.bulkUpsert('sections', sectionCols, sectionTransforms, sections.map((c) => this.processSection(c))));
+    console.log('finished with courses');
+
+    // for (const sections of _.chunk(Object.values(termDump.sections), 2)) {
+    //   await prisma.$executeRaw(this.bulkUpsert('sections', sectionCols, sectionTransforms, sections.map((c) => this.processSection(c))));
+    // }
+
+    await Promise.all(_.chunk(Object.values(termDump.sections), 2000).map(async (sections) => {
+      await prisma.$executeRaw(this.bulkUpsert('sections', sectionCols, sectionTransforms, sections.map((c) => this.processSection(c))));
     }));
+
+    console.log('finished with sections');
 
     if (destroy) {
       await prisma.course.deleteMany({
@@ -128,8 +146,9 @@ class DumpProcessor {
       });
     }
 
+    console.log('finished cleaning up');
+
     await populateES();
-    await prisma.$disconnect();
   }
 
   bulkUpsert(tableName: string, columnNames: string[], valTransforms: Record<string, Function>, vals: any[]): any {
@@ -151,7 +170,7 @@ class DumpProcessor {
   }
 
   intTransform(val: Maybe<number>, kind: string, transforms: Record<string, Function>): string {
-    return val ? `${val}` : 'NULL';
+    return val || val === 0 ? `${val}` : 'NULL';
   }
 
   arrayTransform(val: Maybe<any[]>, kind: string, transforms: Record<string, Function>): string {
