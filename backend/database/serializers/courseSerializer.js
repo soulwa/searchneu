@@ -8,7 +8,7 @@ import _ from 'lodash';
 
 class CourseSerializer {
   constructor() {
-    this.prisma = new PrismaClient({ log: ['query', 'info', 'warn' ]});
+    this.prisma = new PrismaClient();
   }
 
   // FIXME this pattern is bad

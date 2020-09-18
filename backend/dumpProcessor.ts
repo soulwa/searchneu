@@ -107,32 +107,20 @@ class DumpProcessor {
     let currTime = (new Date()).getTime();
     let newTime;
 
-    // for (const profs of _.chunk(Object.values(profDump), 2)) {
-    //   await prisma.$executeRaw(this.bulkUpsert('professors', profCols, profTransforms, profs));
-    // }
-
     await Promise.all(_.chunk(Object.values(profDump), 2000).map(async (profs) => {
       await prisma.$executeRaw(this.bulkUpsert('professors', profCols, profTransforms, profs));
     }));
 
     console.log('finished with profs');
 
-    // for (const courses of _.chunk(Object.values(termDump.classes), 2)) {
-    //   await prisma.$executeRaw(this.bulkUpsert('courses', courseCols, courseTransforms, courses.map((c) => this.processCourse(c))));
-    // }
-
     await Promise.all(_.chunk(Object.values(termDump.classes), 2000).map(async (courses) => {
-      await prisma.$executeRaw(this.bulkUpsert('courses', courseCols, courseTransforms, courses.map((c) => this.processCourse(c))));
+      await prisma.$executeRaw(this.bulkUpsert('courses', courseCols, courseTransforms, courses));
     }));
 
     console.log('finished with courses');
 
-    // for (const sections of _.chunk(Object.values(termDump.sections), 2)) {
-    //   await prisma.$executeRaw(this.bulkUpsert('sections', sectionCols, sectionTransforms, sections.map((c) => this.processSection(c))));
-    // }
-
     await Promise.all(_.chunk(Object.values(termDump.sections), 2000).map(async (sections) => {
-      await prisma.$executeRaw(this.bulkUpsert('sections', sectionCols, sectionTransforms, sections.map((c) => this.processSection(c))));
+      await prisma.$executeRaw(this.bulkUpsert('sections', sectionCols, sectionTransforms, sections));
     }));
 
     console.log('finished with sections');
@@ -182,7 +170,7 @@ class DumpProcessor {
   }
 
   dateTransform(val: Maybe<any>, kind: string, transforms: Record<string, Function>): string {
-    return val ? `to_timestamp(${val/1000})` : `now()`;
+    return val ? `to_timestamp(${val.getTime()/1000})` : `now()`;
   }
 
   boolTransform(val: Maybe<any>, kind: string, transforms: Record<string, Function>): string {
@@ -202,14 +190,14 @@ class DumpProcessor {
       description: classInfo.desc,
       minCredits: Math.floor(classInfo.minCredits),
       maxCredits: Math.floor(classInfo.maxCredits),
-      lastUpdateTime: classInfo.lastUpdateTime,
+      lastUpdateTime: new Date(classInfo.lastUpdateTime),
     };
 
     const correctedQuery = {
       ...classInfo,
       ...additionalProps,
-      classAttributes: classInfo.classAttributes || [],
-      nupath: classInfo.nupath || [],
+      classAttributes: { set: classInfo.classAttributes || [] },
+      nupath: { set: classInfo.nupath || [] },
     };
 
     const { desc, ...finalCourse } = correctedQuery;
@@ -218,7 +206,7 @@ class DumpProcessor {
   }
 
   processSection(secInfo: any): SectionCreateInput {
-    const additionalProps = { id: `${Keys.getSectionHash(secInfo)}`, classHash: Keys.getClassHash(secInfo), profs: secInfo.profs || [] };
+    const additionalProps = { id: `${Keys.getSectionHash(secInfo)}`, classHash: Keys.getClassHash(secInfo), profs: { set: secInfo.profs || [] } };
     return _.omit({ ...secInfo, ...additionalProps }, ['classId', 'termId', 'subject', 'host']) as SectionCreateInput;
   }
 
