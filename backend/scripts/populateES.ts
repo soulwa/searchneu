@@ -12,7 +12,8 @@ import ElasticProfSerializer from '../database/serializers/elasticProfSerializer
 import macros from '../macros';
 
 export async function bulkUpsertCourses(courses: Course[]): Promise<void> {
-  const serializedCourses = await ((new ElasticCourseSerializer()).bulkSerialize(courses));
+  // FIXME this pattern is bad
+  const serializedCourses = await ((new ElasticCourseSerializer()).bulkSerialize(courses, true));
   return elastic.bulkIndexFromMap(elastic.CLASS_INDEX, serializedCourses);
 }
 
@@ -23,9 +24,17 @@ export async function bulkUpsertProfs(profs: Professor[]): Promise<void> {
 
 export async function populateES(): Promise<void> {
   const prisma = new PrismaClient();
-  await bulkUpsertCourses(await prisma.course.findMany());
-  await bulkUpsertProfs(await prisma.professor.findMany());
-  await prisma.$disconnect();
+  const [courses, professors] = await Promise.all([prisma.course.findMany(), prisma.professor.findMany()]);
+  console.log('querying for stuff');
+  console.log(await prisma.$queryRaw(`SELECT pid, query, state FROM pg_stat_activity WHERE state = 'active';`));
+  console.log('finished querying for said stuff');
+  // await prisma.$disconnect();
+  await Promise.all([bulkUpsertCourses(courses), bulkUpsertProfs(professors)]);
+  
+
+  // await bulkUpsertCourses(await prisma.course.findMany());
+  // await bulkUpsertProfs(await prisma.professor.findMany());
+  // await prisma.$disconnect();
 }
 
 if (require.main === module) {

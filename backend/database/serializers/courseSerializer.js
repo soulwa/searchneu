@@ -11,19 +11,20 @@ class CourseSerializer {
     this.prisma = new PrismaClient({ log: ['query', 'info', 'warn' ]});
   }
 
-  async bulkSerialize(instances) {
+  // FIXME this pattern is bad
+  async bulkSerialize(instances, all=false) {
     const courses = instances.map((course) => { return this.serializeCourse(course); });
 
-    try {
-      const sections = await this.prisma.section.findMany({
+    let sections;
+
+    if (all) {
+      sections = await this.prisma.section.findMany();
+    } else {
+      sections = await this.prisma.section.findMany({
         where: {
-          classHash: { in: instances.map((instance) => instance.id) },
+          classHash: { in: instances.slice(0, 100).map((instance) => instance.id) },
         },
       });
-    } catch (error) {
-      console.log(error);
-      this.prisma = new PrismaClient();
-      await this.prisma.user.count();
     }
 
     const classToSections = _.groupBy(sections, 'classHash');
