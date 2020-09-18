@@ -101,7 +101,7 @@ class Searcher {
 
   async initializeSubjects(): Promise<void> {
     if (!this.subjects) {
-      this.subjects = new Set((await this.prisma.$queryRaw('SELECT DISTINCT subject FROM courses;')).map((res) => res.subject));
+      this.subjects = new Set((await this.prisma.course.findMany({ select: { subject: true }, distinct: ['subject'] })).map((obj) => obj.subject));
     }
   }
 
