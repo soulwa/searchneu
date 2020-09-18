@@ -3,18 +3,14 @@
  * See the license file in the root folder for details.
  */
 
-import { PrismaClient } from '@prisma/client';
-
+import prisma from '../prisma';
 import dumpProcessor from '../dumpProcessor';
 import elastic from '../elastic';
-
-let prisma: PrismaClient;
 
 jest.spyOn(elastic, 'bulkIndexFromMap').mockResolvedValue(true);
 
 beforeAll(() => {
   dumpProcessor.CHUNK_SIZE = 2;
-  prisma = new PrismaClient();
 });
 
 beforeEach(async () => {
@@ -25,7 +21,6 @@ beforeEach(async () => {
 
 afterAll(async () => {
   jest.restoreAllMocks();
-  await prisma.$disconnect();
 });
 
 it('does not create records if dump is empty', async () => {

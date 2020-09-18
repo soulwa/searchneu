@@ -1,19 +1,14 @@
-import { PrismaClient, InputJsonValue } from '@prisma/client';
+import { InputJsonValue } from '@prisma/client';
 import pMap from 'p-map';
 import _ from 'lodash';
 
 import { Course as CourseType, Section as SectionType, Requisite } from '../types';
+import prisma from '../prisma';
 import Updater, { Notification } from '../updater';
 import Keys from '../../common/Keys';
 import notifyer from '../notifyer';
 import dumpProcessor from '../dumpProcessor';
 import termParser from '../scrapers/classes/parsersxe/termParser';
-
-let prisma: PrismaClient;
-
-beforeAll(() => {
-  prisma = new PrismaClient();
-});
 
 beforeEach(async () => {
   jest.clearAllMocks();
@@ -29,10 +24,6 @@ beforeEach(async () => {
 
 afterEach(async () => {
   jest.clearAllTimers();
-});
-
-afterAll(async () => {
-  await prisma.$disconnect();
 });
 
 function createEmptySection(sec: SectionType) {

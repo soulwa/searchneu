@@ -1,15 +1,11 @@
-import { PrismaClient } from '@prisma/client';
 import { createTestClient } from 'apollo-server-testing';
 import { gql } from 'apollo-server';
+import prisma from '../../prisma';
 import server from '../index';
 
 const { query } = createTestClient(server);
 
-let prisma: PrismaClient;
-
 beforeAll(async () => {
-  prisma = new PrismaClient();
-
   await prisma.major.deleteMany({});
 
   await prisma.major.create({
@@ -41,10 +37,6 @@ beforeAll(async () => {
       plansOfStudy: [{ years: [1000], id: '0' }],
     },
   });
-});
-
-afterAll(async () => {
-  await prisma.$disconnect();
 });
 
 it('gets major from majorId', async () => {

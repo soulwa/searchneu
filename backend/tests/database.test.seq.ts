@@ -1,11 +1,5 @@
-import { PrismaClient } from '@prisma/client';
+import prisma from '../prisma';
 import database from '../database';
-
-let prisma: PrismaClient;
-
-beforeAll(() => {
-  prisma = new PrismaClient();
-});
 
 beforeEach(async () => {
   await prisma.followedSection.deleteMany({});
@@ -97,10 +91,6 @@ beforeEach(async () => {
       course: { connect: { id: 'neu.edu/202030/CS/3500' } },
     },
   });
-});
-
-afterAll(async () => {
-  await prisma.$disconnect();
 });
 
 describe('set', () => {

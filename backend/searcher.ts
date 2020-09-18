@@ -3,8 +3,8 @@
  * See the license file in the root folder for details.
  */
 
-import { PrismaClient } from '@prisma/client';
 import _ from 'lodash';
+import prisma from './prisma';
 import elastic, { Elastic } from './elastic';
 import HydrateSerializer from './database/serializers/hydrateSerializer';
 import macros from './macros';
@@ -25,15 +25,12 @@ class Searcher {
 
   AGG_RES_SIZE: number;
 
-  prisma: PrismaClient;
-
   constructor() {
     this.elastic = elastic;
     this.subjects = null;
     this.filters = Searcher.generateFilters();
     this.aggFilters = _.pickBy<EsFilterStruct, EsAggFilterStruct>(this.filters, (f): f is EsAggFilterStruct => f.agg !== false);
     this.AGG_RES_SIZE = 1000;
-    this.prisma = new PrismaClient();
   }
 
   static generateFilters(): FilterPrelude {
@@ -101,7 +98,7 @@ class Searcher {
 
   async initializeSubjects(): Promise<void> {
     if (!this.subjects) {
-      this.subjects = new Set((await this.prisma.course.findMany({ select: { subject: true }, distinct: ['subject'] })).map((obj) => obj.subject));
+      this.subjects = new Set((await prisma.course.findMany({ select: { subject: true }, distinct: ['subject'] })).map((obj) => obj.subject));
     }
   }
 

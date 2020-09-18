@@ -3,17 +3,13 @@
  * See the license file in the root folder for details.
  */
 import { createTestClient } from 'apollo-server-testing';
-import { PrismaClient } from '@prisma/client';
 import { gql } from 'apollo-server';
+import prisma from '../../prisma';
 import server from '../index';
 
 const { query } = createTestClient(server);
 
-let prisma: PrismaClient;
-
 beforeAll(async () => {
-  prisma = new PrismaClient();
-
   await prisma.section.deleteMany({});
   await prisma.course.deleteMany({});
   await prisma.course.create({
@@ -39,10 +35,6 @@ beforeAll(async () => {
       lastUpdateTime: new Date(),
     },
   });
-});
-
-afterAll(async () => {
-  await prisma.$disconnect();
 });
 
 it('gets all occurrences', async () => {
