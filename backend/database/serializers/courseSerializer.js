@@ -8,7 +8,7 @@ import prisma from '../../prisma';
 
 class CourseSerializer {
   // FIXME this pattern is bad
-  async bulkSerialize(instances, all=false) {
+  async bulkSerialize(instances, all = false) {
     const courses = instances.map((course) => { return this.serializeCourse(course); });
 
     let sections;

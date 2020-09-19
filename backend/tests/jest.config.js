@@ -21,6 +21,6 @@ module.exports = {
   setupFiles: [
     '<rootDir>/regtests/jestSetupFile.js',
   ],
-  setupFilesAfterEnv: ["<rootDir>/common/teardown.ts"],
+  setupFilesAfterEnv: ['<rootDir>/common/teardown.ts'],
   testEnvironment: '<rootDir>/backend/tests/db_test_env.ts',
 };

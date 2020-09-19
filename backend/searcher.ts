@@ -261,15 +261,8 @@ class Searcher {
       output, resultCount, took, aggregations,
     } = await this.getSearchResults(query, termId, min, max, filters);
 
-    console.log('oof');
-    console.log(resultCount);
-    console.log(output);
-
     const startHydrate = Date.now();
     const results = await (new HydrateSerializer()).bulkSerialize(output);
-
-    console.log('jeez');
-    console.log(results);
 
     return {
       searchContent: results,
