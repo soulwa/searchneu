@@ -12,7 +12,7 @@ class Database {
   // value is any updated columns plus all watchingSections and watchingClasses
   async set(key, value) {
     // TODO probably broken . . . need a `set` somewhere? --> login keys?
-    const updatedUser = _.omit({ ...value, loginKeys: { set: value.loginKeys || [] } }, ['watchingClasses', 'watchingSections']);
+    const updatedUser = _.omit({ ...value, loginKeys: { set: value.loginKeys || [] } }, ['watchingClasses', 'watchingSections', 'facebookMessnegerId']);
     await prisma.user.upsert({
       where: { id: key },
       create: { id: key, ...updatedUser },
