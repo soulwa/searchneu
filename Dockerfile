@@ -9,6 +9,8 @@ RUN yarn install --frozen-lockfile
 COPY backend /app/backend
 COPY common /app/common
 COPY frontend /app/frontend
+COPY prisma /app/prisma
+RUN yarn db:refresh
 RUN yarn build
 
 # FROM node:12.16-alpine
