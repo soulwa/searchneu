@@ -2,14 +2,13 @@
  * This file is part of Search NEU and licensed under AGPL3.
  * See the license file in the root folder for details.  */
 
-import pMap from 'p-map';
 import fs from 'fs-extra';
 import _ from 'lodash';
 import path from 'path';
-import prisma from './prisma';
 import {
   ProfessorCreateInput, CourseCreateInput, SectionCreateInput,
 } from '@prisma/client';
+import prisma from './prisma';
 import Keys from '../common/Keys';
 import macros from './macros';
 import { populateES } from './scripts/populateES';
@@ -34,7 +33,7 @@ class DumpProcessor {
     destroy = false,
   }) {
     const profTransforms = {
-      big_picture_url: this.strTransform, 
+      big_picture_url: this.strTransform,
       email: this.strTransform,
       emails: this.arrayTransform,
       emails_contents: this.arrayStrTransform,
@@ -51,8 +50,8 @@ class DumpProcessor {
       primary_department: this.strTransform,
       primary_role: this.strTransform,
       street_address: this.strTransform,
-      url: this.strTransform
-    }
+      url: this.strTransform,
+    };
 
     const profCols = ['big_picture_url', 'email', 'emails', 'first_name', 'google_scholar_id', 'id', 'last_name', 'link', 'name', 'office_room', 'personal_site', 'phone', 'pic', 'primary_department', 'primary_role', 'street_address', 'url'];
 
@@ -109,19 +108,19 @@ class DumpProcessor {
       await prisma.$executeRaw(this.bulkUpsert('professors', profCols, profTransforms, profs));
     }));
 
-    console.log('finished with profs');
+    macros.log('finished with profs');
 
     await Promise.all(_.chunk(Object.values(termDump.classes), 2000).map(async (courses) => {
-      await prisma.$executeRaw(this.bulkUpsert('courses', courseCols, courseTransforms, courses));
+      await prisma.$executeRaw(this.bulkUpsert('courses', courseCols, courseTransforms, courses.map((c) => this.constituteCourse(c, coveredTerms))));
     }));
 
-    console.log('finished with courses');
+    macros.log('finished with courses');
 
     await Promise.all(_.chunk(Object.values(termDump.sections), 2000).map(async (sections) => {
       await prisma.$executeRaw(this.bulkUpsert('sections', sectionCols, sectionTransforms, sections.map((s) => this.constituteSection(s))));
     }));
 
-    console.log('finished with sections');
+    macros.log('finished with sections');
 
     if (destroy) {
       await prisma.course.deleteMany({
@@ -132,7 +131,7 @@ class DumpProcessor {
       });
     }
 
-    console.log('finished cleaning up');
+    macros.log('finished cleaning up');
 
     await populateES();
   }
@@ -140,13 +139,14 @@ class DumpProcessor {
   bulkUpsert(tableName: string, columnNames: string[], valTransforms: Record<string, Function>, vals: any[]): any {
     let query = `INSERT INTO ${tableName} (${columnNames.join(',')}) VALUES `;
     query += vals.map((val) => {
+      console.log(val);
       return `(${columnNames.map((c) => valTransforms[c](val[this.toCamelCase(c)], c, valTransforms)).join(',')})`;
     }).join(',');
 
     query += ` ON CONFLICT (id) DO UPDATE SET ${columnNames.map((c) => `${c} = excluded.${c}`).join(',')} WHERE ${tableName}.id = excluded.id;`;
     return query;
   }
-  
+
   strTransform(val: Maybe<string>, kind: string, transforms: Record<string, Function>): string {
     return val ? `'${val.replace(/'/g, "''")}'` : `''`;
   }
@@ -168,7 +168,7 @@ class DumpProcessor {
   }
 
   dateTransform(val: Maybe<any>, kind: string, transforms: Record<string, Function>): string {
-    return val ? `to_timestamp(${val/1000})` : `now()`;
+    return val ? `to_timestamp(${val / 1000})` : `now()`;
   }
 
   boolTransform(val: Maybe<any>, kind: string, transforms: Record<string, Function>): string {
@@ -196,6 +196,28 @@ class DumpProcessor {
       ...additionalProps,
       classAttributes: { set: classInfo.classAttributes || [] },
       nupath: { set: classInfo.nupath || [] },
+    };
+
+    const { desc, ...finalCourse } = correctedQuery;
+
+    return finalCourse;
+  }
+
+  constituteCourse(classInfo: any, coveredTerms: Set<string> = new Set()): CourseCreateInput {
+    coveredTerms.add(classInfo.termId);
+
+    const additionalProps = {
+      id: `${Keys.getClassHash(classInfo)}`,
+      description: classInfo.desc,
+      minCredits: Math.floor(classInfo.minCredits),
+      maxCredits: Math.floor(classInfo.maxCredits),
+    };
+
+    const correctedQuery = {
+      ...classInfo,
+      ...additionalProps,
+      classAttributes: classInfo.classAttributes || [],
+      nupath: classInfo.nupath || [],
     };
 
     const { desc, ...finalCourse } = correctedQuery;
