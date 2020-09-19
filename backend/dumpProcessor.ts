@@ -139,7 +139,6 @@ class DumpProcessor {
   bulkUpsert(tableName: string, columnNames: string[], valTransforms: Record<string, Function>, vals: any[]): any {
     let query = `INSERT INTO ${tableName} (${columnNames.join(',')}) VALUES `;
     query += vals.map((val) => {
-      console.log(val);
       return `(${columnNames.map((c) => valTransforms[c](val[this.toCamelCase(c)], c, valTransforms)).join(',')})`;
     }).join(',');
 
@@ -147,31 +146,31 @@ class DumpProcessor {
     return query;
   }
 
-  strTransform(val: Maybe<string>, kind: string, transforms: Record<string, Function>): string {
-    return val ? `'${val.replace(/'/g, "''")}'` : `''`;
+  strTransform(val: Maybe<string>): string {
+    return val ? `'${val.replace(/'/g, "''")}'` : '\'\'';
   }
 
-  arrayStrTransform(val: Maybe<string>, kind: string, transforms: Record<string, Function>): string {
-    return val ? `"${val}"` : `''`;
+  arrayStrTransform(val: Maybe<string>): string {
+    return val ? `"${val}"` : '\'\'';
   }
 
-  intTransform(val: Maybe<number>, kind: string, transforms: Record<string, Function>): string {
+  intTransform(val: Maybe<number>): string {
     return val || val === 0 ? `${val}` : 'NULL';
   }
 
   arrayTransform(val: Maybe<any[]>, kind: string, transforms: Record<string, Function>): string {
-    return val && val.length !== 0 ? `'{${val.map((v) => transforms[`${kind}_contents`](v, `${kind}_contents`, transforms)).join(',')}}'` : `array[]::text[]`;
+    return val && val.length !== 0 ? `'{${val.map((v) => transforms[`${kind}_contents`](v, `${kind}_contents`, transforms)).join(',')}}'` : 'array[]::text[]';
   }
 
-  jsonTransform(val: Maybe<any>, kind: string, transforms: Record<string, Function>): string {
-    return val ? `'${JSON.stringify(val)}'` : `'{}'`;
+  jsonTransform(val: Maybe<any>): string {
+    return val ? `'${JSON.stringify(val)}'` : '\'{}\'';
   }
 
-  dateTransform(val: Maybe<any>, kind: string, transforms: Record<string, Function>): string {
-    return val ? `to_timestamp(${val / 1000})` : `now()`;
+  dateTransform(val: Maybe<any>): string {
+    return val ? `to_timestamp(${val / 1000})` : 'now()';
   }
 
-  boolTransform(val: Maybe<any>, kind: string, transforms: Record<string, Function>): string {
+  boolTransform(val: Maybe<any>): string {
     return val ? 'TRUE' : 'FALSE';
   }
 
