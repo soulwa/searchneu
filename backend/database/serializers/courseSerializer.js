@@ -50,6 +50,7 @@ class CourseSerializer {
   serializeCourse(course) {
     // TODO unclear what type Prisma will return for lastUpdateTime
     course.lastUpdateTime = course.lastUpdateTime.getTime();
+    course.desc = course.description;
     return this.finishCourseObj(course);
   }
 
