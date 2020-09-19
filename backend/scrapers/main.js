@@ -30,7 +30,7 @@ class Main {
 const instance = new Main();
 
 if (require.main === module) {
-  instance.main().then((_) => prisma.$disconnect());
+  instance.main().then(() => prisma.$disconnect());
 }
 
 export default instance;
