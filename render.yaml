@@ -108,7 +108,7 @@ services:
 databases:
   - name: postgres
     region: oregon
-    plan: starter
+    plan: standard
 
 envVarGroups:
 - name: secrets
