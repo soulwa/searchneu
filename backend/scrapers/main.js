@@ -7,9 +7,7 @@ import matchEmployees from './employees/matchEmployees';
 import macros from '../macros';
 import classes from './classes/main';
 import dumpProcessor from '../dumpProcessor';
-import {
-  Professor
-} from '../database/models/index';
+import prisma from '../prisma';
 
 
 // Main file for scraping
@@ -18,7 +16,6 @@ import {
 class Main {
   async main() {
     const classesPromise = classes.main(['neu']);
-    console.log(await Professor.findAll())
 
     const promises = [classesPromise, matchEmployees.main()];
 
@@ -33,7 +30,7 @@ class Main {
 const instance = new Main();
 
 if (require.main === module) {
-  instance.main();
+  instance.main().then(() => prisma.$disconnect());
 }
 
 export default instance;

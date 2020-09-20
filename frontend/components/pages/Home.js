@@ -105,7 +105,6 @@ export default function Home() {
               termId={ termId }
               onChange={ setTermId }
             />
-
             <div className={ cx({
               hitEnterToSearch: true,
               hitEnterToSearchVisible: searchFocused,
