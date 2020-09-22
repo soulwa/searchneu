@@ -252,10 +252,15 @@ class Searcher {
 
   async getOneSearchResult(subject: string, classId: string, termId: string) : Promise<SingleSearchResult> {
     const start = Date.now();
-    const result = await prisma.course.findOne({where: {uniqueCourseProps: {classId, subject, termId}}, include: {sections: true }});
+    const id = `neu.edu/${termId}/${subject.toUpperCase()}/${classId}`;
+    macros.log(`the id is ${id}`);
+    const result = await prisma.course.findOne({where: { id }, include: { sections: true }});
+    // {uniqueCourseProps: {classId, subject, termId}}, include: {sections: true }});
     macros.log(`Single search result: ${result}`);
     const serializer = new HydrateCourseSerializer();
-    return {results: serializer.bulkSerialize([result]), resultCount: 1, took: 0, hydrateDuration: Date.now() - start, aggregations: this.getSingleResultAggs(result)};
+    const results = await serializer.bulkSerialize([result]);
+    macros.log(`Serialized single result: ${results}`);
+    return {results, resultCount: 1, took: 0, hydrateDuration: Date.now() - start, aggregations: this.getSingleResultAggs(result)};
   }
 
    getSingleResultAggs(result: CourseWithSections ) : AggResults {
